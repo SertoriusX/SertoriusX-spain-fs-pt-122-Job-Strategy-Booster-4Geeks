@@ -39,7 +39,7 @@ const translations = {
         noData: "No se proporcionó información",
         downloadPDF: "Descargar PDF",
         language: "Idioma",
-    }
+    },
 };
 
 function Curriculums() {
@@ -61,7 +61,6 @@ function Curriculums() {
         training: "Google Cybersecurity Course - 168 hours",
         experience: "Assistant Analyst at INNOVACION APLICADA A LAS TI, S.L.",
         interests: "Computer science and programming, Sport",
-
     });
 
     const [image, setImage] = useState(null);
@@ -118,6 +117,7 @@ function Curriculums() {
 
         pdf.save("My-CV.pdf");
     };
+
     const renderInlineList = (text) => {
         if (!text) return <p>{t.noData}</p>;
         return (
@@ -130,7 +130,7 @@ function Curriculums() {
                             padding: "5px 10px",
                             borderRadius: "15px",
                             fontSize: "0.9rem",
-                            color: "white"
+                            color: "white",
                         }}
                     >
                         {item.trim()}
@@ -142,9 +142,8 @@ function Curriculums() {
 
     return (
         <>
-            <div className="containerr">
-
-                <div className="inputsCV">
+            <div className="container-center">
+                <div className="input-section">
                     <h1>{t.cvBuilder}</h1>
 
                     <input
@@ -256,32 +255,22 @@ function Curriculums() {
                 <hr style={{ margin: "30px 0" }} />
 
                 <div
-                    className="container1"
+                    className="page-wrapper"
                     ref={cvRef}
                     style={{ padding: 20, borderRadius: 10 }}
                 >
-                    <div className="container-cv" style={{ display: "flex", marginBottom: 20 }}>
-                        <div
-                            className="imgs"
-                            style={{ flex: "0 0 150px", marginRight: 20 }}
-                        >
+                    <div className="cv-header">
+                        <div className="profile-image-wrapper">
                             <img
-                                className="img-f"
+                                className="profile-image"
                                 src={image || "https://via.placeholder.com/150"}
                                 alt="Profile"
-                                style={{
-                                    width: 150,
-                                    height: 150,
-                                    borderRadius: "50%",
-                                    border: "5px solid orange",
-                                    objectFit: "cover",
-                                }}
                             />
                         </div>
 
-                        <div className="title" style={{ flex: 1 }}>
+                        <div className="title-section">
                             <h1 style={{ marginBottom: 10 }}>{data.name || t.name}</h1>
-                            <div className="title-f">
+                            <div className="title-flex">
                                 <h5>{data.email || t.email}</h5>
                                 <h5>{data.phone || t.phone}</h5>
                                 <h5>{data.location || t.location}</h5>
@@ -289,44 +278,41 @@ function Curriculums() {
                         </div>
                     </div>
 
-                    <div className="container2" style={{ display: "flex" }}>
-                        <div
-                            className="strength"
-                            style={{ flex: "0 0 35%", paddingRight: 20 }}
-                        >
+                    <div className="content-columns">
+                        <div className="skill-section">
                             <h1>{t.strengths}</h1>
-                            <hr className="smalleHr" />
+                            <hr className="small-divider" />
                             {renderInlineList(data.strength)}
 
                             <h1>{t.skills}</h1>
-                            <hr className="smalleHr" />
+                            <hr className="small-divider" />
                             {renderInlineList(data.skills)}
 
                             <h1>{t.languages}</h1>
-                            <hr className="smalleHr" />
+                            <hr className="small-divider" />
                             {renderInlineList(data.languages)}
 
                             <h1>{t.interests}</h1>
-                            <hr className="smalleHr" />
+                            <hr className="small-divider" />
                             {renderInlineList(data.interests)}
                         </div>
 
-                        <div className="description" style={{ flex: 1 }}>
+                        <div className="description-section">
                             <h1>{t.aboutMe}</h1>
-                            <hr className="largeHr" />
-                            <p className="p-desing">{data.about}</p>
+                            <hr className="large-divider" />
+                            <p className="paragraph-design">{data.about}</p>
 
                             <h1>{t.education}</h1>
-                            <hr className="largeHr" />
-                            <p className="p-desing">{data.education}</p>
+                            <hr className="large-divider" />
+                            <p className="paragraph-design">{data.education}</p>
 
                             <h1>{t.training}</h1>
-                            <hr className="largeHr" />
-                            <p className="p-desing">{data.training}</p>
+                            <hr className="large-divider" />
+                            <p className="paragraph-design">{data.training}</p>
 
                             <h1>{t.experience}</h1>
-                            <hr className="largeHr" />
-                            <p className="p-desing">{data.experience}</p>
+                            <hr className="large-divider" />
+                            <p className="paragraph-design">{data.experience}</p>
                         </div>
                     </div>
                 </div>
