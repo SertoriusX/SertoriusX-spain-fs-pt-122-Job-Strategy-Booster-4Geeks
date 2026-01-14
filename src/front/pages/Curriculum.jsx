@@ -280,37 +280,37 @@ function Curriculums() {
 
                     <div className="content-columns">
                         <div className="skill-section">
-                            <h1>{t.strengths}</h1>
+                            <h2>{t.strengths}</h2>
                             <hr className="small-divider" />
                             {renderInlineList(data.strength)}
 
-                            <h1>{t.skills}</h1>
+                            <h2>{t.skills}</h2>
                             <hr className="small-divider" />
                             {renderInlineList(data.skills)}
 
-                            <h1>{t.languages}</h1>
+                            <h2>{t.languages}</h2>
                             <hr className="small-divider" />
                             {renderInlineList(data.languages)}
 
-                            <h1>{t.interests}</h1>
+                            <h2>{t.interests}</h2>
                             <hr className="small-divider" />
                             {renderInlineList(data.interests)}
                         </div>
 
                         <div className="description-section">
-                            <h1>{t.aboutMe}</h1>
+                            <h2>{t.aboutMe}</h2>
                             <hr className="large-divider" />
                             <p className="paragraph-design">{data.about}</p>
 
-                            <h1>{t.education}</h1>
+                            <h2>{t.education}</h2>
                             <hr className="large-divider" />
                             <p className="paragraph-design">{data.education}</p>
 
-                            <h1>{t.training}</h1>
+                            <h2>{t.training}</h2>
                             <hr className="large-divider" />
                             <p className="paragraph-design">{data.training}</p>
 
-                            <h1>{t.experience}</h1>
+                            <h2>{t.experience}</h2>
                             <hr className="large-divider" />
                             <p className="paragraph-design">{data.experience}</p>
                         </div>
