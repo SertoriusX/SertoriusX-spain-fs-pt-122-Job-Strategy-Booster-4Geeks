@@ -31,7 +31,10 @@ function HomePage() {
 
 			<div className="widgets">
 				<div className="grafica">
-					<h3>Actividad del mes</h3>
+					<div className="title">
+						<h3>Actividad</h3>
+						<p>Semanal</p>
+					</div>
 					<GraficoDinamico />
 				</div>
 				<div className="remainders"></div>
