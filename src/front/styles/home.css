@@ -10,9 +10,9 @@
   display: flex;
   width: 100%;
   flex-direction: column;
-  height: 100vh;
-  overflow: scroll;
+  height: auto;
   gap: 10px;
+
 }
 
 /* ---------- HEADER HOME STYLES ---------- */
