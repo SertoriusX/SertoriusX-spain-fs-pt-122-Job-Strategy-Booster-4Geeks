@@ -1,0 +1,18 @@
+:root {
+  --back-color: #ffffff;
+  --card-color: #d9d9d9;
+  --font-color: #1b1b1b;
+  --ligther-font-color: #6f6f6f;
+  --main-color: #2b4eeb;
+}
+
+.main_container {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  background-color: var(--card-color);
+  padding: 10px;
+}
+.display_component {
+  width: 100%;
+}

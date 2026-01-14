@@ -1,52 +1,45 @@
-import React, { useEffect } from "react"
-import rigoImageUrl from "../assets/img/rigo-baby.jpg";
-import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
+import { faBell, faSuitcase, faUserTie, faEnvelopesBulk, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export const Home = () => {
+import "../styles/home.css";
+import HomeStatisticsCard from "../Components/HomeStatisticsCard";
+import GraficoDinamico from "../components/GraphicComponent";
 
-	const { store, dispatch } = useGlobalReducer()
-
-	const loadMessage = async () => {
-		try {
-			const backendUrl = import.meta.env.VITE_BACKEND_URL
-
-			if (!backendUrl) throw new Error("VITE_BACKEND_URL is not defined in .env file")
-
-			const response = await fetch(backendUrl + "/api/hello")
-			const data = await response.json()
-
-			if (response.ok) dispatch({ type: "set_hello", payload: data.message })
-
-			return data
-
-		} catch (error) {
-			if (error.message) throw new Error(
-				`Could not fetch the message from the backend.
-				Please check if the backend is running and the backend port is public.`
-			);
-		}
-
-	}
-
-	useEffect(() => {
-		loadMessage()
-	}, [])
-
+function HomePage() {
 	return (
-		<div className="text-center mt-5">
-			<h1 className="display-4">Hello Rigo!!</h1>
-			<p className="lead">
-				<img src={rigoImageUrl} className="img-fluid rounded-circle mb-3" alt="Rigo Baby" />
-			</p>
-			<div className="alert alert-info">
-				{store.message ? (
-					<span>{store.message}</span>
-				) : (
-					<span className="text-danger">
-						Loading message from the backend (make sure your python 🐍 backend is running)...
-					</span>
-				)}
+		<div className="home_display">
+
+			<div className="header_bar">
+				<FontAwesomeIcon className="notification_icon" icon={faBell} />
+
+				<div className="user_data">
+					<div className="user_personal_information">
+						<h3>Nombre del usuario</h3>
+						<p>correodelusuario@gmailcom</p>
+					</div>
+
+					<div className="user_picture"></div>
+				</div>
+			</div>
+
+			<div className="statistics_container">
+				<HomeStatisticsCard title={'Postulaciones'} quantity={10} date={'12/01/2026'} icon={faSuitcase} />
+				<HomeStatisticsCard title={'Entrevistas'} quantity={5} date={'12/01/2026'} icon={faUserTie} />
+				<HomeStatisticsCard title={'Ofertas'} quantity={0} date={'12/01/2026'} icon={faEnvelopesBulk} />
+				<HomeStatisticsCard title={'Descartado'} quantity={0} date={'12/01/2026'} icon={faCircleXmark} />
+			</div>
+
+			<div className="widgets">
+				<div className="grafica">
+					<h3>Actividad del mes</h3>
+					<GraficoDinamico />
+				</div>
+				<div className="remainders"></div>
+				<div className="calendar"></div>
+				<div className="todo_list"></div>
 			</div>
 		</div>
 	);
-}; 
+}
+
+export default HomePage;
