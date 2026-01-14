@@ -11,6 +11,7 @@
   width: 100%;
   flex-direction: column;
   gap: 10px;
+  border: 2px solid black;
 }
 
 /* ---------- HEADER HOME STYLES ---------- */
@@ -32,6 +33,7 @@
 .header_bar .user_data {
   display: flex;
   align-items: center;
+  border: 2px solid black;
 
   .user_personal_information h3 {
     font-size: 16px;

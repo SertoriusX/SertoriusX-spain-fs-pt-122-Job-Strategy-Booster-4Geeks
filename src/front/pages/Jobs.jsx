@@ -1,8 +1,7 @@
+import React from 'react'
 
-function Jobs() {
+export default function Jobs() {
     return (
-        <h1>Jobs</h1>
+        <div>Jobs</div>
     )
 }
-
-export default Jobs

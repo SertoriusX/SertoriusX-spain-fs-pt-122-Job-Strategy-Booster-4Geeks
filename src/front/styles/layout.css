@@ -13,7 +13,9 @@
   padding: 20px;
   box-sizing: border-box;
   background-color: var(--back-color);
-  border-radius: 10px;
+  border-radius: 10px;   
+   border: 2px solid blue;
+
 }
 
 .side_bar .header {

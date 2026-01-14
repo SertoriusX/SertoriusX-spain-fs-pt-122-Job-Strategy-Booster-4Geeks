@@ -25,8 +25,8 @@ function Sidebar() {
             <div className="nav_bar">
                 <h4>Menu</h4>
                 <div className="nav_bar_buttons">
-                    <NavBarButton icon={faHouse} label="Home" />
-                    <NavBarButton icon={faClipboardList} label="Postulaciones" />
+                    <NavBarButton icon={faHouse} label="Home" to="/" />
+                    <NavBarButton icon={faClipboardList} label="Postulaciones" to="/register" />
                     <NavBarButton icon={faBookBookmark} label="Curriculums" />
                     <NavBarButton icon={faHandshake} label="Entrevista" />
                 </div>

@@ -1,0 +1,14 @@
+.container{
+    display: flex;
+    border: 2px solid red;
+    margin-top: 5px;
+    justify-content: center;
+    border: 2px solid yellow;
+    
+}
+.left{
+    width: 30%;
+}
+.right{
+    width: 70%;
+}
