@@ -34,11 +34,11 @@ export default function Formulario() {
     };
 
     return (
-        <div className="container">
+        <div className="container-formulario">
             <div className="card">
 
                 <div className="header">
-                    <div className="icon">
+                    <div className="icon-formulario">
                         <span className="icon-text">📄</span>
                     </div>
                     <h1 className="title">Nueva Postulación</h1>
