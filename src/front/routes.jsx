@@ -12,10 +12,13 @@ import App from "./pages/App";
 import Curriculums from "./pages/Curriculum";
 import Interview from "./pages/Interview";
 import JobsDetail from "./pages/JobsDetail";
+import { useState } from "react";
+
 
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
+
     <Route path="/" element={<App />} errorElement={<h1>Not found!</h1>} >
       <Route index element={<HomePage />} />
       <Route path="jobs" element={<Jobs />} />
