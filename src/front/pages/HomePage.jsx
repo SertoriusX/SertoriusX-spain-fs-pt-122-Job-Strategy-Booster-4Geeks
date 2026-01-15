@@ -1,5 +1,4 @@
 import { faBell, faSuitcase, faUserTie, faEnvelopesBulk, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import "../styles/home.css";
 import HomeStatisticsCard from "../components/HomeStatisticsCard";
@@ -7,20 +6,8 @@ import GraficoDinamico from "../components/GraphicComponent";
 
 function HomePage() {
 	return (
-		<div className="home_display">
 
-			<div className="header_bar">
-				<FontAwesomeIcon className="notification_icon" icon={faBell} />
-
-				<div className="user_data">
-					<div className="user_personal_information">
-						<h3>Nombre del usuario</h3>
-						<p>correodelusuario@gmailcom</p>
-					</div>
-
-					<div className="user_picture"></div>
-				</div>
-			</div>
+		<>
 
 			<div className="statistics_container">
 				<HomeStatisticsCard title={'Postulaciones'} quantity={10} date={'12/01/2026'} icon={faSuitcase} />
@@ -41,7 +28,7 @@ function HomePage() {
 				<div className="calendar"></div>
 				<div className="todo_list"></div>
 			</div>
-		</div>
+		</>
 	);
 }
 

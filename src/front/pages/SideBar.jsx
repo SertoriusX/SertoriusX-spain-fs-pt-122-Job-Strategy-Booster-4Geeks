@@ -19,6 +19,7 @@ import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Sidebar() {
+
     const { token, logOut } = useContext(UserContext);
     const navigate = useNavigate();
 

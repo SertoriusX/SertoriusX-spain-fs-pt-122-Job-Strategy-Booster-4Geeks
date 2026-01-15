@@ -12,7 +12,6 @@
   flex-direction: column;
   height: auto;
   gap: 10px;
-
 }
 
 /* ---------- HEADER HOME STYLES ---------- */
@@ -24,7 +23,9 @@
   justify-content: flex-end;
   padding: 6px 10px;
   border-radius: 10px;
-
+  position: sticky;
+  top: 0px;
+  z-index: 1000;
   .notification_icon {
     margin-right: 15px;
     font-size: 25px;

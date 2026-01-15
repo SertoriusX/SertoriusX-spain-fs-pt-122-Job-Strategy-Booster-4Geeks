@@ -12,11 +12,8 @@
   width: 100%;
   background-color: var(--card-color);
   padding: 10px;
-    height: auto;
-
+  height: auto;
 }
 .display_component {
   width: 100%;
-  
-
 }
