@@ -5,9 +5,9 @@ import "../styles/app.css"
 
 export default function App() {
     return (
-        <div className='main_container'>
+        <div className="layout">
             <Sidebar />
-            <div className='display_component' >
+            <div className="content">
                 <Outlet />
             </div>
         </div>
