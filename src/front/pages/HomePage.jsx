@@ -2,7 +2,7 @@ import { faBell, faSuitcase, faUserTie, faEnvelopesBulk, faCircleXmark } from "@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import "../styles/home.css";
-import HomeStatisticsCard from "../Components/HomeStatisticsCard";
+import HomeStatisticsCard from "../components/HomeStatisticsCard";
 import GraficoDinamico from "../components/GraphicComponent";
 
 function HomePage() {
