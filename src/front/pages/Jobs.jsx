@@ -7,7 +7,7 @@ export default function Jobs() {
             <h1 className="custom-title">Jobs</h1>
 
             <div className="cards-grid">
-                {[1, 1, 1, 1, 1].map((card) => {
+                {[1].map((card) => {
                     return (
                         <JobCard />
                     )
