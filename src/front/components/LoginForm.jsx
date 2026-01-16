@@ -32,7 +32,7 @@ function LoginForm({ changeForm }) {
                 password: form.password,
             });
 
-            saveToken(response.data.access_token);
+            saveToken(response.data.access_token, response.data.user);
             navigate('/')
             setSuccess("Login successful!");
             setError(null);
