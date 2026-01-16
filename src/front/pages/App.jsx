@@ -5,33 +5,20 @@ import "../styles/app.css"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from "@fortawesome/free-solid-svg-icons";
 import { UserContext } from "../hooks/UserContextProvier.jsx";
+import Registration from './RegisterPage.jsx';
 
 
 export default function App() {
     const { token, user } = useContext(UserContext);
     return (
-
         <div className="main_container">
             {token && user && (<>
+                <Sidebar />
                 <div className="display_component">
-                    <Sidebar />
-                    <div className="home_display">
-                        <div className="header_bar">
-                            <FontAwesomeIcon className="notification_icon" icon={faBell} />
-
-                            <div className="user_data">
-                                <div className="user_personal_information">
-                                    <h3>Hello, {user.username}</h3>
-                                    <p>{user.email}</p>
-                                </div>
-
-                                <div className="user_picture"></div>
-                            </div>
-                        </div>
-                    </div>
+                    <Outlet />
                 </div>
             </>)}
-            <Outlet />
+            <Registration />
         </div>
     )
 }
