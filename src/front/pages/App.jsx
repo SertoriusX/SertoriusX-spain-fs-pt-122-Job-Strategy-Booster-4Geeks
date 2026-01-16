@@ -12,12 +12,10 @@ export default function App() {
     return (
 
         <div className="main_container">
-            <Sidebar />
-            <div className="display_component">
-
-
-                <div className="home_display">
-                    {token && user && (<>
+            {token && user && (<>
+                <div className="display_component">
+                    <Sidebar />
+                    <div className="home_display">
                         <div className="header_bar">
                             <FontAwesomeIcon className="notification_icon" icon={faBell} />
 
@@ -30,13 +28,10 @@ export default function App() {
                                 <div className="user_picture"></div>
                             </div>
                         </div>
-                    </>)}
-
-
-                    <Outlet />
+                    </div>
                 </div>
-
-            </div>
+            </>)}
+            <Outlet />
         </div>
     )
 }

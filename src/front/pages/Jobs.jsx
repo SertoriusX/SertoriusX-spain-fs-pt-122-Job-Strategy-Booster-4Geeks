@@ -2,7 +2,7 @@ import React from 'react'
 import '../styles/jobs.css'
 import JobCard from '../components/JobCard'
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function Jobs() {
 
@@ -18,6 +18,6 @@ export default function Jobs() {
                     )
                 })}
             </div>
-        </>
+        </div>
     );
 }

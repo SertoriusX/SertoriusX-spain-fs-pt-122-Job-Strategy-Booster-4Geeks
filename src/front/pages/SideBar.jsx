@@ -40,8 +40,6 @@ function Sidebar() {
                 <div className="nav_bar_buttons">
                     {token ? (
                         <>
-
-
                             <NavBarButton icon={faHouse} label="Home" to="/" />
                             <NavBarButton icon={faClipboardList} label="Postulaciones" to="/Jobs" />
                             <NavBarButton icon={faBookBookmark} label="Curriculums" to="/Curriculum" />
