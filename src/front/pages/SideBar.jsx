@@ -1,3 +1,4 @@
+import React, { useState, useContext } from "react";
 import NavBarButton from "../components/NavBarButton";
 import "../styles/navbar.css";
 
@@ -8,25 +9,38 @@ import {
     faHandshake,
     faGear,
     faCircleQuestion,
-    faRightFromBracket,
-    faUserPlus,
-    faRightToBracket,
-    faUser,
-    faFileLines
+    faFileLines,
 } from "@fortawesome/free-solid-svg-icons";
+
 import { UserContext } from "../hooks/UserContextProvier.jsx";
-import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import LoadingScreen from "../components/LoadingScreen"; // Adjust the path
 
 function Sidebar() {
-
-    const { token, logOut } = useContext(UserContext);
+    const [loading, setLoading] = useState(false);
+    const { logOut } = useContext(UserContext);
     const navigate = useNavigate();
 
-    const handleLogout = () => {
-        logOut();
-        navigate('/register');
+    const handleNavigation = (to) => {
+        setLoading(true);
+        setTimeout(() => {
+            setLoading(false);
+            navigate(to);
+        }, 1500);
     };
+
+    const handleLogout = () => {
+        setLoading(true);
+        setTimeout(() => {
+            logOut();
+            setLoading(false);
+            navigate("/register");
+        }, 1500);
+    };
+
+    if (loading) {
+        return <LoadingScreen />;
+    }
 
     return (
         <div className="side_bar">
@@ -38,21 +52,63 @@ function Sidebar() {
             <div className="nav_bar">
                 <h4>Menu</h4>
                 <div className="nav_bar_buttons">
-                    <NavBarButton icon={faHouse} label="Home" to="/" />
-                    <NavBarButton icon={faClipboardList} label="Postulaciones" to="/Jobs" />
-                    <NavBarButton icon={faBookBookmark} label="Curriculums" to="/Curriculum" />
-                    <NavBarButton icon={faHandshake} label="Entrevista" to="/Interview" />
-                    <NavBarButton icon={faFileLines} label="Formulario" to="/formulario" />
-                    <NavBarButton icon={faClipboardList} label="PostulacionesDetail" to="/jobId" />
+                    <NavBarButton
+                        icon={faHouse}
+                        label="Home"
+                        to="/"
+                        onClick={() => handleNavigation("/")}
+                    />
+                    <NavBarButton
+                        icon={faClipboardList}
+                        label="Postulaciones"
+                        to="/Jobs"
+                        onClick={() => handleNavigation("/Jobs")}
+                    />
+                    <NavBarButton
+                        icon={faBookBookmark}
+                        label="Curriculums"
+                        to="/Curriculum"
+                        onClick={() => handleNavigation("/Curriculum")}
+                    />
+                    <NavBarButton
+                        icon={faHandshake}
+                        label="Entrevista"
+                        to="/Interview"
+                        onClick={() => handleNavigation("/Interview")}
+                    />
+                    <NavBarButton
+                        icon={faFileLines}
+                        label="Formulario"
+                        to="/formulario"
+                        onClick={() => handleNavigation("/formulario")}
+                    />
+                    <NavBarButton
+                        icon={faClipboardList}
+                        label="PostulacionesDetail"
+                        to="/jobId"
+                        onClick={() => handleNavigation("/jobId")}
+                    />
                 </div>
             </div>
 
             <div className="general">
                 <h4>General</h4>
                 <div className="tools_buttons">
-                    <NavBarButton icon={faGear} label={"Ajustes"} />
-                    <NavBarButton icon={faCircleQuestion} label={"Ayuda"} />
-                    <button className="btn btn-secondary mt-2" onClick={handleLogout}> Logout</button>
+                    <NavBarButton
+                        icon={faGear}
+                        label={"Ajustes"}
+                        to="/settings"
+                        onClick={() => handleNavigation("/settings")}
+                    />
+                    <NavBarButton
+                        icon={faCircleQuestion}
+                        label={"Ayuda"}
+                        to="/help"
+                        onClick={() => handleNavigation("/help")}
+                    />
+                    <button className="btn btn-secondary mt-2" onClick={handleLogout}>
+                        Logout
+                    </button>
                 </div>
             </div>
         </div>

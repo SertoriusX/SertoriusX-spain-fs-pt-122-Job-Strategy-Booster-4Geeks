@@ -87,7 +87,9 @@
   border: 1px solid #d9d9d9;
   background: #f8f9fb;
   font-size: 14px;
-  transition: border 0.2s ease, background 0.2s ease;
+  transition:
+    border 0.2s ease,
+    background 0.2s ease;
   width: 100%;
 }
 
@@ -133,7 +135,9 @@
   background: #f8f9fb;
   font-size: 14px;
   cursor: pointer;
-  transition: background 0.2s ease, border 0.2s ease;
+  transition:
+    background 0.2s ease,
+    border 0.2s ease;
 }
 
 .cancel-exit:hover,
