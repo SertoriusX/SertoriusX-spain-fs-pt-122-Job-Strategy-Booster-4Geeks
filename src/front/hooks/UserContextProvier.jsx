@@ -5,6 +5,7 @@ export const UserContext = createContext();
 
 export default function UserContextProvider({ children }) {
     const [token, setToken] = useState(() => localStorage.getItem("token"));
+
     const [user, setUser] = useState(() => {
         const savedUser = localStorage.getItem("user");
         return savedUser ? JSON.parse(savedUser) : null;
@@ -16,6 +17,27 @@ export default function UserContextProvider({ children }) {
         setUser(newUser)
     };
 
+    const getInitialTheme = () => {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme) return savedTheme;
+
+
+        return window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+    };
+
+    const [theme, setTheme] = useState(getInitialTheme);
+
+    useEffect(() => {
+        document.documentElement.setAttribute("data-theme", theme);
+        localStorage.setItem("theme", theme);
+    }, [theme]);
+
+    const toggleTheme = () => {
+        setTheme((prev) => (prev === "light" ? "dark" : "light"));
+    };
+
     const logOut = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
@@ -25,7 +47,7 @@ export default function UserContextProvider({ children }) {
     };
 
     return (
-        <UserContext.Provider value={{ token, saveToken, logOut, user }}>
+        <UserContext.Provider value={{ token, saveToken, logOut, user, theme, toggleTheme }}>
             {children}
         </UserContext.Provider>
     );
