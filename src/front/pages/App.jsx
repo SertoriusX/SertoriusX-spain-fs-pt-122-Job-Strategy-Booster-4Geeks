@@ -20,8 +20,8 @@ export default function App() {
                 <Sidebar />
                 <div className="main_content">
                     <header className="header_bar">
-                        <FontAwesomeIcon className="notification_icon" icon={faBell} />
                         <div className="user_data">
+                            <FontAwesomeIcon className="notification_icon" icon={faBell} />
                             <div className="user_personal_information">
                                 <h3>Hello, {user.username}</h3>
                                 <p>{user.email}</p>
