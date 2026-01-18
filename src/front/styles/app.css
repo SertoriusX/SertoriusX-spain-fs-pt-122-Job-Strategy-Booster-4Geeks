@@ -33,16 +33,13 @@
 .main_content {
   display: flex;
   flex-direction: column;
-  height: auto;
+  height: 100vh;
   width: 100%;
+  overflow: scroll;
   gap: 10px;
 }
-.header_bar {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-.user_data {
+
+.header_bar .user_data {
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -51,29 +48,29 @@
   border-radius: 10px;
 
   background-color: var(--back-color);
-}
 
-.header_bar .user_data .user_personal_information h3 {
-  font-size: 16px;
-  margin: 0 10px;
-}
+  .user_personal_information h3 {
+    font-size: 16px;
+    margin: 0 10px;
+  }
 
-.header_bar .user_data .user_personal_information p {
-  font-size: 15px;
-  margin: 0 10px;
-}
+  .user_personal_information p {
+    font-size: 15px;
+    margin: 0 10px;
+  }
 
-.header_bar .user_data .notification_icon {
-  font-size: 25px;
-  margin-right: 10px;
-  cursor: pointer;
-}
+  .notification_icon {
+    font-size: 25px;
+    margin-right: 10px;
+    cursor: pointer;
+  }
 
-.header_bar .user_data .user_picture {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  margin: 0 15px;
-  background-color: var(--main-color);
-  cursor: pointer;
+  .user_picture {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin: 0 15px;
+    background-color: var(--main-color);
+    cursor: pointer;
+  }
 }

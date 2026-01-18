@@ -4,7 +4,7 @@ export default function JobsDetail() {
     return (
         <div
             className="d-flex flex-column  justify-between my-5 bg-white rounded shadow px-4 py-4"
-            style={{ maxWidth: '90rem', minHeight: '600px' }}
+            style={{ maxWidth: '90rem' }}
         >
             <div className="d-flex align-items-center justify-content-between  p-3 mb-5">
                 <div className="col-auto d-flex align-items-center gap-3 mb-3 mb-md-0">
