@@ -1,19 +1,86 @@
+import React, { useState, useContext } from "react";
+import axios from "axios";
+import { UserContext } from "../hooks/UserContextProvier.jsx";
+import { useNavigate } from "react-router-dom";
+
 function LoginForm({ changeForm }) {
+    const [form, setForm] = useState({
+        username: "",
+        password: "",
+    });
+
+    const { saveToken } = useContext(UserContext);
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const navigate = useNavigate()
+    const [success, setSuccess] = useState(null);
+    const [error, setError] = useState(null);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setForm((prev) => ({ ...prev, [name]: value }));
+
+        setError(null);
+        setSuccess(null);
+    };
+
+    const sendLogin = async (e) => {
+        e.preventDefault();
+
+        try {
+            const response = await axios.post(`${backendUrl}/login`, {
+                username: form.username,
+                password: form.password,
+            });
+
+            saveToken(response.data.access_token);
+            navigate('/')
+            setSuccess("Login successful!");
+            setError(null);
+
+            setForm({
+                username: "",
+                password: "",
+            });
+        } catch (err) {
+            console.error(err);
+            setError("Something went wrong with your login");
+            setSuccess(null);
+        }
+    };
+
     return (
         <div className="form_container">
-            <form className='login' action="">
-                <input type="text" placeholder="Email" />
-                <input type="password" placeholder="Password" name="" id="" />
-                <p>
-                    Recordar <span>contraseña</span>
-                </p>
-                <input className="log_in_btn" type="submit" value="Iniciar sesion" />
+            <form className="login" onSubmit={sendLogin}>
+                <input
+                    type="text"
+                    placeholder="Username"
+                    name="username"
+                    value={form.username}
+                    onChange={handleChange}
+                    required
+                />
+                <input
+                    type="password"
+                    placeholder="Password"
+                    name="password"
+                    value={form.password}
+                    onChange={handleChange}
+                    required
+                />
+                <input className="log_in_btn" type="submit" value="Iniciar sesión" />
             </form>
+
+            {success && <p style={{ color: "green" }}>{success}</p>}
+            {error && <p style={{ color: "red" }}>{error}</p>}
+
             <p>
-                ¿Aún no tienes una cuenta?<span onClick={changeForm}>Crear cuenta</span>
+                ¿Aún no tienes una cuenta?{" "}
+                <span style={{ cursor: "pointer", color: "blue" }} onClick={changeForm}>
+                    Crear cuenta
+                </span>
             </p>
         </div>
     );
 }
 
-export default LoginForm
+export default LoginForm;

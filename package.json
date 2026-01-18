@@ -58,7 +58,11 @@
 		"@fortawesome/free-brands-svg-icons": "^7.1.0",
 		"@fortawesome/free-solid-svg-icons": "^7.1.0",
 		"@fortawesome/react-fontawesome": "^3.1.1",
+<<<<<<< HEAD
 		"@heroicons/react": "^2.2.0",
+=======
+		"axios": "^1.13.2",
+>>>>>>> 43b4d39901a327e2b0f24ee6c8051c38f06bba0f
 		"echarts": "^6.0.0",
 		"echarts-for-react": "^3.0.5",
 		"html2canvas": "^1.4.1",
@@ -70,5 +74,6 @@
 		"react-dom": "^18.2.0",
 		"react-icons": "^5.5.0",
 		"react-router-dom": "^6.18.0"
+		"react-router-dom": "^6.30.3"
 	}
 }

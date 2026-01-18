@@ -13,6 +13,7 @@ import Curriculums from "./pages/Curriculum";
 import Interview from "./pages/Interview";
 import PerfilUsuario from "./pages/PerfilUsuario";
 import Formulario from "./pages/Formulario";
+<<<<<<< HEAD
 import AboutUs from "./pages/AboutUs";
 import ApplicationTimeline from "./pages/ApplicationTimeline";
 
@@ -21,17 +22,23 @@ import ApplicationTimeline from "./pages/ApplicationTimeline";
 
 
 
+=======
+import JobsDetail from "./pages/JobsDetail";
+import { useState } from "react";
+>>>>>>> 43b4d39901a327e2b0f24ee6c8051c38f06bba0f
 
 
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
+
     <Route path="/" element={<App />} errorElement={<h1>Not found!</h1>} >
       <Route index element={<HomePage />} />
       <Route path="jobs" element={<Jobs />} />
       <Route path="curriculum" element={<Curriculums />} />
       <Route path="interview" element={<Interview />} />
       <Route path="register" element={<Registration />} />
+      <Route path="jobId" element={<JobsDetail />} />
       <Route path="login" element={<LoginForm />} />
       <Route path="perfil" element={<PerfilUsuario />} />
       <Route path="formulario" element={<Formulario />} />
