@@ -1,19 +1,42 @@
 """
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
+import os
 from flask_bcrypt import Bcrypt
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Category, City, Gender, Skill, SocialMedia, Status, WorkType, EmploymentType, Postulaciones
+from api.models import db, User, Category, City, Gender, Skill, SocialMedia, Status, WorkType, EmploymentType, Postulaciones, Profile
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from werkzeug.utils import secure_filename
 
 api = Blueprint('api', __name__)
 
 # Allow CORS requests to this API
 CORS(api)
-
+CORS(api, origins=[
+    "https://organic-pancake-977j4vrjprg9h4g5-3000.app.github.dev",
+    "http://localhost:3000"
+])
 bcrypt = Bcrypt()  # just create the instance here
+
+
+def save_uploaded_file(file, upload_folder=None):
+    if not file:
+        return None
+
+    if upload_folder is None:
+        upload_folder = '/tmp/uploads'
+
+    os.makedirs(upload_folder, exist_ok=True)
+
+    filename = secure_filename(file.filename)
+
+    file_path = os.path.join(upload_folder, filename)
+
+    file.save(file_path)
+
+    return filename
 
 
 @api.route('/hello', methods=['POST', 'GET'])
@@ -71,7 +94,7 @@ def login():
     if not user or not bcrypt.check_password_hash(user.password, password):
         return jsonify({"message": "Invalid credentials"}), 401
 
-    access_token = create_access_token(identity=user.id)
+    access_token = create_access_token(identity=str(user.id))
 
     return jsonify({
         "access_token": access_token,
@@ -515,8 +538,118 @@ def employment_type_delete(id):
     db.session.commit()
     return jsonify({"msg": "This employment_type was deleted"})
 
+# -----------------------------Profile-----------------------------#
 
+
+@api.route("/profile", methods=['GET'])
+@jwt_required()
+def profile_get():
+    current_user = get_jwt_identity()
+    user = User.query.get(current_user)
+    profile = Profile.query.filter_by(user_id=user.id).first()
+    if not profile:
+        return jsonify({"message": "Profile not found"}), 404
+    data = profile.serialize()
+    print(data)  # Debug output
+    return jsonify(data)
+
+
+@api.route("/profile", methods=['POST'])
+@jwt_required()
+def profile_post():
+    current_user = get_jwt_identity()
+    user = User.query.get(current_user)
+
+    first_name = request.form.get("first_name")
+    last_name = request.form.get("last_name")
+    bio = request.form.get("bio")
+    image_file = request.files.get("image_filename")
+    skills_input = request.form.getlist("skills")
+    gender_id = request.form.get("gender_id")
+    image_filename = None
+    if image_file:
+        image_filename = save_uploaded_file(
+            image_file, upload_folder=os.getenv('UPLOAD_FOLDER', '/tmp/uploads'))
+
+    new_profile = Profile(
+        first_name=first_name,
+        last_name=last_name,
+        image_filename=image_filename,
+        bio=bio,
+        gender_id=gender_id,
+        user_id=user.id
+    )
+
+    skills_objects = []
+    for skill_name in skills_input:
+        skill = Skill.query.filter_by(name=skill_name).first()
+        if not skill:
+            skill = Skill(name=skill_name)
+            db.session.add(skill)
+            db.session.flush()
+        skills_objects.append(skill)
+
+    new_profile.skills = skills_objects
+    db.session.add(new_profile)
+    db.session.commit()
+
+    return jsonify(new_profile.serialize())
+
+
+@api.route("/profile/<int:id>", methods=['PUT'])
+@jwt_required()
+def profile_put(id):
+    current_user = int(get_jwt_identity())
+    user = User.query.get(current_user)
+    profile = Profile.query.filter_by(user_id=user.id).first()
+
+    first_name = request.form.get("first_name")
+    last_name = request.form.get("last_name")
+    bio = request.form.get("bio")
+    skills = request.form.getlist("skills")
+    gender_id = request.form.get("gender_id")
+    image_file = request.files.get("image_filename")
+
+    if not profile:
+        profile = Profile(user_id=user.id)
+
+    if first_name:
+        profile.first_name = first_name
+    if last_name:
+        profile.last_name = last_name
+    if bio:
+        profile.bio = bio
+
+    # Fix here: assign gender relationship object, not just id
+    if gender_id:
+        gender_obj = Gender.query.get(int(gender_id))
+        profile.gender = gender_obj
+
+    if image_file:
+        image_filename = save_uploaded_file(
+            image_file,
+            upload_folder=os.getenv('UPLOAD_FOLDER', '/tmp/uploads')
+        )
+        profile.image_filename = image_filename
+
+    if skills:
+        skill_objects = []
+        for skill_name in skills:
+            skill = Skill.query.filter_by(name=skill_name).first()
+            if not skill:
+                skill = Skill(name=skill_name)
+                db.session.add(skill)
+                db.session.flush()
+            skill_objects.append(skill)
+        profile.skills = skill_objects
+
+    db.session.add(profile)
+    db.session.commit()
+
+    return jsonify(profile.serialize()), 200
 # -----------------------------Postulaciones-----------------------------#
+
+
 @api.route("/posts/my-post-count", methods=["GET"])
 @jwt_required()
 def count_post():

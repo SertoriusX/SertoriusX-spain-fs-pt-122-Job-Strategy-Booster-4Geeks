@@ -15,6 +15,7 @@ import PerfilUsuario from "./pages/PerfilUsuario";
 import Formulario from "./pages/Formulario";
 import JobsDetail from "./pages/JobsDetail";
 import { useState } from "react";
+import ProfileId from "./components/ProfileId";
 
 
 
@@ -31,6 +32,8 @@ export const router = createBrowserRouter(
       <Route path="/formulario" element={<Formulario />} />
       <Route path="login" element={<LoginForm />} />
       <Route path="/perfil" element={<PerfilUsuario />} />
+      <Route path="/perfilId/:id" element={<ProfileId />} />
+
     </Route>
 
   )

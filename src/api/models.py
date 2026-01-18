@@ -65,7 +65,12 @@ class Profile(db.Model):
             "last_name": self.last_name,
             "bio": self.bio,
             "image_filename": self.image_filename,
-            "gender": self.gender.name
+            "gender": self.gender.name,
+            "gender_r": {
+                "id": self.gender_id,
+                "name": self.gender.name if self.gender else None
+            } if self.gender else None,
+            "skills": [skill.name for skill in self.skills],
 
         }
 
@@ -238,7 +243,7 @@ class Postulaciones(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "nombre_empresa": self.nombre_empressa, 
+            "nombre_empresa": self.nombre_empressa,
             "social_media": self.social_media.name,
             "status": self.status.name,
             "category": self.category.name,
