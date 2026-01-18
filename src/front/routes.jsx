@@ -13,6 +13,14 @@ import Curriculums from "./pages/Curriculum";
 import Interview from "./pages/Interview";
 import PerfilUsuario from "./pages/PerfilUsuario";
 import Formulario from "./pages/Formulario";
+import AboutUs from "./pages/AboutUs";
+import ApplicationTimeline from "./pages/ApplicationTimeline";
+
+
+
+
+
+
 
 
 
@@ -25,8 +33,13 @@ export const router = createBrowserRouter(
       <Route path="interview" element={<Interview />} />
       <Route path="register" element={<Registration />} />
       <Route path="login" element={<LoginForm />} />
-      <Route path="/perfil" element={<PerfilUsuario />} />
-      <Route path="/formulario" element={<Formulario />} />
+      <Route path="perfil" element={<PerfilUsuario />} />
+      <Route path="formulario" element={<Formulario />} />
+      <Route path="about" element={<AboutUs />} />
+      <Route path="timeline" element={<ApplicationTimeline />} />
+
+
+
 
     </Route>
 
