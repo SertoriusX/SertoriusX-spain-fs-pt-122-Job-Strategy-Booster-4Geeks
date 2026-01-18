@@ -13,19 +13,10 @@ import Curriculums from "./pages/Curriculum";
 import Interview from "./pages/Interview";
 import PerfilUsuario from "./pages/PerfilUsuario";
 import Formulario from "./pages/Formulario";
-<<<<<<< HEAD
-import AboutUs from "./pages/AboutUs";
-import ApplicationTimeline from "./pages/ApplicationTimeline";
-
-
-
-
-
-
-=======
 import JobsDetail from "./pages/JobsDetail";
+import AboutUs from "./pages/AboutUs";
+import ListadoAplicaciones from "./pages/ApplicationTimeline.jsx";
 import { useState } from "react";
->>>>>>> 43b4d39901a327e2b0f24ee6c8051c38f06bba0f
 
 
 
@@ -43,7 +34,7 @@ export const router = createBrowserRouter(
       <Route path="perfil" element={<PerfilUsuario />} />
       <Route path="formulario" element={<Formulario />} />
       <Route path="about" element={<AboutUs />} />
-      <Route path="timeline" element={<ApplicationTimeline />} />
+      <Route path="timeline" element={<ListadoAplicaciones />} />
 
 
 
