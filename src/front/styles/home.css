@@ -44,7 +44,6 @@
   background-color: var(--back-color);
   padding: 10px;
   border-radius: 10px;
-  overflow: scroll;
 }
 
 .grafica {
@@ -156,7 +155,9 @@
   font-size: 0.875rem;
   color: var(--font-color);
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .menu_options button:not(:last-child) {
