@@ -136,7 +136,7 @@ function PerfilUsuario() {
                     </p>
                     {profile.image_filename && (
                         <img
-                            src={`${backendUrl}/uploads/${profile.image_filename}`}
+                            src={`${backendUrl}/tmp/uploads/${profile.image_filename}`}
                             alt="Profile"
                             style={{ maxWidth: "200px" }}
                         />
