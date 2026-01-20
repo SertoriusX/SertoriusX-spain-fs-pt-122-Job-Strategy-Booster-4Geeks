@@ -23,7 +23,7 @@ CORS(api, origins=[
     "http://localhost:3000"
 ])
 load_dotenv()  # This loads .env
-api_key = ("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")
+api_key = (os.getenv("OPENAI_API_KEY"))
 bcrypt = Bcrypt()  # just create the instance here
 
 
