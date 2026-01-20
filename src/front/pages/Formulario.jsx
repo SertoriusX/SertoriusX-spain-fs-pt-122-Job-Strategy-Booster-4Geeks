@@ -161,21 +161,12 @@ export default function Formulario() {
             nombre_empresa: formData.nombre_empresa,
             expireiance: formData.expireiance,
             salary: formData.salary,
-<<<<<<< HEAD
-            city_id: formData.city_id,
-            social_media: socialMediaWithStatuses,
-            skills: formData.skills.map(skill => skill.value),
-            category_id: formData.category_id,
-            work_type_id: formData.work_type_id,
-            employment_type_id: formData.employment_type_id,
-=======
             city_id: formData.city_id ? parseInt(formData.city_id) : null,
             social_media: socialMediaWithStatuses,
             skills: formData.skills.map(skill => skill.value),
             category_id: formData.category_id ? parseInt(formData.category_id) : null,
             work_type_id: formData.work_type_id ? parseInt(formData.work_type_id) : null,
             employment_type_id: formData.employment_type_id ? parseInt(formData.employment_type_id) : null,
->>>>>>> ccb351c (Chat Bot)
             job_description: formData.job_description,
             requirements: formData.requirements,
             persona_de_contacto: formData.persona_de_contacto,

@@ -4,7 +4,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 db = SQLAlchemy()
 
-# Association tables
+# =========================
+# ASSOCIATION TABLES
+# =========================
 
 # Profile <-> Skill many-to-many
 profile_skill = Table(
@@ -23,52 +25,50 @@ postulaciones_skill = Table(
     Column('skill_id', Integer, ForeignKey(
         'skill.id', ondelete="CASCADE"), primary_key=True),
     extend_existing=True
-<<<<<<< HEAD
-=======
 )
 
-# SocialMedia <-> SocialMediaStatus many-to-many association table (MISSING from your code, so adding)
+# SocialMedia <-> SocialMediaStatus many-to-many
 social_media_status_association = Table(
     'social_media_status_association',
     db.metadata,
-    Column('social_media_id', Integer, ForeignKey(
-        'social_media.id', ondelete='CASCADE'), primary_key=True),
-    Column('social_media_status_id', Integer, ForeignKey(
-        'social_media_status.id', ondelete='CASCADE'), primary_key=True),
+    Column(
+        'social_media_id',
+        Integer,
+        ForeignKey('social_media.id', ondelete='CASCADE'),
+        primary_key=True
+    ),
+    Column(
+        'social_media_status_id',
+        Integer,
+        ForeignKey('social_media_status.id', ondelete='CASCADE'),
+        primary_key=True
+    ),
 )
 
-# Postulaciones <-> SocialMedia many-to-many with extra status id stored in association table
+# Postulaciones <-> SocialMedia with status stored in association table
 postulacion_social_media = Table(
     'postulacion_social_media',
     db.metadata,
-    Column('postulacion_id', ForeignKey(
-        'postulaciones.id', ondelete='CASCADE'), primary_key=True),
-    Column('social_media_id', ForeignKey('social_media.id'), primary_key=True),
-    Column('social_media_status_id', ForeignKey(
-        'social_media_status.id'), primary_key=True),
->>>>>>> ccb351c (Chat Bot)
+    Column(
+        'postulacion_id',
+        ForeignKey('postulaciones.id', ondelete='CASCADE'),
+        primary_key=True
+    ),
+    Column(
+        'social_media_id',
+        ForeignKey('social_media.id'),
+        primary_key=True
+    ),
+    Column(
+        'social_media_status_id',
+        ForeignKey('social_media_status.id'),
+        primary_key=True
+    ),
 )
 
-# SocialMedia <-> SocialMediaStatus many-to-many association table (MISSING from your code, so adding)
-social_media_status_association = Table(
-    'social_media_status_association',
-    db.metadata,
-    Column('social_media_id', Integer, ForeignKey(
-        'social_media.id', ondelete='CASCADE'), primary_key=True),
-    Column('social_media_status_id', Integer, ForeignKey(
-        'social_media_status.id', ondelete='CASCADE'), primary_key=True),
-)
-
-# Postulaciones <-> SocialMedia many-to-many with extra status id stored in association table
-postulacion_social_media = Table(
-    'postulacion_social_media',
-    db.metadata,
-    Column('postulacion_id', ForeignKey('postulaciones.id'), primary_key=True),
-    Column('social_media_id', ForeignKey('social_media.id'), primary_key=True),
-    Column('social_media_status_id', ForeignKey('social_media_status.id')),
-)
-
-# === MODELS ===
+# =========================
+# MODELS
+# =========================
 
 
 class User(db.Model):
@@ -77,18 +77,17 @@ class User(db.Model):
     email: Mapped[str] = mapped_column(
         String(120), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(nullable=False)
-    profile: Mapped["Profile"] = relationship(
-        "Profile", back_populates="user", uselist=False)
-    postulaciones: Mapped[list["Postulaciones"]] = relationship(
-        "Postulaciones", back_populates="user")
     is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False)
 
+    profile: Mapped["Profile"] = relationship(
+        "Profile", back_populates="user", uselist=False
+    )
+    postulaciones: Mapped[list["Postulaciones"]] = relationship(
+        "Postulaciones", back_populates="user"
+    )
+
     def serialize(self):
-        return {
-            "id": self.id,
-            "username": self.username,
-            "email": self.email,
-        }
+        return {"id": self.id, "username": self.username, "email": self.email}
 
 
 class Profile(db.Model):
@@ -97,13 +96,17 @@ class Profile(db.Model):
     last_name: Mapped[str] = mapped_column(String(50), nullable=False)
     image_filename: Mapped[str] = mapped_column(String(255), nullable=True)
     bio: Mapped[str] = mapped_column(String(5000), nullable=False)
+
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
-    user: Mapped["User"] = relationship("User", back_populates="profile")
     gender_id: Mapped[int] = mapped_column(ForeignKey("gender.id"))
+
+    user: Mapped["User"] = relationship("User", back_populates="profile")
     gender: Mapped["Gender"] = relationship(
         "Gender", back_populates="profiles")
+
     skills: Mapped[list["Skill"]] = relationship(
-        "Skill", secondary=profile_skill, back_populates="profiles")
+        "Skill", secondary=profile_skill, back_populates="profiles"
+    )
 
     def serialize(self):
         return {
@@ -113,10 +116,6 @@ class Profile(db.Model):
             "bio": self.bio,
             "image_filename": self.image_filename,
             "gender": self.gender.name if self.gender else None,
-            "gender_r": {
-                "id": self.gender_id,
-                "name": self.gender.name if self.gender else None
-            } if self.gender else None,
             "skills": [skill.name for skill in self.skills],
         }
 
@@ -124,8 +123,10 @@ class Profile(db.Model):
 class Gender(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50), nullable=False)
+
     profiles: Mapped[list["Profile"]] = relationship(
-        "Profile", back_populates="gender")
+        "Profile", back_populates="gender"
+    )
 
     def serialize(self):
         return {"id": self.id, "name": self.name}
@@ -134,8 +135,10 @@ class Gender(db.Model):
 class City(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50), nullable=False)
+
     postulaciones: Mapped[list["Postulaciones"]] = relationship(
-        "Postulaciones", back_populates="city")
+        "Postulaciones", back_populates="city"
+    )
 
     def serialize(self):
         return {"id": self.id, "name": self.name}
@@ -144,10 +147,13 @@ class City(db.Model):
 class Skill(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50), nullable=False)
+
     profiles: Mapped[list["Profile"]] = relationship(
-        "Profile", secondary=profile_skill, back_populates="skills")
+        "Profile", secondary=profile_skill, back_populates="skills"
+    )
     postulaciones: Mapped[list["Postulaciones"]] = relationship(
-        "Postulaciones", secondary=postulaciones_skill, back_populates="skills")
+        "Postulaciones", secondary=postulaciones_skill, back_populates="skills"
+    )
 
     def serialize(self):
         return {"id": self.id, "name": self.name}
@@ -158,21 +164,13 @@ class SocialMedia(db.Model):
     name: Mapped[str] = mapped_column(String(50), nullable=False)
     image_filename: Mapped[str] = mapped_column(String(255), nullable=True)
 
-<<<<<<< HEAD
-    postulaciones: Mapped[list["Postulaciones"]] = relationship(
-        "Postulaciones",
-        secondary=postulacion_social_media,
-        back_populates="social_medias",
-    )
-
-=======
     postulaciones = relationship(
         "Postulaciones",
         secondary=postulacion_social_media,
         back_populates="social_medias",
         viewonly=True,
     )
->>>>>>> ccb351c (Chat Bot)
+
     statuses: Mapped[list["SocialMediaStatus"]] = relationship(
         "SocialMediaStatus",
         secondary=social_media_status_association,
@@ -202,6 +200,7 @@ class SocialMediaStatus(db.Model):
         "Postulaciones",
         secondary=postulacion_social_media,
         back_populates="social_media_statuses",
+        viewonly=True
     )
 
     def serialize(self):
@@ -211,8 +210,10 @@ class SocialMediaStatus(db.Model):
 class Status(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50), nullable=False)
+
     postulaciones: Mapped[list["Postulaciones"]] = relationship(
-        "Postulaciones", back_populates="status")
+        "Postulaciones", back_populates="status"
+    )
 
     def serialize(self):
         return {"id": self.id, "name": self.name}
@@ -221,8 +222,10 @@ class Status(db.Model):
 class Category(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50), nullable=False)
+
     postulaciones: Mapped[list["Postulaciones"]] = relationship(
-        "Postulaciones", back_populates="category")
+        "Postulaciones", back_populates="category"
+    )
 
     def serialize(self):
         return {"id": self.id, "name": self.name}
@@ -231,8 +234,10 @@ class Category(db.Model):
 class WorkType(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50), nullable=False)
+
     postulaciones: Mapped[list["Postulaciones"]] = relationship(
-        "Postulaciones", back_populates="work_type")
+        "Postulaciones", back_populates="work_type"
+    )
 
     def serialize(self):
         return {"id": self.id, "name": self.name}
@@ -241,8 +246,10 @@ class WorkType(db.Model):
 class EmploymentType(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50), nullable=False)
+
     postulaciones: Mapped[list["Postulaciones"]] = relationship(
-        "Postulaciones", back_populates="employment_type")
+        "Postulaciones", back_populates="employment_type"
+    )
 
     def serialize(self):
         return {"id": self.id, "name": self.name}
@@ -254,68 +261,47 @@ class Postulaciones(db.Model):
     expireiance: Mapped[str] = mapped_column(String(50), nullable=False)
     salary: Mapped[str] = mapped_column(String(50), nullable=False)
 
-    city_id: Mapped[int] = mapped_column(ForeignKey("city.id"), nullable=False)
-    city: Mapped["City"] = relationship("City", back_populates="postulaciones")
+    persona_de_contacto: Mapped[str] = mapped_column(
+        String(255), nullable=True)
+    positions: Mapped[int] = mapped_column(Integer, nullable=True)
+    candidates_applied: Mapped[int] = mapped_column(Integer, nullable=True)
+    completed_interviews: Mapped[int] = mapped_column(Integer, nullable=True)
+    job_description: Mapped[str] = mapped_column(String(5000), nullable=True)
+    requirements: Mapped[str] = mapped_column(String(5000), nullable=True)
 
+    city_id: Mapped[int] = mapped_column(ForeignKey("city.id"), nullable=False)
     status_id: Mapped[int] = mapped_column(
         ForeignKey("status.id"), nullable=False)
-    status: Mapped["Status"] = relationship(
-        "Status", back_populates="postulaciones")
-
     category_id: Mapped[int] = mapped_column(
         ForeignKey("category.id"), nullable=False)
-    category: Mapped["Category"] = relationship(
-        "Category", back_populates="postulaciones")
-
     work_type_id: Mapped[int] = mapped_column(
         ForeignKey("work_type.id"), nullable=False)
-    work_type: Mapped["WorkType"] = relationship(
-        "WorkType", back_populates="postulaciones")
-
     employment_type_id: Mapped[int] = mapped_column(
         ForeignKey("employment_type.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
+
+    city: Mapped["City"] = relationship("City", back_populates="postulaciones")
+    status: Mapped["Status"] = relationship(
+        "Status", back_populates="postulaciones")
+    category: Mapped["Category"] = relationship(
+        "Category", back_populates="postulaciones")
+    work_type: Mapped["WorkType"] = relationship(
+        "WorkType", back_populates="postulaciones")
     employment_type: Mapped["EmploymentType"] = relationship(
         "EmploymentType", back_populates="postulaciones")
-
-    job_description: Mapped[str] = mapped_column(String(2000), nullable=False)
-    requirements: Mapped[str] = mapped_column(String(2000), nullable=False)
-    persona_de_contacto: Mapped[str] = mapped_column(
-        String(50), nullable=False)
-    positions: Mapped[str] = mapped_column(String(50), nullable=False)
-    candidates_applied: Mapped[str] = mapped_column(String(50), nullable=False)
-    completed_interviews: Mapped[str] = mapped_column(
-        String(50), nullable=False)
-
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
     user: Mapped["User"] = relationship("User", back_populates="postulaciones")
 
     skills: Mapped[list["Skill"]] = relationship(
         "Skill",
         secondary=postulaciones_skill,
         back_populates="postulaciones",
-        cascade="all, delete"
-<<<<<<< HEAD
     )
 
-    social_medias: Mapped[list["SocialMedia"]] = relationship(
-        "SocialMedia",
-        secondary=postulacion_social_media,
-        back_populates="postulaciones",
-        cascade="all, delete"
-    )
-
-    social_media_statuses: Mapped[list["SocialMediaStatus"]] = relationship(
-        "SocialMediaStatus",
-        secondary=postulacion_social_media,
-        back_populates="postulaciones",
-        cascade="all, delete"
-=======
-    )
     social_medias = relationship(
         "SocialMedia",
         secondary=postulacion_social_media,
         back_populates="postulaciones",
-        viewonly=True  # Because the real link includes social_media_status_id, so insert manually
+        viewonly=True
     )
 
     social_media_statuses = relationship(
@@ -323,21 +309,12 @@ class Postulaciones(db.Model):
         secondary=postulacion_social_media,
         back_populates="postulaciones",
         viewonly=True
->>>>>>> ccb351c (Chat Bot)
     )
 
     matched_percentage: Mapped[float] = mapped_column(Float, default=0.0)
 
     def serialize(self):
         social_media_with_statuses = []
-<<<<<<< HEAD
-        for sm in self.social_medias:
-            social_media_with_statuses.append({
-                "social_media": sm.name,
-                "statuses": [status.name for status in sm.statuses]
-            })
-
-=======
 
         for sm in self.social_medias:
             status_rows = db.session.execute(
@@ -349,9 +326,6 @@ class Postulaciones(db.Model):
                 )
             ).fetchall()
 
-            print(
-                f"Social Media: {sm.name}, Status IDs: {[row[0] for row in status_rows]}")
-
             status_ids = [row[0] for row in status_rows]
             statuses = db.session.query(SocialMediaStatus).filter(
                 SocialMediaStatus.id.in_(status_ids)
@@ -361,7 +335,6 @@ class Postulaciones(db.Model):
                 "social_media": sm.name,
                 "statuses": [status.name for status in statuses]
             })
->>>>>>> ccb351c (Chat Bot)
         return {
             "id": self.id,
             "nombre_empresa": self.nombre_empresa,

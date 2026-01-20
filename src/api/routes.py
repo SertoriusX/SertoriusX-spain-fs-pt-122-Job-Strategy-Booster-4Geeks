@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from dotenv import load_dotenv
-from openai import OpenAI
+import openai
 import os
 from flask_bcrypt import Bcrypt
 from flask import Flask, request, jsonify, url_for, Blueprint
@@ -12,7 +12,8 @@ from flask_cors import CORS
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from werkzeug.utils import secure_filename
 import traceback  # <-- Add this line!
-
+from dotenv import load_dotenv
+import os
 api = Blueprint('api', __name__)
 
 # Allow CORS requests to this API
@@ -21,11 +22,12 @@ CORS(api, origins=[
     "https://organic-pancake-977j4vrjprg9h4g5-3000.app.github.dev",
     "http://localhost:3000"
 ])
-load_dotenv()
+load_dotenv()  # This loads .env
+api_key = ("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")
 bcrypt = Bcrypt()  # just create the instance here
-openai_api_key = os.getenv("OPENAI_API_KEY")
 
-client = OpenAI(openai_api_key)
+
+openai.api_key = api_key
 
 
 @api.route('/chat', methods=['POST'])
@@ -38,7 +40,7 @@ def chat():
         user_message = data['message']
 
         # Example:
-        response = client.chat.completions.create(
+        response = openai.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
@@ -793,9 +795,9 @@ def postulaciones_post():
     employment_type_id = safe_int(data.get("employment_type_id"))
     persona_de_contacto = data.get("persona_de_contacto")
     requirements = data.get("requirements")
-    candidates_applied = data.get("candidates_applied")
-    completed_interviews = data.get("completed_interviews")
-    positions = data.get("positions")
+    candidates_applied = safe_int(data.get("candidates_applied"))
+    completed_interviews = safe_int(data.get("completed_interviews"))
+    positions = safe_int(data.get("positions"))
     job_description = data.get("job_description")
 
     # Validate essential foreign keys presence
@@ -818,7 +820,6 @@ def postulaciones_post():
     social_media_status_entries = []
 
     for sm in social_media_list:
-        sm_platform = sm.get("platform")  # Expecting social_media.id (int)
         sm_platform = sm.get("platform")  # expecting int social_media_id
         sm_status_ids = sm.get("status")
 
@@ -873,8 +874,7 @@ def postulaciones_post():
     )
 
     db.session.add(new_postulacion)
-    db.session.flush()  # get new_postulacion.id
-    db.session.flush()  # flush to get new_postulacion.id for association table
+    db.session.flush()  # get new_postulacion.id for association tables
 
     # Insert all social media + status entries (multiple allowed now)
     for social_media_id, social_media_status_id in social_media_status_entries:
@@ -909,7 +909,7 @@ def social_media_status():
     social_media_status = SocialMediaStatus.query.order_by(
         SocialMediaStatus.id.asc()).all()
     list_s = [social_media.serialize() for social_media in social_media_status]
-    return list_s
+    return jsonify(list_s)
 
 
 @api.route("/posts/<int:id>", methods=["PUT"])
