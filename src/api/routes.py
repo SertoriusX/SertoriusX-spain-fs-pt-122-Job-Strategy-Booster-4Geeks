@@ -91,8 +91,8 @@ def user_detail():
 @api.route("/category", methods=["GET"])
 def category_get():
     categories = Category.query.order_by(Category.id.asc()).all()
-    list_category = [category.serializer() for category in categories]
-    return jsonify(list_category.serializer())
+    list_category = [category.serialize() for category in categories]
+    return jsonify(list_category)
 
 
 @api.route("/category/<int:id>", methods=["GET"])
@@ -112,7 +112,7 @@ def category_post():
     new_category = Category(name=name)
     db.session.add(new_category)
     db.session.commit()
-    return jsonify(new_category.serialize())
+    return jsonify(new_category)
 
 
 @api.route("/category/<int:id>", methods=["PUT"])
@@ -144,8 +144,8 @@ def category_delete(id):
 @api.route("/city", methods=["GET"])
 def city_get():
     cities = City.query.order_by(City.id.asc()).all()
-    list_city = [city.serializer() for city in cities]
-    return jsonify(list_city.serializer())
+    list_city = [city.serialize() for city in cities]
+    return jsonify(list_city)
 
 
 @api.route("/city/<int:id>", methods=["GET"])
@@ -197,8 +197,8 @@ def city_delete(id):
 @api.route("/gender", methods=["GET"])
 def gender_get():
     genders = Gender.query.order_by(Gender.id.asc()).all()
-    list_gender = [gender.serializer() for gender in genders]
-    return jsonify(list_gender.serializer())
+    list_gender = [gender.serialize() for gender in genders]
+    return jsonify(list_gender)
 
 
 @api.route("/gender/<int:id>", methods=["GET"])
@@ -250,7 +250,7 @@ def gender_delete(id):
 @api.route("/skill", methods=["GET"])
 def skill_get():
     skills = Skill.query.order_by(Skill.id.asc()).all()
-    list_skill = [skill.serializer() for skill in skills]
+    list_skill = [skill.serialize() for skill in skills]
     return jsonify(list_skill)
 
 
@@ -303,7 +303,7 @@ def skill_delete(id):
 @api.route("/social_media", methods=["GET"])
 def social_media_get():
     social_medias = SocialMedia.query.order_by(SocialMedia.id.asc()).all()
-    list_social_media = [social_media.serializer()
+    list_social_media = [social_media.serialize()
                          for social_media in social_medias]
     return jsonify(list_social_media)
 
@@ -357,9 +357,9 @@ def social_media_delete(id):
 @api.route("/status", methods=["GET"])
 def status_get():
     status = Status.query.order_by(Status.id.asc()).all()
-    list_status = [stutu.serializer()
+    list_status = [stutu.serialize()
                    for stutu in status]
-    return jsonify(list_status.serializer())
+    return jsonify(list_status)
 
 
 @api.route("/status/<int:id>", methods=["GET"])
@@ -411,9 +411,9 @@ def status_delete(id):
 @api.route("/WorkType", methods=["GET"])
 def work_type_get():
     work_types = WorkType.query.order_by(WorkType.id.asc()).all()
-    list_work_type = [work_type.serializer()
+    list_work_type = [work_type.serialize()
                       for work_type in work_types]
-    return jsonify(list_work_type.serializer())
+    return jsonify(list_work_type)
 
 
 @api.route("/WorkType/<int:id>", methods=["GET"])
@@ -466,9 +466,9 @@ def new_work_type_delete(id):
 def employment_type_get():
     employment_types = EmploymentType.query.order_by(
         EmploymentType.id.asc()).all()
-    list_employment_type = [employment_type.serializer()
+    list_employment_type = [employment_type.serialize()
                             for employment_type in employment_types]
-    return jsonify(list_employment_type.serializer())
+    return jsonify(list_employment_type)
 
 
 @api.route("/EmploymentType/<int:id>", methods=["GET"])
@@ -503,7 +503,7 @@ def employment_type_put(id):
     if name:
         employment_type.name = name
     db.session.commit()
-    return jsonify(employment_type.serialize())
+    return jsonify(employment_type.serializer())
 
 
 @api.route("/EmploymentType/<int:id>", methods=["DELETE"])

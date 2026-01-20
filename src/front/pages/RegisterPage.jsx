@@ -1,10 +1,33 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/register.css";
 import LoginForm from "../components/LoginForm";
 import SignupForm from "../components/SignupForm";
+import LoadingScreen from "../components/LoadingScreen";
 
 function Registration() {
+    const [loading, setLoading] = useState(true);
     const [formType, setFormType] = useState("login");
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 1500);
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    const changeForm = () => {
+        setLoading(true);
+        setTimeout(() => {
+            setFormType(prev => (prev === "login" ? "signup" : "login"));
+            setLoading(false);
+        }, 1500);
+    };
+
+    if (loading) {
+        return <LoadingScreen />;
+    }
+
     return (
         <div className="container">
             <div className="log_in_page">
@@ -18,9 +41,9 @@ function Registration() {
                     </div>
 
                     {formType === "login" ? (
-                        <LoginForm changeForm={() => setFormType("signup")} />
+                        <LoginForm changeForm={changeForm} />
                     ) : (
-                        <SignupForm changeForm={() => setFormType("login")} />
+                        <SignupForm changeForm={changeForm} />
                     )}
                 </div>
 

@@ -1,215 +1,232 @@
-import React, { useState } from 'react';
-import {
-    Briefcase, Target, FileText, Edit2, Save, Upload, ExternalLink,
-    Building2, CheckCircle2, Circle, Activity, Plus, X, Calendar,
-    User, MapPin
-} from 'lucide-react';
-import { usePerfilData } from '../hooks/usePerfilData';
-import '../styles/PerfilUsuario.css';
+import React, { useState, useEffect, useRef } from "react";
+import { ExternalLink, Plus, Save, X, Trash2, Pencil } from "lucide-react";
+import { usePerfilData } from "../hooks/usePerfilData";
+import "../styles/PerfilUsuario.css";
+import mermaid from "mermaid";
+
+function MermaidChart({ chart }) {
+    const ref = useRef(null);
+
+    useEffect(() => {
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: "default"
+        });
+        if (ref.current) {
+            mermaid.contentLoaded();
+        }
+    }, [chart]);
+
+    return (
+        <div ref={ref} className="mermaid">
+            {chart}
+        </div>
+    );
+}
 
 export default function PerfilUsuario() {
-    const {
-        isEditingGlobal,
-        setIsEditingGlobal,
-        editingSections,
-        toggleSectionEdit,
-        profileData,
-        handleInputChange,
-        handleSave
-    } = usePerfilData();
-
-    const [newGoal, setNewGoal] = useState('');
-    const [newPortal, setNewPortal] = useState({ name: '', url: '' });
-    const [newCompany, setNewCompany] = useState('');
-    const [newInterview, setNewInterview] = useState({
-        company: '', position: '', date: '', contact: '', address: '', notes: ''
-    });
+    const { profileData, handleInputChange } = usePerfilData();
 
     const [avatarPreview, setAvatarPreview] = useState(null);
+    const [isEditingProfile, setIsEditingProfile] = useState(false);
+    const [showAgendaModal, setShowAgendaModal] = useState(false);
+    const [showApplications, setShowApplications] = useState(false);
+    const [editingInterviewIndex, setEditingInterviewIndex] = useState(null);
+    const [editingPortals, setEditingPortals] = useState(false);
+
+    const [selectedApplication, setSelectedApplication] = useState(null);
+    const [showTimelineEditor, setShowTimelineEditor] = useState(false);
+    const [timelineApp, setTimelineApp] = useState(null);
+    const [showTimelineViewer, setShowTimelineViewer] = useState(false);
+    const [timelineViewerApp, setTimelineViewerApp] = useState(null);
+
+    const [newInterview, setNewInterview] = useState({
+        company: "",
+        position: "",
+        date: "",
+        time: "",
+        contact: "",
+        address: "",
+        notes: ""
+    });
+
+    const [newPortal, setNewPortal] = useState({ name: "", url: "" });
+
+    const [newApplication, setNewApplication] = useState({
+        company: "",
+        position: "",
+        status: "",
+        timeline: []
+    });
+
+    const [newTimelineItem, setNewTimelineItem] = useState({
+        date: "",
+        event: ""
+    });
 
     const handleSkillsChange = (value) => {
-        const skillsArray = value.split(',').map(s => s.trim()).filter(s => s);
-        handleInputChange('skills', skillsArray);
-    };
-
-    const toggleGoalCompletion = (index) => {
-        const updatedGoals = [...profileData.shortTermGoals];
-        updatedGoals[index].completed = !updatedGoals[index].completed;
-        handleInputChange('shortTermGoals', updatedGoals);
-    };
-
-    const addGoal = () => {
-        if (newGoal.trim()) {
-            handleInputChange('shortTermGoals', [...profileData.shortTermGoals, { task: newGoal, completed: false }]);
-            setNewGoal('');
-        }
-    };
-
-    const removeGoal = (index) => {
-        handleInputChange('shortTermGoals', profileData.shortTermGoals.filter((_, i) => i !== index));
-    };
-
-    const togglePortalActive = (index) => {
-        const updatedPortals = [...profileData.jobPortals];
-        updatedPortals[index].active = !updatedPortals[index].active;
-        handleInputChange('jobPortals', updatedPortals);
-    };
-
-    const addPortal = () => {
-        if (newPortal.name.trim() && newPortal.url.trim()) {
-            handleInputChange('jobPortals', [...profileData.jobPortals, { ...newPortal, active: true }]);
-            setNewPortal({ name: '', url: '' });
-        }
-    };
-
-    const removePortal = (index) => {
-        handleInputChange('jobPortals', profileData.jobPortals.filter((_, i) => i !== index));
-    };
-
-    const addCompany = () => {
-        if (newCompany.trim()) {
-            handleInputChange('targetCompanies', [...profileData.targetCompanies, newCompany]);
-            setNewCompany('');
-        }
-    };
-
-    const removeCompany = (index) => {
-        handleInputChange('targetCompanies', profileData.targetCompanies.filter((_, i) => i !== index));
-    };
-
-    const addInterview = () => {
-        if (newInterview.company.trim() && newInterview.position.trim()) {
-            handleInputChange('upcomingInterviews', [...profileData.upcomingInterviews, newInterview]);
-            setNewInterview({ company: '', position: '', date: '', contact: '', address: '', notes: '' });
-        }
-    };
-
-    const removeInterview = (index) => {
-        handleInputChange('upcomingInterviews', profileData.upcomingInterviews.filter((_, i) => i !== index));
-    };
-
-    const updateInterview = (index, field, value) => {
-        const updatedInterviews = [...profileData.upcomingInterviews];
-        updatedInterviews[index][field] = value;
-        handleInputChange('upcomingInterviews', updatedInterviews);
+        const skillsArray = value.split(",").map(s => s.trim()).filter(s => s);
+        handleInputChange("skills", skillsArray);
     };
 
     const handleImageUpload = (file) => {
         if (!file) return;
         const reader = new FileReader();
-        reader.onloadend = () => {
-            setAvatarPreview(reader.result);
-        };
+        reader.onloadend = () => setAvatarPreview(reader.result);
         reader.readAsDataURL(file);
+    };
+
+    const addInterview = () => {
+        const fullDate = `${newInterview.date} ${newInterview.time}`;
+        const interview = { ...newInterview, date: fullDate };
+        handleInputChange("upcomingInterviews", [...profileData.upcomingInterviews, interview]);
+        setNewInterview({ company: "", position: "", date: "", time: "", contact: "", address: "", notes: "" });
+    };
+
+    const updateInterview = () => {
+        const fullDate = `${newInterview.date} ${newInterview.time}`;
+        const updated = [...profileData.upcomingInterviews];
+        updated[editingInterviewIndex] = { ...newInterview, date: fullDate };
+        handleInputChange("upcomingInterviews", updated);
+        setEditingInterviewIndex(null);
+        setNewInterview({ company: "", position: "", date: "", time: "", contact: "", address: "", notes: "" });
+    };
+
+    const addPortal = () => {
+        if (newPortal.name.trim() && newPortal.url.trim()) {
+            handleInputChange("jobPortals", [...profileData.jobPortals, newPortal]);
+            setNewPortal({ name: "", url: "" });
+        }
+    };
+
+    const removePortal = (index) => {
+        handleInputChange("jobPortals", profileData.jobPortals.filter((_, i) => i !== index));
+    };
+
+    const generateTimeline = (timeline) => {
+        if (!timeline || timeline.length === 0) return "timeline\n    title Proceso de Aplicación\n";
+        let output = "timeline\n    title Proceso de Aplicación\n";
+        timeline.forEach(item => {
+            output += `    ${item.date} : ${item.event}\n`;
+        });
+        return output;
+    };
+
+    const addApplication = () => {
+        if (!newApplication.company || !newApplication.position) return;
+        const appWithTimeline = {
+            ...newApplication,
+            timeline: newApplication.timeline.length ? newApplication.timeline : []
+        };
+        handleInputChange("applications", [...profileData.applications, appWithTimeline]);
+        setNewApplication({ company: "", position: "", status: "", timeline: [] });
+    };
+
+    const removeApplication = (index) => {
+        handleInputChange("applications", profileData.applications.filter((_, i) => i !== index));
+        setSelectedApplication(null);
     };
 
     return (
         <div className="perfil-container">
+            <div className="profile-header-banner">
+                <div className="banner-circle banner-circle-1"></div>
+                <div className="banner-circle banner-circle-2"></div>
+                <div className="banner-circle banner-circle-3"></div>
+                <div className="banner-circle banner-circle-4"></div>
+            </div>
             <div className="perfil-layout">
                 <div className="perfil-sidebar">
                     <div className="profile-card">
                         <div className="avatar-wrapper">
                             <div className="avatar">
-                                <img src={
-                                    avatarPreview ||
-                                    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect fill='%2366D9EF' width='200' height='200'/%3E%3Ctext x='50%25' y='50%25' font-size='80' fill='white' text-anchor='middle' dominant-baseline='middle' font-family='system-ui'%3E👩‍💻%3C/text%3E%3C/svg%3E"
-                                }
+                                <img
+                                    src={
+                                        avatarPreview ||
+                                        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect fill='%2366D9EF' width='200' height='200'/%3E%3Ctext x='50%25' y='50%25' font-size='80' fill='white' text-anchor='middle' dominant-baseline='middle' font-family='system-ui'%3E👩‍💻%3C/text%3E%3C/svg%3E"
+                                    }
                                     alt="Avatar"
                                     className="avatar-image"
                                 />
-
-                                <div className="verified-badge">✓</div>
                             </div>
-                            {isEditingGlobal && (
-                                <>
-                                    <label htmlFor="avatar-upload" className="upload-avatar-button">
-                                        <Upload size={16} />
-                                        Cambiar foto
-                                    </label>
-                                    <input id="avatar-upload" type="file" accept="image/*" onChange={(e) => handleImageUpload(e.target.files[0])}
-                                        className="avatar-input-hidden"
-                                    />
-                                </>
-                            )}
-                        </div>
 
-                        {isEditingGlobal ? (
-                            <>
-                                <input type="text" value={profileData.name} onChange={(e) => handleInputChange('name', e.target.value)}
-                                    className="name-input"
-                                />
-                                <input type="text" value={profileData.title} onChange={(e) => handleInputChange('title', e.target.value)}
-                                    className="title-input"
-                                />
-                            </>
-                        ) : (
-                            <>
-                                <h2 className="name">{profileData.name}</h2>
-                                <p className="job-title">{profileData.title}</p>
-                            </>
-                        )}
-                    </div>
+                            <label htmlFor="avatar-upload" className="avatar-edit-icon">
+                                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                                    <circle cx="12" cy="13" r="4" />
+                                </svg>
+                            </label>
 
-                    <div className="section">
-                        <h3 className="section-title">SKILLS</h3>
-                        {isEditingGlobal ? (
                             <input
-                                type="text"
-                                value={profileData.skills.join(', ')}
-                                onChange={(e) => handleSkillsChange(e.target.value)}
-                                className="input-field"
-                                placeholder="Separadas por comas"
+                                id="avatar-upload"
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => handleImageUpload(e.target.files[0])}
+                                className="avatar-input-hidden"
                             />
-                        ) : (
-                            <div className="skills-grid">
-                                {profileData.skills.map((skill, index) => (
-                                    <span key={index} className="skill-badge">{skill}</span>
-                                ))}
+                        </div>
+
+                        <h2 className="name">{profileData.name}</h2>
+                        <p className="job-title">{profileData.title}</p>
+
+                        {!isEditingProfile && (
+                            <button onClick={() => setIsEditingProfile(true)} className="edit-profile-button">
+                                <Pencil size={16} />
+                            </button>
+                        )}
+
+                        {isEditingProfile && (
+                            <div className="profile-edit-card">
+                                <input
+                                    type="text"
+                                    value={profileData.name}
+                                    onChange={(e) => handleInputChange("name", e.target.value)}
+                                    className="input-field"
+                                    placeholder="Nombre"
+                                />
+                                <input
+                                    type="text"
+                                    value={profileData.title}
+                                    onChange={(e) => handleInputChange("title", e.target.value)}
+                                    className="input-field"
+                                    placeholder="Profesión"
+                                />
+                                <div className="edit-actions">
+                                    <button onClick={() => setIsEditingProfile(false)} className="cancel-button">
+                                        <X size={16} />
+                                    </button>
+                                    <button onClick={() => setIsEditingProfile(false)} className="confirm-button">
+                                        <Save size={16} />
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </div>
 
                     <div className="section">
-                        <div className="section-header">
-                            <h3 className="section-title">ESTADO DE BÚSQUEDA</h3>
-                            <button
-                                onClick={() => toggleSectionEdit('estado')}
-                                className="edit-button-small"
-                            >
-                                {editingSections.estado ? <Save size={14} /> : <Edit2 size={14} />}
-                            </button>
-                        </div>
-                        <div className="status-indicator">
-                            <Activity size={18} className="status-icon" />
-                            {editingSections.estado ? (
-                                <select
-                                    value={profileData.searchStatus}
-                                    onChange={(e) => handleInputChange('searchStatus', e.target.value)}
-                                    className="status-select"
-                                >
-                                    <option value="Búsqueda activa">Búsqueda activa</option>
-                                    <option value="Abierto a ofertas">Abierto a ofertas</option>
-                                    <option value="En entrevistas">En entrevistas</option>
-                                    <option value="No disponible">No disponible</option>
-                                </select>
-                            ) : (
-                                <span className="status-text">{profileData.searchStatus}</span>
-                            )}
+                        <h3 className="section-title">Skills</h3>
+                        <input
+                            type="text"
+                            value={profileData.skills.join(", ")}
+                            onChange={(e) => handleSkillsChange(e.target.value)}
+                            className="input-field"
+                            placeholder="Separadas por comas"
+                        />
+                        <div className="skills-grid">
+                            {profileData.skills.map((skill, index) => (
+                                <span key={index} className="skill-badge">{skill}</span>
+                            ))}
                         </div>
                     </div>
 
-
-
                     <div className="section">
                         <div className="section-header">
-                            <h3 className="section-title">PORTALES</h3>
-                            <button
-                                onClick={() => toggleSectionEdit('portales')}
-                                className="edit-button-small"
-                            >
-                                {editingSections.portales ? <Save size={14} /> : <Edit2 size={14} />}
+                            <h3 className="section-title">Páginas de búsqueda</h3>
+                            <button onClick={() => setEditingPortals(!editingPortals)} className="edit-profile-button">
+                                <Pencil size={16} />
                             </button>
                         </div>
+
                         <div className="portals-list">
                             {profileData.jobPortals.map((portal, index) => (
                                 <div key={index} className="portal-item-container">
@@ -217,85 +234,43 @@ export default function PerfilUsuario() {
                                         href={portal.url}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className={portal.active ? "portal-link-active" : "portal-link-inactive"}
-                                        onClick={(e) => editingSections.portales && e.preventDefault()}
+                                        className="portal-link-active"
                                     >
                                         <span>{portal.name}</span>
                                         <ExternalLink size={14} />
                                     </a>
-                                    {editingSections.portales && (
-                                        <div className="portal-actions">
-                                            <button onClick={() => togglePortalActive(index)} className="toggle-button">
-                                                {portal.active ? '✓' : '○'}
-                                            </button>
-                                            <button onClick={() => removePortal(index)} className="remove-button">
-                                                <X size={14} />
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                        {editingSections.portales && (
-                            <div className="add-portal-container">
-                                <input
-                                    type="text"
-                                    value={newPortal.name}
-                                    onChange={(e) => setNewPortal({ ...newPortal, name: e.target.value })}
-                                    placeholder="Nombre"
-                                    className="add-input-small"
-                                />
-                                <input
-                                    type="text"
-                                    value={newPortal.url}
-                                    onChange={(e) => setNewPortal({ ...newPortal, url: e.target.value })}
-                                    placeholder="URL"
-                                    className="add-input-small"
-                                />
-                                <button onClick={addPortal} className="add-button">
-                                    <Plus size={16} />
-                                </button>
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="section">
-                        <div className="section-header">
-                            <h3 className="section-title">EMPRESAS OBJETIVO</h3>
-                            <button
-                                onClick={() => toggleSectionEdit('empresas')}
-                                className="edit-button-small"
-                            >
-                                {editingSections.empresas ? <Save size={14} /> : <Edit2 size={14} />}
-                            </button>
-                        </div>
-                        <div className="companies-list">
-                            {profileData.targetCompanies.map((company, index) => (
-                                <div key={index} className="company-item">
-                                    <div className="company-content">
-                                        <Building2 size={16} className="company-icon" />
-                                        <span className="company-name">{company}</span>
-                                    </div>
-                                    {editingSections.empresas && (
-                                        <button onClick={() => removeCompany(index)} className="remove-button-company">
-                                            <X size={14} />
+                                    {editingPortals && (
+                                        <button
+                                            className="remove-portal-button"
+                                            onClick={() => removePortal(index)}
+                                        >
+                                            <Trash2 size={14} />
                                         </button>
                                     )}
                                 </div>
                             ))}
                         </div>
-                        {editingSections.empresas && (
-                            <div className="add-item-container">
-                                <input
-                                    type="text"
-                                    value={newCompany}
-                                    onChange={(e) => setNewCompany(e.target.value)}
-                                    placeholder="Nueva empresa..."
-                                    className="add-input"
-                                    onKeyPress={(e) => e.key === 'Enter' && addCompany()}
-                                />
-                                <button onClick={addCompany} className="add-button">
-                                    <Plus size={16} />
+
+                        {editingPortals && (
+                            <div className="add-portal">
+                                <div className="add-portal-row">
+                                    <input
+                                        type="text"
+                                        className="input-field"
+                                        placeholder="Nombre"
+                                        value={newPortal.name}
+                                        onChange={(e) => setNewPortal({ ...newPortal, name: e.target.value })}
+                                    />
+                                    <input
+                                        type="text"
+                                        className="input-field"
+                                        placeholder="URL"
+                                        value={newPortal.url}
+                                        onChange={(e) => setNewPortal({ ...newPortal, url: e.target.value })}
+                                    />
+                                </div>
+                                <button className="add-portal-button" onClick={addPortal}>
+                                    <Plus size={14} /> Añadir portal
                                 </button>
                             </div>
                         )}
@@ -303,328 +278,313 @@ export default function PerfilUsuario() {
                 </div>
 
                 <div className="perfil-main-content">
+
                     <div className="perfil-header">
-                        <h1 className="page-title">Objetivos de Búsqueda</h1>
-                        <button
-                            onClick={() => isEditingGlobal ? handleSave() : setIsEditingGlobal(true)}
-                            className="edit-button-main"
-                        >
-                            {isEditingGlobal ? (
-                                <>
-                                    <Save size={18} />
-                                    <span>Guardar Todo</span>
-                                </>
-                            ) : (
-                                <>
-                                    <Edit2 size={18} />
-
-                                </>
-                            )}
-                        </button>
-                    </div>
-
-                    <div className="card">
-                        <div className="card-header">
-                            <div className="card-title-wrapper">
-                                <Target size={20} className="card-icon" />
-                                <h3 className="card-title">Preferencias Profesionales</h3>
-                            </div>
-                            <button
-                                onClick={() => toggleSectionEdit('preferencias')}
-                                className="edit-button-small"
-                            >
-                                {editingSections.preferencias ? <Save size={14} /> : <Edit2 size={14} />}
+                        <h1 className="page-title">Panel Profesional</h1>
+                        <div className="action-buttons">
+                            <button className="agenda-button" onClick={() => setShowAgendaModal(true)}>
+                                Agenda de entrevistas
                             </button>
-                        </div>
-
-                        <div className="grid">
-                            <div className="field">
-                                <label className="field-label">Puesto Deseado</label>
-                                {editingSections.preferencias ? (
-                                    <input
-                                        type="text"
-                                        value={profileData.desiredPosition}
-                                        onChange={(e) => handleInputChange('desiredPosition', e.target.value)}
-                                        className="input-field"
-                                    />
-                                ) : (
-                                    <div className="field-value">{profileData.desiredPosition}</div>
-                                )}
-                            </div>
-
-                            <div className="field">
-                                <label className="field-label">Disponibilidad</label>
-                                {editingSections.preferencias ? (
-                                    <input
-                                        type="text"
-                                        value={profileData.availability}
-                                        onChange={(e) => handleInputChange('availability', e.target.value)}
-                                        className="input-field"
-                                    />
-                                ) : (
-                                    <div className="field-value">{profileData.availability}</div>
-                                )}
-                            </div>
-
-                            <div className="field">
-                                <label className="field-label">Modalidad de Trabajo</label>
-                                {editingSections.preferencias ? (
-                                    <input
-                                        type="text"
-                                        value={profileData.jobType}
-                                        onChange={(e) => handleInputChange('jobType', e.target.value)}
-                                        className="input-field"
-                                    />
-                                ) : (
-                                    <div className="field-value">{profileData.jobType}</div>
-                                )}
-                            </div>
-
-                            <div className="field">
-                                <label className="field-label">Rango Salarial</label>
-                                {editingSections.preferencias ? (
-                                    <input
-                                        type="text"
-                                        value={profileData.salaryRange}
-                                        onChange={(e) => handleInputChange('salaryRange', e.target.value)}
-                                        className="input-field"
-                                    />
-                                ) : (
-                                    <div className="field-value">{profileData.salaryRange}</div>
-                                )}
-                            </div>
-
-                            <div className="field field-full">
-                                <label className="field-label">Sectores de Interés</label>
-                                {editingSections.preferencias ? (
-                                    <input
-                                        type="text"
-                                        value={profileData.sectors}
-                                        onChange={(e) => handleInputChange('sectors', e.target.value)}
-                                        className="input-field"
-                                    />
-                                ) : (
-                                    <div className="field-value">{profileData.sectors}</div>
-                                )}
-                            </div>
+                            <button className="apps-button" onClick={() => setShowApplications(true)}>
+                                Listado de aplicaciones
+                            </button>
                         </div>
                     </div>
 
-                    <div className="section">
-                        <div className="section-header">
-                            <h3 className="section-title">OBJETIVOS</h3>
-                            <button
-                                onClick={() => toggleSectionEdit('objetivos')}
-                                className="edit-button-small"
-                            >
-                                {editingSections.objetivos ? <Save size={14} /> : <Edit2 size={14} />}
-                            </button>
-                        </div>
-                        <div className="goals-list">
-                            {profileData.shortTermGoals.map((goal, index) => (
-                                <div key={index} className="goal-item">
-                                    <button
-                                        onClick={() => toggleGoalCompletion(index)}
-                                        className="goal-check-button"
-                                    >
-                                        {goal.completed ? (
-                                            <CheckCircle2 size={18} className="goal-icon-completed" />
-                                        ) : (
-                                            <Circle size={18} className="goal-icon-pending" />
-                                        )}
-                                    </button>
-                                    <span className={goal.completed ? "goal-text-completed" : "goal-text"}>
-                                        {goal.task}
-                                    </span>
-                                    {editingSections.objetivos && (
-                                        <button onClick={() => removeGoal(index)} className="remove-button">
-                                            <X size={14} />
-                                        </button>
-                                    )}
+                    <div className="interviews-today">
+                        <h2>Entrevistas programadas</h2>
+                        {profileData.upcomingInterviews.length === 0 && (
+                            <p>No tienes entrevistas programadas.</p>
+                        )}
+                        {profileData.upcomingInterviews.map((interview, index) => (
+                            <div key={index} className="interview-item">
+                                <div className="interview-info">
+                                    <h3>{interview.company}</h3>
+                                    <p>{interview.position}</p>
+                                    <p>{interview.date.split(" ")[0]}</p>
+                                    <p>{interview.time || interview.date.split(" ")[1]}</p>
+                                    <p>{interview.address}</p>
                                 </div>
-                            ))}
+
+                                <button
+                                    className="edit-interview-button"
+                                    onClick={() => {
+                                        const [datePart, timePart] = interview.date.split(" ");
+                                        setNewInterview({
+                                            company: interview.company,
+                                            position: interview.position,
+                                            date: datePart || "",
+                                            time: timePart || "",
+                                            contact: interview.contact,
+                                            address: interview.address,
+                                            notes: interview.notes
+                                        });
+                                        setEditingInterviewIndex(index);
+                                        setShowAgendaModal(true);
+                                    }}
+                                >
+                                    <Pencil size={16} />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+
+                    {showApplications && (
+                        <div className="applications-section">
+                            <div className="applications-header">
+                                <h2>Mis Aplicaciones</h2>
+                                <button className="close-apps" onClick={() => setShowApplications(false)}>✕</button>
+                            </div>
+
+                            <div className="applications-list">
+                                {profileData.applications.map((app, index) => (
+                                    <div
+                                        key={index}
+                                        className="application-row"
+                                        onClick={() => {
+                                            setTimelineViewerApp(app);
+                                            setShowTimelineViewer(true);
+                                        }}
+                                    >
+                                        <span>{app.company}</span>
+                                        <span>{app.position}</span>
+                                        <span>{app.status}</span>
+                                        <button
+                                            className="edit-interview-button"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setTimelineApp(app);
+                                                setShowTimelineEditor(true);
+                                            }}
+                                        >
+                                            <Pencil size={16} />
+                                        </button>
+                                        <button
+                                            className="remove-application-button"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                removeApplication(index);
+                                            }}
+                                        >
+                                            <Trash2 size={14} />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="add-application">
+                                <div className="add-application-row">
+                                    <input
+                                        type="text"
+                                        className="input-field"
+                                        placeholder="Empresa"
+                                        value={newApplication.company}
+                                        onChange={(e) => setNewApplication({ ...newApplication, company: e.target.value })}
+                                    />
+                                    <input
+                                        type="text"
+                                        className="input-field"
+                                        placeholder="Posición"
+                                        value={newApplication.position}
+                                        onChange={(e) => setNewApplication({ ...newApplication, position: e.target.value })}
+                                    />
+                                    <input
+                                        type="text"
+                                        className="input-field"
+                                        placeholder="Estado"
+                                        value={newApplication.status}
+                                        onChange={(e) => setNewApplication({ ...newApplication, status: e.target.value })}
+                                    />
+                                </div>
+                                <button className="add-application-button" onClick={addApplication}>
+                                    <Plus size={14} /> Añadir aplicación
+                                </button>
+                            </div>
                         </div>
-                        {editingSections.objetivos && (
-                            <div className="add-item-container">
+                    )}
+
+                    {showAgendaModal && (
+                        <div className="modal-overlay">
+                            <div className="modal-content">
+                                <h2>Agendar entrevista</h2>
+
                                 <input
                                     type="text"
-                                    value={newGoal}
-                                    onChange={(e) => setNewGoal(e.target.value)}
-                                    placeholder="Nueva tarea..."
-                                    className="add-input"
-                                    onKeyPress={(e) => e.key === 'Enter' && addGoal()}
+                                    placeholder="Empresa"
+                                    className="input-field"
+                                    value={newInterview.company}
+                                    onChange={(e) => setNewInterview({ ...newInterview, company: e.target.value })}
                                 />
-                                <button onClick={addGoal} className="add-button">
-                                    <Plus size={16} />
-                                </button>
-                            </div>
-                        )}
-                    </div>
 
-                    <div className="card">
-                        <div className="card-header">
-                            <div className="card-title-wrapper">
-                                <Calendar size={20} className="card-icon" />
-                                <h3 className="card-title">Próximas entrevistas</h3>
-                            </div>
-                            <button
-                                onClick={() => toggleSectionEdit('entrevistas')}
-                                className="edit-button-small"
-                            >
-                                {editingSections.entrevistas ? <Save size={14} /> : <Edit2 size={14} />}
-                            </button>
-                        </div>
+                                <input
+                                    type="text"
+                                    placeholder="Posición"
+                                    className="input-field"
+                                    value={newInterview.position}
+                                    onChange={(e) => setNewInterview({ ...newInterview, position: e.target.value })}
+                                />
 
-                        <div className="interviews-list">
-                            {profileData.upcomingInterviews.map((interview, index) => (
-                                <div key={index} className="interview-card">
-                                    <div className="interview-header">
-                                        {editingSections.entrevistas ? (
-                                            <div className="interview-edit-container">
-                                                <input
-                                                    type="text"
-                                                    value={interview.position}
-                                                    onChange={(e) => updateInterview(index, 'position', e.target.value)}
-                                                    placeholder="Posición"
-                                                    className="interview-input-title"
-                                                />
-                                                <input
-                                                    type="text"
-                                                    value={interview.company}
-                                                    onChange={(e) => updateInterview(index, 'company', e.target.value)}
-                                                    placeholder="Empresa"
-                                                    className="interview-input-subtitle"
-                                                />
-                                            </div>
-                                        ) : (
-                                            <div>
-                                                <h4 className="interview-position">{interview.position}</h4>
-                                                <p className="interview-company">{interview.company}</p>
-                                            </div>
-                                        )}
-                                        {editingSections.entrevistas && (
-                                            <button onClick={() => removeInterview(index)} className="remove-button">
-                                                <X size={16} />
-                                            </button>
-                                        )}
-                                    </div>
-
-                                    <div className="interview-details">
-                                        <div className="interview-detail-item">
-                                            <Calendar size={16} className="interview-detail-icon" />
-                                            {editingSections.entrevistas ? (
-                                                <input
-                                                    type="text"
-                                                    value={interview.date}
-                                                    onChange={(e) => updateInterview(index, 'date', e.target.value)}
-                                                    placeholder="Fecha"
-                                                    className="interview-input-detail"
-                                                />
-                                            ) : (
-                                                <span className="interview-detail-text">{interview.date}</span>
-                                            )}
-                                        </div>
-                                        <div className="interview-detail-item">
-                                            <User size={16} className="interview-detail-icon" />
-                                            {editingSections.entrevistas ? (
-                                                <input
-                                                    type="text"
-                                                    value={interview.contact}
-                                                    onChange={(e) => updateInterview(index, 'contact', e.target.value)}
-                                                    placeholder="Contacto"
-                                                    className="interview-input-detail"
-                                                />
-                                            ) : (
-                                                <span className="interview-detail-text">Contacto: {interview.contact}</span>
-                                            )}
-                                        </div>
-                                        <div className="interview-detail-item">
-                                            <MapPin size={16} className="interview-detail-icon" />
-                                            {editingSections.entrevistas ? (
-                                                <input
-                                                    type="text"
-                                                    value={interview.address}
-                                                    onChange={(e) => updateInterview(index, 'address', e.target.value)}
-                                                    placeholder="Dirección"
-                                                    className="interview-input-detail"
-                                                />
-                                            ) : (
-                                                <span className="interview-detail-text">Dirección: {interview.address}</span>
-                                            )}
-                                        </div>
-                                        <div className="interview-detail-item">
-                                            <FileText size={16} className="interview-detail-icon" />
-                                            {editingSections.entrevistas ? (
-                                                <input
-                                                    type="text"
-                                                    value={interview.notes}
-                                                    onChange={(e) => updateInterview(index, 'notes', e.target.value)}
-                                                    placeholder="Notas"
-                                                    className="interview-input-detail"
-                                                />
-                                            ) : (
-                                                <span className="interview-detail-text">Nota: {interview.notes}</span>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-
-                        {editingSections.entrevistas && (
-                            <div className="add-interview-container">
-                                <h4 className="add-interview-title">Agregar Nueva Entrevista</h4>
-                                <div className="add-interview-grid">
+                                <div className="modal-row">
                                     <input
-                                        type="text"
-                                        value={newInterview.position}
-                                        onChange={(e) => setNewInterview({ ...newInterview, position: e.target.value })}
-                                        placeholder="Posición"
-                                        className="add-input"
-                                    />
-                                    <input
-                                        type="text"
-                                        value={newInterview.company}
-                                        onChange={(e) => setNewInterview({ ...newInterview, company: e.target.value })}
-                                        placeholder="Empresa"
-                                        className="add-input"
-                                    />
-                                    <input
-                                        type="text"
+                                        type="date"
+                                        className="input-field"
                                         value={newInterview.date}
                                         onChange={(e) => setNewInterview({ ...newInterview, date: e.target.value })}
-                                        placeholder="Fecha"
-                                        className="add-input"
                                     />
                                     <input
-                                        type="text"
-                                        value={newInterview.contact}
-                                        onChange={(e) => setNewInterview({ ...newInterview, contact: e.target.value })}
-                                        placeholder="Contacto"
-                                        className="add-input"
-                                    />
-                                    <input
-                                        type="text"
-                                        value={newInterview.address}
-                                        onChange={(e) => setNewInterview({ ...newInterview, address: e.target.value })}
-                                        placeholder="Dirección"
-                                        className="add-input"
-                                    />
-                                    <input
-                                        type="text"
-                                        value={newInterview.notes}
-                                        onChange={(e) => setNewInterview({ ...newInterview, notes: e.target.value })}
-                                        placeholder="Notas"
-                                        className="add-input"
+                                        type="time"
+                                        className="input-field"
+                                        value={newInterview.time}
+                                        onChange={(e) => setNewInterview({ ...newInterview, time: e.target.value })}
                                     />
                                 </div>
-                                <button onClick={addInterview} className="add-interview-button">
-                                    <Plus size={16} />
-                                    Agregar Entrevista
-                                </button>
+
+                                <input
+                                    type="text"
+                                    placeholder="Contacto"
+                                    className="input-field"
+                                    value={newInterview.contact}
+                                    onChange={(e) => setNewInterview({ ...newInterview, contact: e.target.value })}
+                                />
+
+                                <input
+                                    type="text"
+                                    placeholder="Dirección"
+                                    className="input-field"
+                                    value={newInterview.address}
+                                    onChange={(e) => setNewInterview({ ...newInterview, address: e.target.value })}
+                                />
+
+                                <textarea
+                                    placeholder="Notas"
+                                    className="textarea-field"
+                                    value={newInterview.notes}
+                                    onChange={(e) => setNewInterview({ ...newInterview, notes: e.target.value })}
+                                />
+
+                                <div className="modal-actions">
+                                    <button
+                                        className="cancel-button"
+                                        onClick={() => {
+                                            setShowAgendaModal(false);
+                                            setEditingInterviewIndex(null);
+                                            setNewInterview({ company: "", position: "", date: "", time: "", contact: "", address: "", notes: "" });
+                                        }}
+                                    >
+                                        <X size={16} />
+                                    </button>
+
+                                    <button
+                                        className="confirm-button"
+                                        onClick={() => {
+                                            if (editingInterviewIndex !== null) {
+                                                updateInterview();
+                                            } else {
+                                                addInterview();
+                                            }
+                                            setShowAgendaModal(false);
+                                        }}
+                                    >
+                                        <Save size={16} />
+                                    </button>
+                                </div>
                             </div>
-                        )}
-                    </div>
+                        </div>
+                    )}
+
+                    {showTimelineEditor && timelineApp && (
+                        <div className="modal-overlay">
+                            <div className="modal-content">
+                                <h2>Editar Timeline</h2>
+
+                                <div className="timeline-form">
+                                    <input
+                                        type="text"
+                                        className="input-field"
+                                        placeholder="Fecha (ej: 03/01)"
+                                        value={newTimelineItem.date}
+                                        onChange={(e) => setNewTimelineItem({ ...newTimelineItem, date: e.target.value })}
+                                    />
+
+                                    <input
+                                        type="text"
+                                        className="input-field"
+                                        placeholder="Evento (ej: apliqué)"
+                                        value={newTimelineItem.event}
+                                        onChange={(e) => setNewTimelineItem({ ...newTimelineItem, event: e.target.value })}
+                                    />
+
+                                    <button
+                                        className="add-application-button"
+                                        onClick={() => {
+                                            if (!newTimelineItem.date || !newTimelineItem.event) return;
+
+                                            const updated = [...(timelineApp.timeline || []), newTimelineItem];
+
+                                            const updatedApps = profileData.applications.map(app =>
+                                                app.company === timelineApp.company &&
+                                                    app.position === timelineApp.position
+                                                    ? { ...app, timeline: updated }
+                                                    : app
+                                            );
+
+                                            handleInputChange("applications", updatedApps);
+
+                                            setTimelineApp({ ...timelineApp, timeline: updated });
+                                            setNewTimelineItem({ date: "", event: "" });
+                                        }}
+                                    >
+                                        Añadir etapa
+                                    </button>
+                                </div>
+
+                                <div className="timeline-list">
+                                    {(timelineApp.timeline || []).map((item, index) => (
+                                        <div key={index} className="timeline-row">
+                                            <span>{item.date}</span>
+                                            <span>{item.event}</span>
+                                            <button
+                                                className="remove-application-button"
+                                                onClick={() => {
+                                                    const updated = (timelineApp.timeline || []).filter((_, i) => i !== index);
+
+                                                    const updatedApps = profileData.applications.map(app =>
+                                                        app.company === timelineApp.company &&
+                                                            app.position === timelineApp.position
+                                                            ? { ...app, timeline: updated }
+                                                            : app
+                                                    );
+
+                                                    handleInputChange("applications", updatedApps);
+                                                    setTimelineApp({ ...timelineApp, timeline: updated });
+                                                }}
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="modal-actions">
+                                    <button className="cancel-button" onClick={() => setShowTimelineEditor(false)}>
+                                        Cerrar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {showTimelineViewer && timelineViewerApp && (
+                        <div className="modal-overlay">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h3>Timeline de {timelineViewerApp.company}</h3>
+                                    <button className="close-apps" onClick={() => setShowTimelineViewer(false)}>✕</button>
+                                </div>
+                                <MermaidChart chart={generateTimeline(timelineViewerApp.timeline)} />
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

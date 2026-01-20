@@ -14,6 +14,8 @@ import Interview from "./pages/Interview";
 import PerfilUsuario from "./pages/PerfilUsuario";
 import Formulario from "./pages/Formulario";
 import JobsDetail from "./pages/JobsDetail";
+import AboutUs from "./pages/AboutUs";
+import ListadoAplicaciones from "./pages/ApplicationTimeline.jsx";
 import { useState } from "react";
 
 
@@ -30,7 +32,14 @@ export const router = createBrowserRouter(
       <Route path="jobId" element={<JobsDetail />} />
       <Route path="/formulario" element={<Formulario />} />
       <Route path="login" element={<LoginForm />} />
-      <Route path="/perfil" element={<PerfilUsuario />} />
+      <Route path="perfil" element={<PerfilUsuario />} />
+      <Route path="formulario" element={<Formulario />} />
+      <Route path="about" element={<AboutUs />} />
+      <Route path="timeline" element={<ListadoAplicaciones />} />
+
+
+
+
     </Route>
 
   )
