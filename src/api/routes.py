@@ -3,7 +3,7 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 """
 from flask_bcrypt import Bcrypt
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Category, City, Gender, Skill, SocialMedia, Status, WorkType, EmploymentType, Postulaciones
+from api.models import db, User, Postulations
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
@@ -85,559 +85,22 @@ def user_detail():
     list_user = [user.serialize() for user in users]
     return jsonify(list_user)
 
-# -----------------------------Category-----------------------------#
-
-
-@api.route("/category", methods=["GET"])
-def category_get():
-    categories = Category.query.order_by(Category.id.asc()).all()
-    list_category = [category.serialize() for category in categories]
-    return jsonify(list_category)
-
-
-@api.route("/category/<int:id>", methods=["GET"])
-def category_get_by_id(id):
-    category = Category.query.filter_by(id=id).first()
-    if not category:
-        return jsonify({"msg": "Category not found"}), 404
-    return jsonify(category.serialize())
-
-
-@api.route("/category", methods=["POST"])
-def category_post():
-    data = request.get_json()
-    name = data.get("name")
-    if not name:
-        return jsonify({"msg": "This field is required"})
-    new_category = Category(name=name)
-    db.session.add(new_category)
-    db.session.commit()
-    return jsonify(new_category)
-
-
-@api.route("/category/<int:id>", methods=["PUT"])
-def category_put(id):
-    category = Category.query.filter_by(id=id).first()
-    if not category:
-        return jsonify({"msg": "Category not founded"})
-    data = request.get_json()
-    name = data.get("name")
-    if not name:
-        return jsonify({"msg": "This field is required"})
-    if name:
-        category.name = name
-    db.session.commit()
-    return jsonify(category.serialize())
-
-
-@api.route("/category/<int:id>", methods=["DELETE"])
-def category_delete(id):
-    category = Category.query.filter_by(id=id).first()
-    if not category:
-        return jsonify({"msg": "Category not founded"})
-    db.session.remove(category)
-    db.session.commit()
-    return jsonify({"msg": "This category was deleted"})
-
-
-# -----------------------------City-----------------------------#
-@api.route("/city", methods=["GET"])
-def city_get():
-    cities = City.query.order_by(City.id.asc()).all()
-    list_city = [city.serialize() for city in cities]
-    return jsonify(list_city)
-
-
-@api.route("/city/<int:id>", methods=["GET"])
-def city_get_by_id(id):
-    city = City.query.filter_by(id=id).first()
-    if not city:
-        return jsonify({"msg": "City not found"}), 404
-    return jsonify(city.serialize())
-
-
-@api.route("/city", methods=["POST"])
-def city_post():
-    data = request.get_json()
-    name = data.get("name")
-    if not name:
-        return jsonify({"msg": "This field is required"})
-    new_city = City(name=name)
-    db.session.add(new_city)
-    db.session.commit()
-    return jsonify(new_city.serialize())
-
-
-@api.route("/city/<int:id>", methods=["PUT"])
-def city_put(id):
-    city = City.query.filter_by(id=id).first()
-    if not city:
-        return jsonify({"msg": "City not founded"})
-    data = request.get_json()
-    name = data.get("name")
-    if not name:
-        return jsonify({"msg": "This field is required"})
-    if name:
-        city.name = name
-    db.session.commit()
-    return jsonify(city.serialize())
-
-
-@api.route("/city/<int:id>", methods=["DELETE"])
-def city_delete(id):
-    city = City.query.filter_by(id=id).first()
-    if not city:
-        return jsonify({"msg": "City not founded"})
-    db.session.remove(city)
-    db.session.commit()
-    return jsonify({"msg": "This city was deleted"})
-
-
-# -----------------------------Gender-----------------------------#
-@api.route("/gender", methods=["GET"])
-def gender_get():
-    genders = Gender.query.order_by(Gender.id.asc()).all()
-    list_gender = [gender.serialize() for gender in genders]
-    return jsonify(list_gender)
-
-
-@api.route("/gender/<int:id>", methods=["GET"])
-def gender_get_by_id(id):
-    gender = Gender.query.filter_by(id=id).first()
-    if not gender:
-        return jsonify({"msg": "Gender not found"}), 404
-    return jsonify(gender.serialize())
-
-
-@api.route("/gender", methods=["POST"])
-def gender_post():
-    data = request.get_json()
-    name = data.get("name")
-    if not name:
-        return jsonify({"msg": "This field is required"})
-    new_gender = Gender(name=name)
-    db.session.add(new_gender)
-    db.session.commit()
-    return jsonify(new_gender.serialize())
-
-
-@api.route("/gender/<int:id>", methods=["PUT"])
-def gender_put(id):
-    gender = Gender.query.filter_by(id=id).first()
-    if not gender:
-        return jsonify({"msg": "Gender not founded"})
-    data = request.get_json()
-    name = data.get("name")
-    if not name:
-        return jsonify({"msg": "This field is required"})
-    if name:
-        gender.name = name
-    db.session.commit()
-    return jsonify(gender.serialize())
-
-
-@api.route("/gender/<int:id>", methods=["DELETE"])
-def gender_delete(id):
-    gender = Gender.query.filter_by(id=id).first()
-    if not gender:
-        return jsonify({"msg": "Gender not founded"})
-    db.session.remove(gender)
-    db.session.commit()
-    return jsonify({"msg": "This Gender was deleted"})
-
-
-# -----------------------------Skill-----------------------------#
-@api.route("/skill", methods=["GET"])
-def skill_get():
-    skills = Skill.query.order_by(Skill.id.asc()).all()
-    list_skill = [skill.serialize() for skill in skills]
-    return jsonify(list_skill)
-
-
-@api.route("/skill/<int:id>", methods=["GET"])
-def skill_get_by_id(id):
-    skill = Skill.query.filter_by(id=id).first()
-    if not skill:
-        return jsonify({"msg": "Skill not found"}), 404
-    return jsonify(skill.serialize())
-
-
-@api.route("/skill", methods=["POST"])
-def skill_post():
-    data = request.get_json()
-    name = data.get("name")
-    if not name:
-        return jsonify({"msg": "This field is required"})
-    new_skill = Skill(name=name)
-    db.session.add(new_skill)
-    db.session.commit()
-    return jsonify(new_skill.serialize())
-
-
-@api.route("/skill/<int:id>", methods=["PUT"])
-def skill_put(id):
-    skill = Skill.query.filter_by(id=id).first()
-    if not skill:
-        return jsonify({"msg": "Skill not founded"})
-    data = request.get_json()
-    name = data.get("name")
-    if not name:
-        return jsonify({"msg": "This field is required"})
-    if name:
-        skill.name = name
-    db.session.commit()
-    return jsonify(skill.serialize())
-
-
-@api.route("/skill/<int:id>", methods=["DELETE"])
-def skill_delete(id):
-    skill = Skill.query.filter_by(id=id).first()
-    if not skill:
-        return jsonify({"msg": "Skill not founded"})
-    db.session.remove(skill)
-    db.session.commit()
-    return jsonify({"msg": "This Skill was deleted"})
-
-
-# -----------------------------SocialMedia-----------------------------#
-@api.route("/social_media", methods=["GET"])
-def social_media_get():
-    social_medias = SocialMedia.query.order_by(SocialMedia.id.asc()).all()
-    list_social_media = [social_media.serialize()
-                         for social_media in social_medias]
-    return jsonify(list_social_media)
-
-
-@api.route("/social_media/<int:id>", methods=["GET"])
-def social_media_by_id(id):
-    social_media = SocialMedia.query.filter_by(id=id).first()
-    if not social_media:
-        return jsonify({"msg": "social_media not found"}), 404
-    return jsonify(social_media.serialize())
-
-
-@api.route("/social_media", methods=["POST"])
-def social_media_post():
-    data = request.get_json()
-    name = data.get("name")
-    if not name:
-        return jsonify({"msg": "This field is required"})
-    new_social_media = SocialMedia(name=name)
-    db.session.add(new_social_media)
-    db.session.commit()
-    return jsonify(new_social_media.serialize())
-
-
-@api.route("/social_media/<int:id>", methods=["PUT"])
-def social_media_put(id):
-    social_media = SocialMedia.query.filter_by(id=id).first()
-    if not social_media:
-        return jsonify({"msg": "social_media not founded"})
-    data = request.get_json()
-    name = data.get("name")
-    if not name:
-        return jsonify({"msg": "This field is required"})
-    if name:
-        social_media.name = name
-    db.session.commit()
-    return jsonify(social_media.serialize())
-
-
-@api.route("/social_media/<int:id>", methods=["DELETE"])
-def social_media_delete(id):
-    social_media = SocialMedia.query.filter_by(id=id).first()
-    if not social_media:
-        return jsonify({"msg": "social_media not founded"})
-    db.session.remove(social_media)
-    db.session.commit()
-    return jsonify({"msg": "This social_media was deleted"})
-
-
-# -----------------------------Status-----------------------------#
-@api.route("/status", methods=["GET"])
-def status_get():
-    status = Status.query.order_by(Status.id.asc()).all()
-    list_status = [stutu.serialize()
-                   for stutu in status]
-    return jsonify(list_status)
-
-
-@api.route("/status/<int:id>", methods=["GET"])
-def status_id(id):
-    status = Status.query.filter_by(id=id).first()
-    if not status:
-        return jsonify({"msg": "Status not found"}), 404
-    return jsonify(status.serialize())
-
-
-@api.route("/status", methods=["POST"])
-def status_post():
-    data = request.get_json()
-    name = data.get("name")
-    if not name:
-        return jsonify({"msg": "This field is required"})
-    new_status = Status(name=name)
-    db.session.add(new_status)
-    db.session.commit()
-    return jsonify(new_status.serialize())
-
-
-@api.route("/status/<int:id>", methods=["PUT"])
-def status_put(id):
-    status = Status.query.filter_by(id=id).first()
-    if not status:
-        return jsonify({"msg": "Status not founded"})
-    data = request.get_json()
-    name = data.get("name")
-    if not name:
-        return jsonify({"msg": "This field is required"})
-    if name:
-        status.name = name
-    db.session.commit()
-    return jsonify(status.serialize())
-
-
-@api.route("/status/<int:id>", methods=["DELETE"])
-def status_delete(id):
-    status = Status.query.filter_by(id=id).first()
-    if not status:
-        return jsonify({"msg": "Status not founded"})
-    db.session.remove(status)
-    db.session.commit()
-    return jsonify({"msg": "This status was deleted"})
-
-
-# -----------------------------WorkType-----------------------------#
-@api.route("/WorkType", methods=["GET"])
-def work_type_get():
-    work_types = WorkType.query.order_by(WorkType.id.asc()).all()
-    list_work_type = [work_type.serialize()
-                      for work_type in work_types]
-    return jsonify(list_work_type)
-
-
-@api.route("/WorkType/<int:id>", methods=["GET"])
-def work_type_id(id):
-    work_type_id = WorkType.query.filter_by(id=id).first()
-    if not work_type_id:
-        return jsonify({"msg": "new_work_type not found"}), 404
-    return jsonify(work_type_id.serialize())
-
-
-@api.route("/WorkType", methods=["POST"])
-def work_type_post():
-    data = request.get_json()
-    name = data.get("name")
-    if not name:
-        return jsonify({"msg": "This field is required"})
-    new_work_type = WorkType(name=name)
-    db.session.add(new_work_type)
-    db.session.commit()
-    return jsonify(new_work_type.serialize())
-
-
-@api.route("/WorkType/<int:id>", methods=["PUT"])
-def new_work_type_put(id):
-    new_work_type = WorkType.query.filter_by(id=id).first()
-    if not new_work_type:
-        return jsonify({"msg": "new_work_type not founded"})
-    data = request.get_json()
-    name = data.get("name")
-    if not name:
-        return jsonify({"msg": "This field is required"})
-    if name:
-        new_work_type.name = name
-    db.session.commit()
-    return jsonify(new_work_type.serialize())
-
-
-@api.route("/WorkType/<int:id>", methods=["DELETE"])
-def new_work_type_delete(id):
-    new_work_type = WorkType.query.filter_by(id=id).first()
-    if not new_work_type:
-        return jsonify({"msg": "new_work_type not founded"})
-    db.session.remove(new_work_type)
-    db.session.commit()
-    return jsonify({"msg": "This new_work_type was deleted"})
-
-
-# -----------------------------EmploymentType-----------------------------#
-@api.route("/EmploymentType", methods=["GET"])
-def employment_type_get():
-    employment_types = EmploymentType.query.order_by(
-        EmploymentType.id.asc()).all()
-    list_employment_type = [employment_type.serialize()
-                            for employment_type in employment_types]
-    return jsonify(list_employment_type)
-
-
-@api.route("/EmploymentType/<int:id>", methods=["GET"])
-def employment_type_id(id):
-    employment_type = EmploymentType.query.filter_by(id=id).first()
-    if not employment_type:
-        return jsonify({"msg": "employment_type not found"}), 404
-    return jsonify(employment_type.serialize())
-
-
-@api.route("/EmploymentType", methods=["POST"])
-def employment_type_post():
-    data = request.get_json()
-    name = data.get("name")
-    if not name:
-        return jsonify({"msg": "This field is required"})
-    new_employment_type = EmploymentType(name=name)
-    db.session.add(new_employment_type)
-    db.session.commit()
-    return jsonify(new_employment_type.serialize())
-
-
-@api.route("/EmploymentType/<int:id>", methods=["PUT"])
-def employment_type_put(id):
-    employment_type = EmploymentType.query.filter_by(id=id).first()
-    if not employment_type:
-        return jsonify({"msg": "employment_type not founded"})
-    data = request.get_json()
-    name = data.get("name")
-    if not name:
-        return jsonify({"msg": "This field is required"})
-    if name:
-        employment_type.name = name
-    db.session.commit()
-    return jsonify(employment_type.serializer())
-
-
-@api.route("/EmploymentType/<int:id>", methods=["DELETE"])
-def employment_type_delete(id):
-    employment_type = EmploymentType.query.filter_by(id=id).first()
-    if not employment_type:
-        return jsonify({"msg": "employment_type not founded"})
-    db.session.remove(employment_type)
-    db.session.commit()
-    return jsonify({"msg": "This employment_type was deleted"})
-
 
 # -----------------------------Postulaciones-----------------------------#
-@api.route("/posts/my-post-count", methods=["GET"])
+@api.route("/postulations", methods=["GET"])
 @jwt_required()
-def count_post():
+def get_my_postulations():
     current_user = get_jwt_identity()
-    user = User.query.get(current_user)
-    count = Postulaciones.query.filter_by(user_id=user.id).count()
-    return jsonify({"count": count})
 
-@api.route("/WorkType/<int:id>", methods=["GET"])
-def work_type_id(id):
-    work_type_id = WorkType.query.filter_by(id=id).first()
-    if not work_type_id:
-        return jsonify({"msg": "new_work_type not found"}), 404
-    return jsonify(work_type_id.serialize())
+    postulations = Postulations.query.filter_by(user_id=current_user).all()
 
+    return jsonify([
+        postulation.serialize() for postulation in postulations
+    ]), 200
 
-@api.route("/WorkType", methods=["POST"])
-def work_type_post():
-    data = request.get_json()
-    name = data.get("name")
-    if not name:
-        return jsonify({"msg": "This field is required"})
-    new_work_type = WorkType(name=name)
-    db.session.add(new_work_type)
-    db.session.commit()
-    return jsonify(new_work_type.serialize())
-
-
-@api.route("/WorkType/<int:id>", methods=["PUT"])
-def new_work_type_put(id):
-    new_work_type = WorkType.query.filter_by(id=id).first()
-    if not new_work_type:
-        return jsonify({"msg": "new_work_type not founded"})
-    data = request.get_json()
-    name = data.get("name")
-    if not name:
-        return jsonify({"msg": "This field is required"})
-    if name:
-        new_work_type.name = name
-    db.session.commit()
-    return jsonify(new_work_type.serialize())
-
-
-@api.route("/WorkType/<int:id>", methods=["DELETE"])
-def new_work_type_delete(id):
-    new_work_type = WorkType.query.filter_by(id=id).first()
-    if not new_work_type:
-        return jsonify({"msg": "new_work_type not founded"})
-    db.session.remove(new_work_type)
-    db.session.commit()
-    return jsonify({"msg": "This new_work_type was deleted"})
-
-
-# -----------------------------EmploymentType-----------------------------#
-@api.route("/EmploymentType", methods=["GET"])
-def employment_type_get():
-    employment_types = EmploymentType.query.order_by(
-        EmploymentType.id.asc()).all()
-    list_employment_type = [employment_type.serialize()
-                            for employment_type in employment_types]
-    return jsonify(list_employment_type)
-
-
-@api.route("/EmploymentType/<int:id>", methods=["GET"])
-def employment_type_id(id):
-    employment_type = EmploymentType.query.filter_by(id=id).first()
-    if not employment_type:
-        return jsonify({"msg": "employment_type not found"}), 404
-    return jsonify(employment_type.serialize())
-
-
-@api.route("/EmploymentType", methods=["POST"])
-def employment_type_post():
-    data = request.get_json()
-    name = data.get("name")
-    if not name:
-        return jsonify({"msg": "This field is required"})
-    new_employment_type = EmploymentType(name=name)
-    db.session.add(new_employment_type)
-    db.session.commit()
-    return jsonify(new_employment_type.serialize())
-
-
-@api.route("/EmploymentType/<int:id>", methods=["PUT"])
-def employment_type_put(id):
-    employment_type = EmploymentType.query.filter_by(id=id).first()
-    if not employment_type:
-        return jsonify({"msg": "employment_type not founded"})
-    data = request.get_json()
-    name = data.get("name")
-    if not name:
-        return jsonify({"msg": "This field is required"})
-    if name:
-        employment_type.name = name
-    db.session.commit()
-    return jsonify(employment_type.serializer())
-
-
-@api.route("/EmploymentType/<int:id>", methods=["DELETE"])
-def employment_type_delete(id):
-    employment_type = EmploymentType.query.filter_by(id=id).first()
-    if not employment_type:
-        return jsonify({"msg": "employment_type not founded"})
-    db.session.remove(employment_type)
-    db.session.commit()
-    return jsonify({"msg": "This employment_type was deleted"})
-
-
-# -----------------------------Postulaciones-----------------------------#
-@api.route("/posts/my-post-count", methods=["GET"])
-@jwt_required()
-def count_post():
-    current_user = get_jwt_identity()
-    user = User.query.get(current_user)
-    count = Postulaciones.query.filter_by(user_id=user.id).count()
-    return jsonify({"count": count})
-
-@api.route("/posts", methods=["POST"])
+@api.route("/postulations", methods=["POST"])
 @jwt_required()
 def postulaciones_post():
-
     data = request.get_json()
     current_user_id = get_jwt_identity()
 
@@ -647,33 +110,35 @@ def postulaciones_post():
         except (ValueError, TypeError):
             return default
 
+    postulation_state = data.get("postulation_state")
     company_name = data.get("company_name")
+    role = data.get("role")
     expireiance = data.get("expireiance")
-    city_id = safe_int(data.get("city_id"))
+    inscription_date = data.get('inscription_date')
+    city = data.get("city")
     salary = data.get("salary")
-    platform = data.get("plataforma")
+    platform = data.get("platform")
     postulation_url = data.get("url")
-    category_id = safe_int(data.get("category_id"))
-    work_type_id = safe_int(data.get("work_type_id"))
-    employment_type_id = safe_int(data.get("employment_type_id"))
+    work_type = data.get("work_type")
     requirements = data.get("requirements")
     candidates_applied = data.get("candidates_applied")
-    positions = data.get("positions")
+    available_positions = data.get("available_positions")
     job_description = data.get("job_description")
 
     REQUIRED_FIELDS = [
+    "postulation_state",
     "company_name",
+    "role",
     "expireiance",
-    "city_id",
+    "inscription_date",
+    "city",
     "salary",
-    "plataforma",
+    "platform",
     "url",
-    "category_id",
-    "work_type_id",
-    "employment_type_id",
+    "work_type",
     "requirements",
     "candidates_applied",
-    "positions",
+    "available_positions",
     "job_description",
     ]
 
@@ -685,39 +150,42 @@ def postulaciones_post():
             "fields": missing_field
         }, 400
 
-    if None in [city_id, category_id, work_type_id, employment_type_id]:
-        return {"error": "Invalid or missing foreign key IDs"}, 400
 
-    if not City.query.get(city_id):
-        return {"error": "City not found"}, 404
-    if not Category.query.get(category_id):
-        return {"error": "Category not found"}, 404
-    if not WorkType.query.get(work_type_id):
-        return {"error": "Work type not found"}, 404
-    if not EmploymentType.query.get(employment_type_id):
-        return {"error": "Employment type not found"}, 404
-
-    pending_status = Status.query.filter_by(name="pending").first()
-    if not pending_status:
-        return {"error": "Missing 'pending' status in DB"}, 500
-
-    new_postulacion = Postulaciones(
+    new_postulacion = Postulations(
+        user_id=current_user_id,
+        postulation_state= postulation_state,
         company_name=company_name,
+        role=role,
         expireiance=expireiance,
-        city_id=city_id,
+        inscription_date= inscription_date,
+        city=city,
         salary=salary,
         platform = platform,
         postulation_url = postulation_url,
-        status_id=pending_status.id,
-        category_id=category_id,
-        work_type_id=work_type_id,
-        employment_type_id=employment_type_id,
+        work_type= work_type,
         requirements=requirements,
         candidates_applied=candidates_applied,
+        available_positions = available_positions,
         job_description=job_description,
-        positions=positions,
     )
 
     db.session.add(new_postulacion)
     db.session.commit()
     return jsonify(new_postulacion.serialize()), 201
+
+
+@api.route('/post/<int:id>', methods=['DELETE'])
+@jwt_required()
+def remove_postulation(id):
+    current_user_id = get_jwt_identity()
+
+    if postulation.user_id != current_user_id:
+        return {"message": "Unauthorized"}, 403
+
+    postulation = Postulations.query.filter_by(id=id).first()
+    if not postulation:
+        return {'message': 'There is no postulation to eliminate'}, 400
+    
+    db.session.delete(postulation)
+    db.session.commit()
+    return jsonify({"message": "Postulation has been removed"})
