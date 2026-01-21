@@ -7,7 +7,7 @@
   --main-color-hover: #6b82ec;
 }
 
-[data-theme="dark"] {
+:root[data-theme="dark"] {
   --back-color: #0f1115;
   --card-color: #1c1f26;
   --font-color: #e6e6e6;
