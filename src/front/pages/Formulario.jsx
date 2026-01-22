@@ -3,9 +3,11 @@ import "../styles/Formulario.css";
 import { FiSave, FiX, FiLogOut } from "react-icons/fi";
 
 import { createNewPostulation } from '../Fetch/postulationFecth'
+import { useGetAuthorizationHeader } from "../hooks/useGetAuthorizationHeader";
 
 
 export default function Formulario() {
+    const authorizationHeader = useGetAuthorizationHeader();
     const [formData, setFormData] = useState({
         postulation_state: "",
         company_name: "",
@@ -65,8 +67,7 @@ export default function Formulario() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const token = localStorage.getItem("token");
-            const result = await createNewPostulation(payload, token);
+            const result = await createNewPostulation(payload, authorizationHeader);
             console.log("Postulación creada:", result);
 
         } catch (error) {
