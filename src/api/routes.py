@@ -150,10 +150,11 @@ def postulaciones_ge_filtert():
 @api.route("/postulations", methods=["GET"])
 @jwt_required()
 def count_post():
-    current_user = get_jwt_identity()
-    user = User.query.get(current_user)
-    count = Postulations.query.filter_by(user_id=user.id).count()
-    return jsonify({"count": count})
+    current_user_id = get_jwt_identity()
+    postulations = Postulations.query.filter_by(user_id=current_user_id).all()
+    postulations_data = [p.serialize() for p in postulations]
+
+    return jsonify({"postulations": postulations_data}), 200
 
 
 @api.route("/postulations", methods=["POST"])
@@ -165,17 +166,6 @@ def postulaciones_post():
         return {"error": "Request body must be JSON"}, 400
 
     current_user_id = get_jwt_identity()
-    postulation_state = data.get("postulation_state")
-    company_name = data.get("company_name")
-    role = data.get("role")
-    inscription_date = data.get('inscription_date')
-    city = data.get("city")
-    platform = data.get("platform")
-    postulation_url = data.get("url")
-    work_type = data.get("work_type")
-    requirements = data.get("requirements")
-
-    job_description = data.get("job_description")
 
     REQUIRED_FIELDS = [
         "postulation_state",
@@ -186,7 +176,7 @@ def postulaciones_post():
         "city",
         "salary",
         "platform",
-        "url",
+        "postulation_url",
         "work_type",
         "requirements",
         "candidates_applied",
@@ -211,38 +201,51 @@ def postulaciones_post():
 
     try:
         experience = safe_int(data["experience"], "experience", 0)
-        salary = safe_int(data.get("salary"), "salary", 0)
+        salary = safe_int(data["salary"], "salary", 0)
         candidates_applied = safe_int(
-            data.get("candidates_applied"), "candidates_applied", 0)
+            data["candidates_applied"], "candidates_applied", 0)
         available_positions = safe_int(
-            data.get("available_positions"), "available_positions", 1)
+            data["available_positions"], "available_positions", 1)
     except ValueError as e:
         return {"error": str(e)}, 400
 
     try:
         inscription_date = datetime.strptime(
-            inscription_date, "%d-%m-%Y").date()
+            data["inscription_date"], "%Y-%m-%d").date()
     except (ValueError, TypeError):
-        return {"error": "inscription_date must be in dd-mm-yyyy format"}, 400
+        return {"error": "inscription_date must be in yyyy-mm-dd format"}, 400
 
     new_postulacion = Postulations(
         user_id=current_user_id,
-        postulation_state=postulation_state,
-        company_name=company_name,
-        role=role,
+        postulation_state=data["postulation_state"],
+        company_name=data["company_name"],
+        role=data["role"],
         experience=experience,
         inscription_date=inscription_date,
-        city=city,
+        city=data["city"],
         salary=salary,
-        platform=platform,
-        postulation_url=postulation_url,
-        work_type=work_type,
-        requirements=requirements,
+        platform=data["platform"],
+        postulation_url=data["postulation_url"],
+        work_type=data["work_type"],
+        requirements=data["requirements"],
         candidates_applied=candidates_applied,
         available_positions=available_positions,
-        job_description=job_description
+        job_description=data["job_description"]
     )
 
     db.session.add(new_postulacion)
     db.session.commit()
     return jsonify(new_postulacion.serialize()), 201
+
+
+@api.route('/postulations/<int:id>', methods=['DELETE'])
+@jwt_required()
+def delete_postulation(id):
+    postulation = Postulations.query.filter_by(id=id).first()
+
+    if not postulation:
+        return jsonify({'message': 'There is not postulation to delete'}), 400
+
+    db.session.remove(postulation)
+    db.session.commit()
+    return jsonify({"message": "Postulation has been removed"})

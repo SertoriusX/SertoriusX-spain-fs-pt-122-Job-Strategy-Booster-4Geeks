@@ -3,6 +3,7 @@ from sqlalchemy import String, Boolean, ForeignKey, Integer, Float, JSON, DateTi
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from datetime import datetime, date
+from typing import List
 
 
 db = SQLAlchemy()
@@ -39,14 +40,14 @@ class Postulations(db.Model):
     role: Mapped[str] = mapped_column(String(100), nullable=False)
     experience: Mapped[int] = mapped_column(Integer, nullable=False)
     inscription_date: Mapped[date] = mapped_column(Date, nullable=False)
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     city: Mapped[str] = mapped_column(String(50), nullable=False)
     salary: Mapped[int] = mapped_column(Integer, nullable=False)
     platform: Mapped[str] = mapped_column(String(100), nullable=False)
     postulation_url: Mapped[str] = mapped_column(String(2000), nullable=False)
     work_type: Mapped[str] = mapped_column(String(50), nullable=False)
-    requirements: Mapped[list] = mapped_column(JSON, nullable=False)
+
+    requirements: Mapped[List[str]] = mapped_column(JSON, nullable=False)    
+    
     candidates_applied: Mapped[int] = mapped_column(Integer, nullable=False)
     available_positions: Mapped[int] = mapped_column(Integer, nullable=False)
     job_description: Mapped[str] = mapped_column(String(500), nullable=False)
@@ -70,4 +71,5 @@ class Postulations(db.Model):
             "requirements": self.requirements,
             "candidates_applied": self.candidates_applied,
             "available_positions": self.available_positions,
-            "job_description": self.job_description}
+            "job_description": self.job_description
+        }
