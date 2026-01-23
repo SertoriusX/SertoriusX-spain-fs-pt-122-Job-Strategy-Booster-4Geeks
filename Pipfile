@@ -9,7 +9,6 @@ flask-jwt-extended = "*"
 [packages]
 flask = "*"
 flask-sqlalchemy = "*"
-flask-migrate = "*"
 flask-swagger = "*"
 psycopg2-binary = "*"
 python-dotenv = "*"
@@ -22,6 +21,7 @@ sqlalchemy = "*"
 flask-bcrypt = "*"
 flask-jwt-extended = "*"
 flask-cors = "*"
+flask-migrate = "*"
 
 [requires]
 python_version = "3.13"

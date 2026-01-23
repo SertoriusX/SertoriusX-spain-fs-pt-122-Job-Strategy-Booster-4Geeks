@@ -2,8 +2,13 @@ import { useState } from "react";
 import "../styles/Formulario.css";
 import { FiSave, FiX, FiLogOut } from "react-icons/fi";
 
+import { createNewPostulation } from '../Fetch/postulationFecth'
+import { useGetAuthorizationHeader } from "../hooks/useGetAuthorizationHeader";
+import { Link } from "react-router-dom";
+
 
 export default function Formulario() {
+    const authorizationHeader = useGetAuthorizationHeader();
     const [formData, setFormData] = useState({
         postulation_state: "",
         company_name: "",
@@ -13,7 +18,7 @@ export default function Formulario() {
         city: "",
         salary: "",
         platform: "",
-        url: "",
+        postulation_url: "",
         work_type: "",
         requirements: [],
         candidates_applied: "",
@@ -52,11 +57,18 @@ export default function Formulario() {
         }));
     };
 
+    const payload = {
+        ...formData,
+        experience: Number(formData.experience),
+        available_positions: Number(formData.available_positions),
+        candidates_applied: Number(formData.candidates_applied),
+        salary: Number(formData.salary)
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const token = localStorage.getItem("token");
-            const result = await createNewPostulation(formData, token);
+            const result = await createNewPostulation(payload, authorizationHeader);
             console.log("Postulación creada:", result);
 
         } catch (error) {
@@ -64,200 +76,8 @@ export default function Formulario() {
         }
     };
 
+
     return (
-        /*         <div className="container-formulario">
-                    <div className="card">
-        
-                        <div className="header">
-                            <div className="icon-formulario">
-                                <span className="icon-text">📄</span>
-                            </div>
-                            <h1 className="title">Nueva Postulación</h1>
-                            <p className="subtitle">Registra una oportunidad laboral que estás siguiendo</p>
-                        </div>
-        
-                        <div className="form-content">
-        
-                            <div className="grid">
-                                <div className="form-group">
-                                    <label className="label">Empresa</label>
-                                    <input
-                                        type="text"
-                                        name="company"
-                                        value={formData.company}
-                                        onChange={handleChange}
-                                        className="input"
-                                    />
-                                </div>
-        
-                                <div className="form-group">
-                                    <label className="label">Cargo</label>
-                                    <input
-                                        type="text"
-                                        name="position"
-                                        value={formData.position}
-                                        onChange={handleChange}
-                                        className="input"
-                                    />
-                                </div>
-                            </div>
-        
-                            <div className="grid">
-                                <div className="form-group">
-                                    <label className="label">Plataforma</label>
-                                    <select
-                                        name="platform"
-                                        value={formData.platform}
-                                        onChange={handleChange}
-                                        className="input"
-                                    >
-                                        <option value="">Selecciona una plataforma</option>
-                                        <option value="LinkedIn">LinkedIn</option>
-                                        <option value="Indeed">Indeed</option>
-                                        <option value="Glassdoor">Glassdoor</option>
-                                        <option value="Portal interno">Portal interno</option>
-                                    </select>
-                                </div>
-        
-                                <div className="form-group">
-                                    <label className="label">Fecha de postulación</label>
-                                    <input
-                                        type="date"
-                                        name="applicationDate"
-                                        value={formData.applicationDate}
-                                        onChange={handleChange}
-                                        className="input"
-                                    />
-                                </div>
-                            </div>
-        
-                            <div className="grid">
-                                <div className="form-group">
-                                    <label className="label">Estado</label>
-                                    <select
-                                        name="status"
-                                        value={formData.status}
-                                        onChange={handleChange}
-                                        className="input"
-                                    >
-                                        <option value="">Selecciona un estado</option>
-                                        <option value="Pendiente">Pendiente</option>
-                                        <option value="En proceso">En proceso</option>
-                                        <option value="Entrevista">Entrevista</option>
-                                        <option value="Rechazada">Rechazada</option>
-                                        <option value="Aceptada">Aceptada</option>
-                                    </select>
-                                </div>
-        
-                                <div className="form-group">
-                                    <label className="label">Prioridad</label>
-                                    <select
-                                        name="priority"
-                                        value={formData.priority}
-                                        onChange={handleChange}
-                                        className="input"
-                                    >
-                                        <option value="">Selecciona prioridad</option>
-                                        <option value="Alta">Alta</option>
-                                        <option value="Media">Media</option>
-                                        <option value="Baja">Baja</option>
-                                    </select>
-                                </div>
-                            </div>
-        
-                            <div className="grid">
-                                <div className="form-group">
-                                    <label className="label">URL de la oferta</label>
-                                    <input
-                                        type="url"
-                                        name="jobUrl"
-                                        value={formData.jobUrl}
-                                        onChange={handleChange}
-                                        className="input"
-                                    />
-                                </div>
-        
-                                <div className="form-group">
-                                    <label className="label">Ubicación</label>
-                                    <input
-                                        type="text"
-                                        name="location"
-                                        value={formData.location}
-                                        onChange={handleChange}
-                                        className="input"
-                                    />
-                                </div>
-                            </div>
-        
-                            <div className="grid">
-                                <div className="form-group">
-                                    <label className="label">Modalidad</label>
-                                    <select
-                                        name="workMode"
-                                        value={formData.workMode}
-                                        onChange={handleChange}
-                                        className="input"
-                                    >
-                                        <option value="">Selecciona modalidad</option>
-                                        <option value="Presencial">Presencial</option>
-                                        <option value="Remoto">Remoto</option>
-                                        <option value="Híbrido">Híbrido</option>
-                                    </select>
-                                </div>
-        
-                                <div className="form-group">
-                                    <label className="label">Salario</label>
-                                    <input
-                                        type="text"
-                                        name="salary"
-                                        value={formData.salary}
-                                        onChange={handleChange}
-                                        className="input"
-                                    />
-                                </div>
-                            </div>
-        
-                            <div className="grid">
-                                <div className="form-group">
-                                    <label className="label">Persona de contacto</label>
-                                    <input
-                                        type="text"
-                                        name="contactPerson"
-                                        value={formData.contactPerson}
-                                        onChange={handleChange}
-                                        className="input"
-                                    />
-                                </div>
-        
-                                <div className="form-group">
-                                    <label className="label">Email de contacto</label>
-                                    <input
-                                        type="email"
-                                        name="contactEmail"
-                                        value={formData.contactEmail}
-                                        onChange={handleChange}
-                                        className="input"
-                                    />
-                                </div>
-                            </div>
-        
-                            <div className="button-icon-group">
-                                <button onClick={handleSubmit} className="icon-button">
-                                    <FiSave />
-                                </button>
-        
-                                <button type="button" className="icon-button">
-                                    <FiX />
-                                </button>
-        
-                                <button type="button" className="icon-button">
-                                    <FiLogOut />
-                                </button>
-                            </div>
-        
-                        </div>
-                    </div>
-                </div> */
         <form onSubmit={handleSubmit}>
             <div className="container-formulario">
                 <div className="card horizontal-form">
@@ -283,11 +103,12 @@ export default function Formulario() {
                                     onChange={handleChange}
                                 >
                                     <option value="">Seleccionar</option>
-                                    <option>Pendiente</option>
-                                    <option>En proceso</option>
-                                    <option>Entrevista</option>
-                                    <option>Rechazada</option>
-                                    <option>Aceptada</option>
+                                    <option>abierta</option>
+                                    <option>en proceso</option>
+                                    <option>entrevista</option>
+                                    <option>oferta</option>
+                                    <option>descartado</option>
+                                    <option>aceptada</option>
                                 </select>
                             </div>
 
@@ -314,9 +135,9 @@ export default function Formulario() {
                             <div className="form-group">
                                 <label>Experiencia</label>
                                 <input
-                                    type="text"
+                                    type="number"
                                     name="experience"
-                                    value={formData.expireiance}
+                                    value={formData.experience}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -347,7 +168,7 @@ export default function Formulario() {
                             <div className="form-group">
                                 <label>Salario</label>
                                 <input
-                                    type="text"
+                                    type="number"
                                     name="salary"
                                     value={formData.salary}
                                     onChange={handleChange}
@@ -371,8 +192,8 @@ export default function Formulario() {
                                 <label>URL oferta</label>
                                 <input
                                     type="url"
-                                    name="url"
-                                    value={formData.url}
+                                    name="postulation_url"
+                                    value={formData.postulation_url}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -449,9 +270,11 @@ export default function Formulario() {
                             <button type="submit" className="icon-button">
                                 <FiSave />
                             </button>
-                            <button type="button" className="icon-button secondary">
-                                <FiX />
-                            </button>
+                            <Link to='/Jobs'>
+                                <button type="button" className="icon-button secondary">
+                                    <FiX />
+                                </button>
+                            </Link>
                         </div>
 
                     </div>

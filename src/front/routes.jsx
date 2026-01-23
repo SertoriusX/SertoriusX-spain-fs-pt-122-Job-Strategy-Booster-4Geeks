@@ -23,19 +23,20 @@ import { useState } from "react";
 export const router = createBrowserRouter(
   createRoutesFromElements(
 
-    <Route path="/" element={<App />} errorElement={<h1>Not found!</h1>} >
+    <Route path="/" element={<App />} errorElement={<h1>Not found!</h1>}>
+
       <Route index element={<HomePage />} />
       <Route path="jobs" element={<Jobs />} />
       <Route path="curriculum" element={<Curriculums />} />
       <Route path="interview" element={<Interview />} />
       <Route path="register" element={<Registration />} />
-        <Route path="/postulacion/:id" element={<JobsDetail />} />
-      <Route path="/formulario" element={<Formulario />} />
       <Route path="login" element={<LoginForm />} />
       <Route path="perfil" element={<PerfilUsuario />} />
-      <Route path="formulario" element={<Formulario />} />
       <Route path="about" element={<AboutUs />} />
       <Route path="timeline" element={<ListadoAplicaciones />} />
+      <Route path="/postulacion/:id" element={<JobsDetail />} />
+      <Route path="formulario" element={<Formulario />} />
+
     </Route>
 
   )

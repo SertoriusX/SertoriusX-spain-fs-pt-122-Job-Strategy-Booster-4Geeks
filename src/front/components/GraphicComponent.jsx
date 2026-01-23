@@ -1,18 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ReactECharts from "echarts-for-react";
 
-const GraficoDinamico = () => {
-    const [stats, setStats] = useState([]);
-
-    useEffect(() => {
-        setStats([
-            { name: "Postulaciones", value: 10, color: "#338fe1ff" },
-            { name: "Entrevistas", value: 5, color: "#8462bfff" },
-            { name: "Ofertas", value: 2, color: "#4c9e50ff" },
-            { name: "Descartado", value: 10, color: "#e44441ff" }
-        ]);
-    }, []);
-
+const GraficoDinamico = ({ stats }) => {
 
     const option = {
         series: [

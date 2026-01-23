@@ -35,18 +35,35 @@
 .filters {
   display: flex;
   justify-content: space-between;
-  width: 50%;
+  align-items: center;
+  width: 100%;
   margin: 10px 0;
   padding: 10px;
   border-radius: 10px;
   background-color: var(--back-color);
 
-  .advance_filter {
-    border: none;
+  .menu_options {
+    margin-right: 20px;
+  }
+
+  .advance_filter,
+  .add_new_postulation {
+    appearance: none;
+    border: 3px solid var(--card-color);
     border-radius: 10px;
-    outline: none;
-    padding: 4px 10px;
+    background: transparent;
+    padding: 0.4rem 0.9rem;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--back-color);
+    cursor: pointer;
     background-color: var(--main-color);
+    transition: 0.2s ease;
+  }
+
+  .advance_filter:hover,
+  .add_new_postulation:hover {
+    background-color: var(--main-color-hover);
     color: var(--back-color);
   }
 }
@@ -79,13 +96,17 @@
     border-radius: 10px;
     color: var(--back-color);
     background-color: rgb(83, 186, 83);
-    position: relative;
   }
 
-  .status::before {
+  .category {
+    position: relative;
+    margin-left: 10px;
+  }
+
+  .category::before {
     content: "";
     top: 0;
-    left: 60px;
+    left: -2px;
     position: absolute;
     height: 100%;
     width: 2px;
@@ -112,8 +133,10 @@
   margin: 13.5px 0;
 
   .title h2 {
-    font-size: 22.5px;
+    font-size: 20px;
+    font-weight: 400;
     margin-bottom: 0;
+    margin-left: 2.5px;
     color: var(--font-color);
   }
 

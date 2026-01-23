@@ -76,13 +76,7 @@ function Sidebar() {
                         to="/Interview"
                         onClick={() => handleNavigation("/Interview")}
                     />
-                    <NavBarButton
-                        icon={faFileLines}
-                        label="Formulario"
-                        to="/formulario"
-                        onClick={() => handleNavigation("/formulario")}
-                    />
-                   
+
                 </div>
             </div>
 

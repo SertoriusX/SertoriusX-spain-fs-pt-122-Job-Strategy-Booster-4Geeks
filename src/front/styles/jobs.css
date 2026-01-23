@@ -6,6 +6,7 @@
 /* App Layout */
 .app-container {
   padding: 30px;
+  padding-top: 0;
 }
 
 /* Header */

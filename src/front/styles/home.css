@@ -276,13 +276,11 @@
   padding: 2px 4px;
 }
 
-/* Hover evento */
 .fc .fc-event:hover {
   opacity: 0.9;
   cursor: pointer;
 }
 
-/* Título evento */
 .fc .fc-event-title {
   font-weight: 500;
 }
@@ -303,18 +301,15 @@
   background-color: var(--main-color-hover);
 }
 
-/* Quitar sombras por defecto */
 .fc-theme-standard .fc-scrollgrid {
   border: none;
 }
 
-/* Separadores más suaves */
 .fc-theme-standard td,
 .fc-theme-standard th {
   border-color: var(--card-color);
 }
 
-/* Estado activo REAL (click) */
 .fc .fc-button-primary:active,
 .fc .fc-button-primary:not(:disabled):active {
   background-color: var(--main-color) !important;
@@ -322,7 +317,6 @@
   color: var(--back-color) !important;
 }
 
-/* Quitar cualquier sombra u outline */
 .fc .fc-button-primary:focus,
 .fc .fc-button-primary:focus-visible {
   outline: none !important;
