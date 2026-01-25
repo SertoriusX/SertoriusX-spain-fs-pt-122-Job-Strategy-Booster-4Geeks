@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../styles/jobs.css';
-import JobCard2 from '../components/JobCard2';
-import MenuButttons from '../components/MenuButtons';
+import JobCard2 from '../components/JobComponent/JobCard2';
+import MenuButttons from '../components/home/MenuButtons';
 import '../styles/JobCard2.css';
 
 export default function Jobs() {

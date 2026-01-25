@@ -10,9 +10,10 @@ import LoadingScreen from "../components/LoadingScreen";
 import { translatePage as translatePageFunc } from "../hooks/usePageTranslate.js";
 
 export default function App() {
-    const { token, user, theme, toggleTheme } = useContext(UserContext);
+    const { token, user, theme, toggleTheme, profile } = useContext(UserContext);
     const [loading, setLoading] = useState(true);
     const [language, setLanguage] = useState("en");
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
     useEffect(() => {
         window.googleTranslateElementInit = () => {
@@ -46,7 +47,6 @@ export default function App() {
         return () => clearTimeout(timer);
     }, []);
 
-    // Wrapper to update local state and call imported translatePage
     const handleLanguageChange = (lang) => {
         setLanguage(lang);
         translatePageFunc(lang);
@@ -72,7 +72,6 @@ export default function App() {
                                 {theme === "dark" ? "Modo claro" : "Modo oscuro"}
                             </button>
 
-                            {/* Language dropdown */}
                             <select
                                 value={language}
                                 onChange={(e) => handleLanguageChange(e.target.value)}
@@ -85,11 +84,19 @@ export default function App() {
                             </select>
 
                             <div className="user_personal_information" style={{ marginLeft: "10px" }}>
-                                <h3>Hello, {user.username}</h3>
-                                <p>{user.email}</p>
+                                <h3>Hello, {user?.username}</h3>
+                                <p>{user?.email}</p>
                             </div>
                             <Link to="/perfil">
-                                <div className="user_picture"></div>
+                                <div className="">
+                                    {profile ? (<img className='user_picture '
+                                        src={profile?.img_profile ? `${backendUrl}/uploads/${profile.img_profile}` : '/img/default-profile.png'}
+                                        alt={profile?.first_name || "profile"}
+                                        onError={e => { e.target.onerror = null; e.target.src = '/img/default-profile.png'; }}
+                                    />) : (<Link to="/perfil">
+                                        <div className="user_picture"></div>
+                                    </Link>)}
+                                </div>
                             </Link>
                         </div>
                     </div>

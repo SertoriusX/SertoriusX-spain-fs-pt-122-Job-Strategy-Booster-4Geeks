@@ -1,4 +1,4 @@
-import { translateBatch } from "../pages/googleTranslate"; 
+import { translateBatch } from "./googleTranslate"; 
 
 export async function translatePage(targetLang) {
   const walker = document.createTreeWalker(

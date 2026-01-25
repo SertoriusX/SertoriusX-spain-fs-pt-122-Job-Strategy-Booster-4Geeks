@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import NavBarButton from "../components/NavBarButton";
+import NavBarButton from "../components/navbar/NavBarButton.jsx";
 import "../styles/navbar.css";
 
 import {

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "../styles/register.css";
-import LoginForm from "../components/LoginForm";
-import SignupForm from "../components/SignupForm";
-import LoadingScreen from "../components/LoadingScreen";
 
+import LoadingScreen from "../components/LoadingScreen";
+import LoginForm from "../components/user/LoginForm";
+import SignupForm from "../components/user/SignupForm"
 function Registration() {
     const [loading, setLoading] = useState(true);
     const [formType, setFormType] = useState("login");

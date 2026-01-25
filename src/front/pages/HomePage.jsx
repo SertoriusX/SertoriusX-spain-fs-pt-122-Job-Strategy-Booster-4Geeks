@@ -1,47 +1,51 @@
 import { faBell, faSuitcase, faUserTie, faEnvelopesBulk, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 
 import "../styles/home.css";
-import HomeStatisticsCard from "../components/HomeStatisticsCard";
-import GraficoDinamico from "../components/GraphicComponent";
-import Calendar from "../components/Calendar";
+import HomeStatisticsCard from "../components/home/HomeStatisticsCard";
+import GraficoDinamico from "../components/home/GraphicComponent";
+import Calendar from "../components/home/Calendar";
 import '../styles/homeWidgets.css'
-import MenuButttons from "../components/MenuButtons";
+import MenuButttons from "../components/home/MenuButtons";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
 
 function HomePage() {
 	const backendUrl = import.meta.env.VITE_BACKEND_URL;
-	const[count,setCount]=useState(0)
-		const[entrevista,setEntrevista]=useState(0)
-		const[descartado,setDescartado]=useState(0)
+	const [count, setCount] = useState(0)
+	const [entrevista, setEntrevista] = useState(0)
+	const [descartado, setDescartado] = useState(0)
 
-		const[oferta,setOferta]=useState(0)
-
-		
-	useEffect(()=>{
+	const [oferta, setOferta] = useState(0)
 
 
+	useEffect(() => {
 
 
-		axios.get(`${backendUrl}/posts/my-post-count`).then((res)=>{setCount(res.data)}).catch((err)=>{console.error(err);
+
+
+		axios.get(`${backendUrl}/posts/my-post-count`).then((res) => { setCount(res.data) }).catch((err) => {
+			console.error(err);
 		})
-	},[])
+	}, [])
 
-	useEffect(()=>{
-		axios.get(`${backendUrl}/posts/entrevista`).then((res)=>{setEntrevista(res.data)}).catch((err)=>{console.error(err);
+	useEffect(() => {
+		axios.get(`${backendUrl}/posts/entrevista`).then((res) => { setEntrevista(res.data) }).catch((err) => {
+			console.error(err);
 		})
-	},[])
+	}, [])
 
-	useEffect(()=>{
-		axios.get(`${backendUrl}/posts/descartado`).then((res)=>{setDescartado(res.data)}).catch((err)=>{console.error(err);
+	useEffect(() => {
+		axios.get(`${backendUrl}/posts/descartado`).then((res) => { setDescartado(res.data) }).catch((err) => {
+			console.error(err);
 		})
-	},[])
+	}, [])
 
-	useEffect(()=>{
-		axios.get(`${backendUrl}/posts/oferta`).then((res)=>{setOferta(res.data)}).catch((err)=>{console.error(err);
+	useEffect(() => {
+		axios.get(`${backendUrl}/posts/oferta`).then((res) => { setOferta(res.data) }).catch((err) => {
+			console.error(err);
 		})
-	},[])
+	}, [])
 
 
 

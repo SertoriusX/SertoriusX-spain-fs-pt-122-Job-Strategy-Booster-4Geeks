@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import "../styles/JobDetail.css"
+import "../../styles/JobDetail.css"
 export default function JobsDetail() {
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "../styles/Formulario.css";
+import "../../styles/Formulario.css";
 import { FiSave, FiX, FiLogOut } from "react-icons/fi";
 
 

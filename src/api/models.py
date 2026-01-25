@@ -16,35 +16,39 @@ class User(db.Model):
     email: Mapped[str] = mapped_column(
         String(120), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(nullable=False)
+    profile:Mapped["Profile"] = relationship("Profile", back_populates="user",uselist=False,
+        cascade="all, delete-orphan")
+
     is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False)
-    postulaciones:Mapped[List["Postulaciones"]]=relationship("Postulaciones",back_populates="user")
     def serialize(self):
         return {
             "id": self.id,
             "username": self.username,
             "email": self.email,
             "is_active": self.is_active
-            # do NOT include password here for security reasons
         }
     def __str__(self):
         return self.username
     
 
-class Postulaciones(db.Model):
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name_company:Mapped[str]=mapped_column(String(50),nullable=False)
-    salary:Mapped[int]=mapped_column(Integer,nullable=False)
-    candidatos:Mapped[int]=mapped_column(Integer,nullable=False)
-    reqerments: Mapped[List[Any]] = mapped_column(JSON, nullable=False)
-    user_id:Mapped[int]=mapped_column(ForeignKey("user.id"))
-    user:Mapped["User"]=relationship("User",back_populates="postulaciones")
-    def serializer(self):
-        return {
-            "id":self.id,
-            "name_company":self.name_company,
-            "salary":self.salary,
-            "candidatos":self.candidatos,
-            "reqerments":[req for req in self.reqerments]
-
-        }
-    
+class Profile(db.Model):
+        id: Mapped[int] = mapped_column(primary_key=True)
+        first_name: Mapped[str] = mapped_column(String(50), nullable=False)
+        last_name: Mapped[str] = mapped_column(String(50), nullable=False)
+        img_profile: Mapped[str] = mapped_column(String(50), nullable=False)
+        bio: Mapped[str] = mapped_column(String(999999), nullable=False)
+        skill: Mapped[List[str]] = mapped_column(JSON, nullable=False, default=list)
+        user_id:Mapped[int]=mapped_column(ForeignKey("user.id"))
+        user:Mapped["User"] = relationship("User", back_populates="profile",uselist=False)
+        def serialize(self):
+            return {
+                "id": self.id,
+                "first_name": self.first_name,
+                "last_name": self.last_name,
+                "img_profile":self.img_profile,
+                "bio": self.bio,
+                "skill": self.skill,
+                
+            }
+        def __str__(self):
+            return f"{ self.first_name} {self.last_name}"

@@ -1,8 +1,8 @@
 import React, { useState, useContext } from "react";
 import axios from "axios";
-import { UserContext } from "../hooks/UserContextProvier.jsx";
 import { useNavigate } from "react-router-dom";
-import LoadingScreen from "./LoadingScreen"; // Adjust the path if needed
+import LoadingScreen from "../LoadingScreen";
+import { UserContext } from "../../hooks/UserContextProvier";
 
 function LoginForm({ changeForm }) {
     const [form, setForm] = useState({
