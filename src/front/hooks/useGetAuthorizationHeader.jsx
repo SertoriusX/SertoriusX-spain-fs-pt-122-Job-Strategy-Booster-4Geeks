@@ -1,12 +1,14 @@
 import { useContext } from 'react';
-import { UserContext } from '../hooks/UserContextProvier'
+import { UserContext } from './UserContextProvier';
 
-export const useGetAuthorizationHeader = () => {
+const useGetAuthorizationHeader = () => {
     const { token } = useContext(UserContext);
-    return { 
+    return {
         headers: {
-            "Content-Type": "application/json", 
-            'Authorization': `Bearer ${token}` 
-        } 
+            "Content-Type": "application/json",
+            'Authorization': `Bearer ${token}`
+        }
     };
-} 
+}
+
+export default useGetAuthorizationHeader;

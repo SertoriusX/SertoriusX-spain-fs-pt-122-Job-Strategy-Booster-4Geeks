@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getPostulationById, getPostulations, removePostulation } from '../Fetch/postulationFecth';
-import { useGetAuthorizationHeader } from '../hooks/useGetAuthorizationHeader';
+import useGetAuthorizationHeader from '../../hooks/useGetAuthorizationHeader';
+import { getPostulationById, removePostulation } from '../../Fetch/postulationFecth';
+import "../../styles/JobDetail.css"
 
 export default function JobsDetail() {
     const { id } = useParams();
@@ -31,13 +32,13 @@ export default function JobsDetail() {
         };
 
         fetchPostulation();
-    }, [id, authorizationHeader]);
+    }, [id]);
 
     if (!postulation) return <p>Postulation not found</p>;
 
     return (
         <div
-            className="d-flex flex-column my-5 bg-white rounded shadow px-4 py-4"
+            className=" my-container d-flex flex-column my-5 bg-white rounded shadow px-4 py-4"
             style={{ maxWidth: '90rem' }}
         >
             <div className="d-flex align-items-center justify-content-between p-3 mb-5">

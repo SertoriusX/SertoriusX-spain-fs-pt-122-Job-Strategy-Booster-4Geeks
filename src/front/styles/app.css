@@ -15,6 +15,26 @@
   --main-color: #4c6fff;
   --main-color-hover: #6e8bff;
 }
+.translator_box {
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+}
+
+/* Style Google dropdown */
+#google_translate_element select {
+  padding: 5px 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* Hide Google branding (optional) */
+.goog-logo-link,
+.goog-te-gadget span {
+  display: none !important;
+}
 
 .main_container {
   display: flex;

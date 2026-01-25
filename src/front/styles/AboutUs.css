@@ -1,7 +1,25 @@
+:root {
+  --back-color: #ffffff;
+  --card-color: #d9d9d9;
+  --font-color: #1b1b1b;
+  --ligther-font-color: #6f6f6f;
+  --main-color: #2b4eeb;
+  --main-color-hover: #6b82ec;
+}
+[data-theme="dark"]  {
+  --back-color: #0f1115;
+  --card-color: #1c1f26;
+  --font-color: #e6e6e6;
+  --ligther-font-color: #a1a1aa;
+  --main-color: #4c6fff;
+  --main-color-hover: #6e8bff;
+}
+
+
 .about-container {
   font-family: 'Inter', sans-serif;
-  background-color: #f7f9fc;
-  color: #1a1a1a;
+  background-color: var(--back-color);
+  color: var(--back-color);;
   padding: 40px;
   max-width: 1100px;
   margin: auto;
@@ -10,7 +28,7 @@
 
 h2 {
   font-size: 36px;
-  color: #0b3d91;
+  color: var(--font-color);
   margin-bottom: 16px;
   text-align: left;
 }
@@ -36,12 +54,14 @@ h2 {
 .intro-text {
   flex: 1;
   min-width: 300px;
+  color:var(--font-color);
 }
 
 .team-section {
-  background-color: #f3e8ff;
+  background-color: var(--back-color);
   border-radius: 12px;
   padding: 40px;
+  color: var(--font-color);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 

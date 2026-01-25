@@ -1,10 +1,10 @@
 import { useState } from "react";
-import "../styles/Formulario.css";
+import "../../styles/Formulario.css";
 import { FiSave, FiX, FiLogOut } from "react-icons/fi";
 
-import { createNewPostulation } from '../Fetch/postulationFecth'
-import { useGetAuthorizationHeader } from "../hooks/useGetAuthorizationHeader";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import useGetAuthorizationHeader from "../../hooks/useGetAuthorizationHeader";
+import { createNewPostulation } from "../../Fetch/postulationFecth";
 
 
 export default function Formulario() {
@@ -27,7 +27,7 @@ export default function Formulario() {
     });
 
     const [inputValue, setInputValue] = useState("");
-
+    const navigate = useNavigate()
     const handleKeyDown = (e) => {
         if (e.key === "Enter") {
             e.preventDefault();
@@ -70,6 +70,7 @@ export default function Formulario() {
         try {
             const result = await createNewPostulation(payload, authorizationHeader);
             console.log("Postulación creada:", result);
+            navigate("/jobs")
 
         } catch (error) {
             console.error("Error al crear postulación:", error.message);
