@@ -1,12 +1,13 @@
-"""
-This module takes care of starting the API Server, Loading the DB and Adding the endpoints
-"""
 from flask_bcrypt import Bcrypt
+from flask import Flask, request, jsonify, url_for, Blueprint
+from api.models import db, User, CV
 from flask import Flask, request, jsonify, url_for, Blueprint,send_from_directory
 from api.models import db, User, Postulations,Profile
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+import json
+from datetime import datetime
 from api.data_mock.mock_data import jobs
 from datetime import datetime
 
@@ -19,6 +20,7 @@ import requests
 from werkzeug.utils import secure_filename
 
 CORS(api)
+bcrypt = Bcrypt()
 
 bcrypt = Bcrypt()  
 
@@ -109,12 +111,7 @@ def uploaded_file(filename):
 
 @api.route('/hello', methods=['POST', 'GET'])
 def handle_hello():
-
-    response_body = {
-        "message": "Hello! I'm a message that came from the backend, check the network tab on the google inspector and you will see the GET request"
-    }
-
-    return jsonify(response_body), 200
+    return jsonify({"message": "Hello! I'm a message that came from the backend"}), 200
 
 
 """ ---------- REGISTER ENDPOINT ----------- """
@@ -123,7 +120,6 @@ def handle_hello():
 @api.route('/register', methods=["POST"])
 def register():
     data = request.get_json()
-
     username = data.get('username')
     email = data.get('email')
     password = data.get('password')
@@ -139,20 +135,12 @@ def register():
 
     password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
 
-    new_user = User(
-        username=username,
-        email=email,
-        password=password_hash,
-        is_active=True
-    )
-
+    new_user = User(username=username, email=email,
+                    password=password_hash, is_active=True)
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({
-        "message": "User registered successfully",
-        "user": new_user.serialize()
-    }), 201
+    return jsonify({"message": "User registered successfully", "user": new_user.serialize()}), 201
 
 
 """ ------------ LOGIN ENDPOINT ----------- """
@@ -168,7 +156,6 @@ def login():
     if not user or not bcrypt.check_password_hash(user.password, password):
         return jsonify({"message": "Invalid credentials"}), 401
 
-    access_token = create_access_token(str(user.id))
     access_token = create_access_token(identity=str(user.id))
 
     return jsonify({
@@ -180,6 +167,133 @@ def login():
 @api.route('/user', methods=["GET"])
 def user_detail():
     users = User.query.all()
+    return jsonify([user.serialize() for user in users])
+
+
+@api.route("/cv", methods=["GET"])
+@jwt_required()
+def get_cv():
+    try:
+        current_user_id = get_jwt_identity()
+        cv = CV.query.filter_by(user_id=current_user_id).first()
+
+        if not cv:
+            return jsonify({'success': False, 'message': 'CV no encontrado'}), 404
+
+        datos = json.loads(cv.datos)
+
+        return jsonify({
+            'success': True,
+            'datos': datos,
+            'fecha_creacion': cv.fecha_creacion.isoformat() if cv.fecha_creacion else None,
+            'fecha_modificacion': cv.fecha_modificacion.isoformat() if cv.fecha_modificacion else None
+        }), 200
+
+    except json.JSONDecodeError as e:
+        return jsonify({'success': False, 'message': 'Error al leer los datos del CV'}), 500
+
+    except Exception as e:
+        print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@api.route("/cv", methods=["POST"])
+@jwt_required()
+def save_cv():
+    try:
+        current_user_id = get_jwt_identity()
+        data = request.get_json()
+
+        if not data:
+            return jsonify({'success': False, 'message': 'No se enviaron datos'}), 400
+
+        if not data.get('nombre'):
+            return jsonify({'success': False, 'message': 'El nombre es obligatorio'}), 400
+
+        if not data.get('email'):
+            return jsonify({'success': False, 'message': 'El email es obligatorio'}), 400
+
+        if not data.get('telefono'):
+            return jsonify({'success': False, 'message': 'El teléfono es obligatorio'}), 400
+
+        json_data = json.dumps(data, ensure_ascii=False)
+        cv = CV.query.filter_by(user_id=current_user_id).first()
+
+        if cv:
+            cv.datos = json_data
+            cv.fecha_modificacion = datetime.utcnow()
+        else:
+            cv = CV(
+                user_id=current_user_id,
+                datos=json_data,
+                fecha_creacion=datetime.utcnow(),
+                fecha_modificacion=datetime.utcnow()
+            )
+            db.session.add(cv)
+
+        db.session.commit()
+
+        return jsonify({'success': True, 'message': 'CV guardado correctamente', 'cv_id': cv.id}), 200
+
+    except Exception as e:
+        print(f"ERROR: {e}")
+        import traceback
+        traceback.print_exc()
+        db.session.rollback()
+        return jsonify({'success': False, 'message': f'Error al guardar: {str(e)}'}), 500
+
+
+@api.route("/cv", methods=["DELETE"])
+@jwt_required()
+def delete_cv():
+    try:
+        current_user_id = get_jwt_identity()
+        cv = CV.query.filter_by(user_id=current_user_id).first()
+
+        if not cv:
+            return jsonify({'success': False, 'message': 'CV no encontrado'}), 404
+
+        db.session.delete(cv)
+        db.session.commit()
+
+        return jsonify({'success': True, 'message': 'CV eliminado correctamente'}), 200
+
+    except Exception as e:
+        print(f"ERROR: {e}")
+        import traceback
+        traceback.print_exc()
+        db.session.rollback()
+        return jsonify({'success': False, 'message': f'Error al eliminar: {str(e)}'}), 500
+
+
+@api.route("/cv/export", methods=["GET"])
+@jwt_required()
+def export_cv():
+    try:
+        current_user_id = get_jwt_identity()
+        cv = CV.query.filter_by(user_id=current_user_id).first()
+
+        if not cv:
+            return jsonify({'success': False, 'message': 'CV no encontrado'}), 404
+
+        datos = json.loads(cv.datos)
+        nombre = datos.get('nombre', 'cv').replace(' ', '-').lower()
+        fecha = datetime.now().strftime('%Y-%m-%d')
+        filename = f"cv-{nombre}-{fecha}.json"
+
+        response = jsonify(datos)
+        response.headers['Content-Disposition'] = f'attachment; filename={filename}'
+        response.headers['Content-Type'] = 'application/json'
+
+        return response, 200
+
+    except Exception as e:
+        print(f"ERROR: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': f'Error al exportar: {str(e)}'}), 500
     list_user = [user.serialize() for user in users]
     return jsonify(list_user)
 

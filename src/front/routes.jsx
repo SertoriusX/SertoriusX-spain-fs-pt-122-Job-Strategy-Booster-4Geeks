@@ -12,6 +12,9 @@ import Curriculums from "./pages/Curriculum";
 import Interview from "./pages/Interview";
 import PerfilUsuario from "./pages/PerfilUsuario";
 import AboutUs from "./pages/AboutUs";
+import AdminCV from "./pages/AdminCV";
+
+
 import { useState } from "react";
 import EditProfile from "./components/ProfileComponents/EditProfile.jsx";
 import LoginForm from "./components/user/LoginForm.jsx";
@@ -28,8 +31,12 @@ export const router = createBrowserRouter(
       <Route path="curriculum" element={<Curriculums />} />
       <Route path="interview" element={<Interview />} />
       <Route path="register" element={<Registration />} />
+      <Route path="jobId" element={<JobsDetail />} />
+      <Route path="formulario" element={<Formulario />} />
       <Route path="login" element={<LoginForm />} />
       <Route path="perfil" element={<PerfilUsuario />} />
+      <Route path="about" element={<AboutUs />} />
+      <Route path="admin-cv" element={<AdminCV />} />
       <Route path="about" element={<AboutUs />} />
       <Route path="/post/:id" element={<JobsDetail />} />
       <Route path="formulario" element={<Formulario />} />
@@ -40,6 +47,5 @@ export const router = createBrowserRouter(
 
 
     </Route>
-
   )
 );
