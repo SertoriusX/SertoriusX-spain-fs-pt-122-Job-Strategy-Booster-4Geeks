@@ -8,14 +8,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 
 import '../styles/jobDetails.css'
-import Stepper from '../components/CreateRouteMap';
 
 export default function JobsDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
     const authorizationHeader = useGetAuthorizationHeader();
     const [postulation, setPostulation] = useState(null);
-    const [shortUrl, setShortUrl] = useState(null);
 
     const handleDelete = async () => {
         if (!postulation) return;
@@ -31,7 +29,6 @@ export default function JobsDetail() {
     const formatLink = (link) => {
         return link.split('/').slice(0, 3).join('')
     }
-
 
     useEffect(() => {
         const fetchPostulation = async () => {
@@ -65,15 +62,15 @@ export default function JobsDetail() {
             <div className="rode_map_details">
                 <h2>{postulation.postulation_state}</h2>
                 <div className="rode_map_options">
-                    <button className='modify_route'>Modificar ruta</button>
+                    <Link to={`/postulations/${id}/create-stepper`}>
+                        <button className='modify_route'>Modificar ruta</button>
+                    </Link>
                     <div className="progress_">
                         <button>Prev</button>
                         <button>Next</button>
                     </div>
                 </div>
             </div>
-
-            <Stepper />
 
             <div className="postulation_content">
                 <div className="general_details_left">
