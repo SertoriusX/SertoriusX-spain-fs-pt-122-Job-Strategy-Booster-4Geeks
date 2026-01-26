@@ -65,100 +65,117 @@ def user_detail():
 
 @api.route("/cv", methods=["GET"])
 @jwt_required()
-def get_cv():
+def get_all_cvs():
     try:
         current_user_id = get_jwt_identity()
-        cv = CV.query.filter_by(user_id=current_user_id).first()
-
-        if not cv:
-            return jsonify({'success': False, 'message': 'CV no encontrado'}), 404
-
-        datos = json.loads(cv.datos)
+        cvs = CV.query.filter_by(user_id=current_user_id).all()
 
         return jsonify({
-            'success': True,
-            'datos': datos,
-            'fecha_creacion': cv.fecha_creacion.isoformat() if cv.fecha_creacion else None,
-            'fecha_modificacion': cv.fecha_modificacion.isoformat() if cv.fecha_modificacion else None
+            "success": True,
+            "cvs": [cv.serialize() for cv in cvs]
         }), 200
 
-    except json.JSONDecodeError as e:
-        return jsonify({'success': False, 'message': 'Error al leer los datos del CV'}), 500
+    except Exception as e:
+        print(f"ERROR: {e}")
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@api.route("/cv/<int:cv_id>", methods=["GET"])
+@jwt_required()
+def get_cv_by_id(cv_id):
+    try:
+        current_user_id = get_jwt_identity()
+        cv = CV.query.filter_by(id=cv_id, user_id=current_user_id).first()
+
+        if not cv:
+            return jsonify({"success": False, "message": "CV no encontrado"}), 404
+
+        return jsonify({"success": True, "cv": cv.serialize()}), 200
 
     except Exception as e:
-        print(f"Error: {e}")
-        import traceback
-        traceback.print_exc()
-        return jsonify({'success': False, 'message': str(e)}), 500
+        print(f"ERROR: {e}")
+        return jsonify({"success": False, "message": str(e)}), 500
 
 
 @api.route("/cv", methods=["POST"])
 @jwt_required()
-def save_cv():
+def create_cv():
     try:
         current_user_id = get_jwt_identity()
         data = request.get_json()
 
         if not data:
-            return jsonify({'success': False, 'message': 'No se enviaron datos'}), 400
+            return jsonify({"success": False, "message": "No se enviaron datos"}), 400
 
-        if not data.get('nombre'):
-            return jsonify({'success': False, 'message': 'El nombre es obligatorio'}), 400
+        # Crear un nuevo CV
+        nuevo_cv = CV(
+            user_id=current_user_id,
+            datos=json.dumps(data, ensure_ascii=False),
+            fecha_creacion=datetime.utcnow(),
+            fecha_modificacion=datetime.utcnow()
+        )
 
-        if not data.get('email'):
-            return jsonify({'success': False, 'message': 'El email es obligatorio'}), 400
-
-        if not data.get('telefono'):
-            return jsonify({'success': False, 'message': 'El teléfono es obligatorio'}), 400
-
-        json_data = json.dumps(data, ensure_ascii=False)
-        cv = CV.query.filter_by(user_id=current_user_id).first()
-
-        if cv:
-            cv.datos = json_data
-            cv.fecha_modificacion = datetime.utcnow()
-        else:
-            cv = CV(
-                user_id=current_user_id,
-                datos=json_data,
-                fecha_creacion=datetime.utcnow(),
-                fecha_modificacion=datetime.utcnow()
-            )
-            db.session.add(cv)
-
+        db.session.add(nuevo_cv)
         db.session.commit()
 
-        return jsonify({'success': True, 'message': 'CV guardado correctamente', 'cv_id': cv.id}), 200
+        return jsonify({
+            "success": True,
+            "cv": nuevo_cv.serialize()
+        }), 201
 
     except Exception as e:
         print(f"ERROR: {e}")
-        import traceback
-        traceback.print_exc()
         db.session.rollback()
-        return jsonify({'success': False, 'message': f'Error al guardar: {str(e)}'}), 500
+        return jsonify({"success": False, "message": str(e)}), 500
 
 
-@api.route("/cv", methods=["DELETE"])
+@api.route("/cv/<int:cv_id>", methods=["PUT"])
 @jwt_required()
-def delete_cv():
+def update_cv(cv_id):
     try:
         current_user_id = get_jwt_identity()
-        cv = CV.query.filter_by(user_id=current_user_id).first()
+        data = request.get_json()
+
+        cv = CV.query.filter_by(id=cv_id, user_id=current_user_id).first()
 
         if not cv:
-            return jsonify({'success': False, 'message': 'CV no encontrado'}), 404
+            return jsonify({"success": False, "message": "CV no encontrado"}), 404
+
+        cv.datos = json.dumps(data, ensure_ascii=False)
+        cv.fecha_modificacion = datetime.utcnow()
+
+        db.session.commit()
+
+        return jsonify({
+            "success": True,
+            "cv": cv.serialize()
+        }), 200
+
+    except Exception as e:
+        print(f"ERROR: {e}")
+        db.session.rollback()
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@api.route("/cv/<int:cv_id>", methods=["DELETE"])
+@jwt_required()
+def delete_cv(cv_id):
+    try:
+        current_user_id = get_jwt_identity()
+        cv = CV.query.filter_by(id=cv_id, user_id=current_user_id).first()
+
+        if not cv:
+            return jsonify({"success": False, "message": "CV no encontrado"}), 404
 
         db.session.delete(cv)
         db.session.commit()
 
-        return jsonify({'success': True, 'message': 'CV eliminado correctamente'}), 200
+        return jsonify({"success": True, "message": "CV eliminado correctamente"}), 200
 
     except Exception as e:
         print(f"ERROR: {e}")
-        import traceback
-        traceback.print_exc()
         db.session.rollback()
-        return jsonify({'success': False, 'message': f'Error al eliminar: {str(e)}'}), 500
+        return jsonify({"success": False, "message": str(e)}), 500
 
 
 @api.route("/cv/export", methods=["GET"])
