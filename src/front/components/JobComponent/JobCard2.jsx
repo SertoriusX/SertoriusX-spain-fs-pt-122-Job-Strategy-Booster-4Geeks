@@ -19,7 +19,7 @@ function JobCard2({ post }) {
                     <span className="status">{post.postulation_state}</span>
                     <span className="category">{post.company_name}</span>
                 </div>
-                <button onClick={() => navigate(`/post/${post.id}`)} className="view_details">Detalles</button>
+                <button onClick={() => navigate(`/postulations/${post.id}`)} className="view_details">Detalles</button>
             </div>
 
             <div className="application_card_title">

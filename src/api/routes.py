@@ -1,5 +1,4 @@
 from flask_bcrypt import Bcrypt
-from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import db, User, CV
 from flask import Flask, request, jsonify, url_for, Blueprint,send_from_directory
 from api.models import db, User, Postulations,Profile
@@ -16,7 +15,7 @@ from dotenv import load_dotenv
 import os
 import traceback 
 import openai
-import requests  
+import requests
 from werkzeug.utils import secure_filename
 
 CORS(api)

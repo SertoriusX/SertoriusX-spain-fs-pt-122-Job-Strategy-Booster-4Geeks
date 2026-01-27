@@ -70,7 +70,7 @@ export default function Formulario() {
         try {
             const result = await createNewPostulation(payload, authorizationHeader);
             console.log("Postulación creada:", result);
-            navigate("/jobs")
+            navigate("/postulations")
 
         } catch (error) {
             console.error("Error al crear postulación:", error.message);
@@ -255,11 +255,9 @@ export default function Formulario() {
                             <button type="submit" className="icon-button">
                                 <FiSave />
                             </button>
-                            <Link to='/Jobs'>
-                                <button type="button" className="icon-button secondary">
-                                    <FiX />
-                                </button>
-                            </Link>
+                            <button onClick={() => navigate(-1)} type="button" className="icon-button secondary">
+                                <FiX />
+                            </button>
                         </div>
 
                     </div>

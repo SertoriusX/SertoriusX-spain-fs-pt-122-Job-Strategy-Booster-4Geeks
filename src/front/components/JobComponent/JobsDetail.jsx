@@ -1,19 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { getPostulationById, removePostulation } from '../Fetch/postulationFecth';
-import { useGetAuthorizationHeader } from '../hooks/useGetAuthorizationHeader';
-import { useNavigate, useParams } from 'react-router-dom';
 import useGetAuthorizationHeader from '../../hooks/useGetAuthorizationHeader';
 import { getPostulationById, removePostulation } from '../../Fetch/postulationFecth';
-import "../../styles/JobDetail.css"
+import "../../styles/jobDetails.css"
 
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 
-import '../styles/jobDetails.css'
-import Stepper from '../components/CreateRouteMap';
-
+/* import Stepper from '../components/CreateRouteMap';
+ */
 export default function JobsDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -77,7 +73,6 @@ export default function JobsDetail() {
                 </div>
             </div>
 
-            <Stepper />
 
             <div className="postulation_content">
                 <div className="general_details_left">
