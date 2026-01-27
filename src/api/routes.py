@@ -3,7 +3,7 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 """
 from flask_bcrypt import Bcrypt
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Postulations
+from api.models import db, User, Postulations, Stages
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
@@ -95,57 +95,6 @@ def user_detail():
 
 
 # -----------------------------Postulaciones-----------------------------#
-""" @api.route("/posts/my-post-count", methods=["GET"])
-def count_post():
-    total_job = len(jobs)
-    return jsonify({"count": total_job})
-
-
-@api.route("/posts/oferta", methods=["GET"])
-def count_oferta():
-    total_job = len([j for j in jobs if j["proceso"] == "Ofertas"])
-    return jsonify({"oferta": total_job})
-
-
-@api.route("/posts/descartado", methods=["GET"])
-def count_descartado():
-    total_job = len([j for j in jobs if j["proceso"] == "Descartado"])
-    return jsonify({"descartado": total_job})
-
-
-@api.route("/posts/entrevista", methods=["GET"])
-def count_entrevista():
-    total_job = len([j for j in jobs if j["proceso"] == "En entrevista"])
-    return jsonify({"entrevista": total_job})
-
-
-@api.route("/postulacion", methods=['GET'])
-def postulaciones_get():
-    job = [j for j in jobs]
-    return jsonify(job)
-
-
-@api.route("/postulacion/<int:id>", methods=['GET'])
-def postulaciones_get_id(id):
-    job = next((j for j in jobs if j['id'] == id), None)
-    if job is None:
-        return jsonify({"error": "Job not found"}), 404
-    return jsonify(job)
-
-
-@api.route("/postulacion/filter", methods=['GET'])
-def postulaciones_ge_filtert():
-    status_filter = request.args.get('status', None)
-
-    if status_filter:
-        filtered_jobs = [job for job in jobs if job.get(
-            'status', '').lower() == status_filter.lower()]
-    else:
-        filtered_jobs = jobs
-
-    return jsonify(filtered_jobs), 200
- """
-
 
 @api.route("/postulations", methods=["GET"])
 @jwt_required()
@@ -265,3 +214,37 @@ def delete_postulation(id):
     db.session.delete(postulation)
     db.session.commit()
     return jsonify({"message": "Postulation has been removed"})
+
+
+# -----------------------------STEPPER-----------------------------#
+
+@api.route('/postulations/<int:id>/create-stepper', methods=['POST'])
+@jwt_required()
+def create_new_step_map(id):
+    stage_list = request.get_json()
+
+    if not stage_list or not isinstance(stage_list, list):
+        return jsonify({'error': 'Data must be a stages list'}), 400
+    
+    postulation = Postulations.query.get(id)
+    if not postulation:
+        return jsonify({'error':'Postulation not found'}), 404
+    
+    new_stage = []
+    for stage_name in stage_list:
+        if not isinstance(stage_name, str) or not stage_name.strip():
+            continue
+
+        stage = Stages(
+            stage_name=stage_name.strip(),
+            postulation=postulation 
+        )
+        db.session.add(stage)
+        new_stage.append(stage)
+    
+    db.session.commit()
+
+    return jsonify({
+        "message": "Stages created successfully",
+        "stages": [stage.serialize() for stage in new_stage]
+    }), 201

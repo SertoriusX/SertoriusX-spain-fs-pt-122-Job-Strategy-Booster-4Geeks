@@ -49,9 +49,11 @@ class Postulations(db.Model):
     candidates_applied: Mapped[int] = mapped_column(Integer, nullable=False)
     available_positions: Mapped[int] = mapped_column(Integer, nullable=False)
     job_description: Mapped[str] = mapped_column(String(500), nullable=False)
-    stages: Mapped[List[str]] = mapped_column
+
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     user: Mapped["User"] = relationship("User", back_populates="postulations")
+
+    stages: Mapped[list['Stages']] = relationship('Stages', back_populates='postulation', cascade="all, delete-orphan")
 
     def serialize(self):
         return {
@@ -70,4 +72,24 @@ class Postulations(db.Model):
             "candidates_applied": self.candidates_applied,
             "available_positions": self.available_positions,
             "job_description": self.job_description
+            
+        }
+    
+class Stages(db.Model):
+    __tablename__= 'stages'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    stage_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    date_completed_stage: Mapped[date] = mapped_column(Date, nullable=True)
+    stage_completed: Mapped[bool] = mapped_column(Boolean,nullable=False, default=False)
+
+    postulation_id: Mapped[int] = mapped_column(ForeignKey('postulations.id'),nullable=False)
+    postulation: Mapped['Postulations'] = relationship('Postulations', back_populates='stages')
+
+    def serialize(self):
+        return{
+            'id': self.id,
+            'stage_name': self.stage_name,
+            'date_completed_stage': self.date_completed_stage,
+            'stage_completed': self.stage_completed
         }
