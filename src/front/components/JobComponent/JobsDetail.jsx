@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useMatch, useNavigate, useParams } from 'react-router-dom';
 import useGetAuthorizationHeader from '../../hooks/useGetAuthorizationHeader';
 import { getPostulationById, removePostulation } from '../../Fetch/postulationFecth';
 import "../../styles/jobDetails.css"
 
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Stepper from '../CreateRouteMap';
+import RouteMapPreview from '../RouteMapPreview';
 
-
-/* import Stepper from '../components/CreateRouteMap';
- */
 export default function JobsDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const isRouteMap = useMatch('/postulations/:id/route-map');
     const authorizationHeader = useGetAuthorizationHeader();
     const [postulation, setPostulation] = useState(null);
-    const [shortUrl, setShortUrl] = useState(null);
+    const [stages, setStages] = useState([])
 
     const handleDelete = async () => {
         if (!postulation) return;
@@ -31,6 +31,20 @@ export default function JobsDetail() {
     const formatLink = (link) => {
         return link.split('/').slice(0, 3).join('')
     }
+
+    const closeStepper = () => {
+        if(isRouteMap){
+            if (stages.length > 0) {
+                const confirmationClose = window.confirm('Si cierras el modificador de rutas, no se guardaran datos, quieres cerrarlo de todas maneras?')
+                if (!confirmationClose) return
+            }
+            setStages([])
+            navigate(-1)
+        }else{
+            navigate(`/postulations/${id}/route-map`);
+        }
+    }
+
 
 
     useEffect(() => {
@@ -53,25 +67,29 @@ export default function JobsDetail() {
                 <div className="left_side">
                     <Link to='/postulations'><span><FontAwesomeIcon icon={faArrowLeft} />Volver a lista de postulaciones</span></Link>
                     <h1>{postulation.company_name}</h1>
-                    <p>{postulation.role}</p>
+                    <section>
+                        <h5 className='role'>{postulation.role}</h5>
+                        <h5>{postulation.postulation_state}</h5>
+                    </section>
                 </div>
 
                 <div className="rigth_side">
                     <button className='update'>Actualizar</button>
                     <button onClick={handleDelete} className='delete'>Eliminar</button>
+                    <button onClick={closeStepper}>
+                        {isRouteMap ? 'Cerrar' : 'Modificar ruta'}
+                    </button>
+
                 </div>
             </div>
 
             <div className="rode_map_details">
-                <h2>{postulation.postulation_state}</h2>
-                <div className="rode_map_options">
-                    <button className='modify_route'>Modificar ruta</button>
-                    <div className="progress_">
-                        <button>Prev</button>
-                        <button>Next</button>
-                    </div>
-                </div>
+                {isRouteMap
+                    ? <Stepper stages={stages} setStages={setStages} />
+                    : <RouteMapPreview stages={stages} />
+                }
             </div>
+
 
 
             <div className="postulation_content">
