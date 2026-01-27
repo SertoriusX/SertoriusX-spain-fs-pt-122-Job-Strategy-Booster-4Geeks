@@ -1,5 +1,6 @@
 import { useState } from "react";
 import '../styles/stepper.css'
+import { useNavigate } from "react-router-dom";
 
 const WORK_STAGES = [
     { value: "initial_contact", label: "Toma de contacto inicial" },
@@ -18,65 +19,59 @@ const WORK_STAGES = [
 ];
 
 const Stepper = () => {
-    const [selectedStage, setSelectedStage] = useState(WORK_STAGES[0].value);
-    const [isSelectorOpen, setIsSelectorOpen] = useState(false);
-    const [stages, setStages] = useState([]); // listado de etapas añadidas
-    const [loading, setLoading] = useState(false);
+    const [stageData, setStageData] = useState(WORK_STAGES[0].value)
+    const [stages, setStages] = useState([])
+    const navigate = useNavigate()
 
     const handleAddStage = () => {
-        setLoading(true);
-        setStages(prev => [...prev, WORK_STAGES.find(s => s.value === selectedStage).label]);
-        setLoading(false);
-    };
+        setStages(prev => [...prev, stageData]);
+        setStageData(WORK_STAGES[0].value);
+        console.log(stages)
+    }
 
     return (
         <div className="stages_container">
             <div className="header">
                 <h2>Tu proceso</h2>
-                <button
-                    onClick={() => setIsSelectorOpen(prev => !prev)}
-                    className="modify_route"
+            </div>
+            <div className="selector_container">
+                <select
+                    value={stageData}
+                    onChange={(e) => setStageData(prev => (e.target.value))}
                 >
-                    {isSelectorOpen ? "Cerrar selector" : "Modificar ruta"}
+                    {WORK_STAGES.map(stage => (
+                        <option key={stage.value} value={stage.value}>
+                            {stage.label}
+                        </option>
+                    ))}
+                </select>
+
+                <button onClick={handleAddStage} className="add_stage_btn" >
+                    Añadir etapa
                 </button>
             </div>
-
-            {isSelectorOpen && (
-                <div className="selector_container">
-                    <select
-                        value={selectedStage}
-                        onChange={(e) => setSelectedStage(e.target.value)}
-                    >
-                        {WORK_STAGES.map(stage => (
-                            <option key={stage.value} value={stage.value}>
-                                {stage.label}
-                            </option>
-                        ))}
-                    </select>
-                    <button onClick={handleAddStage} className="add_stage_btn" disabled={loading}>
-                        {loading ? "Añadiendo..." : "Añadir etapa"}
-                    </button>
-                </div>
-            )}
-
-            {stages.length === 0 ? (
-                <h4>No tienes un proceso creado</h4>
-            ) : (
-                <div className="stepper">
-                    {stages.map((label, index) => {
+            <div className="stepper">
+                {stages.length === 0 ? (
+                    <h4>No tienes un proceso creado</h4>
+                ) : (
+                    stages.map((stage, index) => {
                         const isLast = index === stages.length - 1;
+                        const label = WORK_STAGES.find(s => s.value === stage).label;
+
                         return (
-                            <div
-                                key={index}
-                                className={`stage ${!isLast ? "connected" : ""} completed`}
-                            >
+                            <div key={`${stage}-${index}`} className={`stage ${!isLast ? "connected" : ""}`}>
                                 <div className="step">{index + 1}</div>
                                 <p>{label}</p>
                             </div>
                         );
-                    })}
-                </div>
-            )}
+                    })
+                )}
+            </div>
+
+            <footer className="options_buttons">
+                <button onClick={() => navigate(-1)} className="discard_btn">Descartar</button>
+                <button className="save_btn">Guardar</button>
+            </footer>
         </div>
     );
 };
