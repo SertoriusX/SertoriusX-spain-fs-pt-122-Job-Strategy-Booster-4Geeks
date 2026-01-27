@@ -4,7 +4,7 @@ function MenuButttons({ options, onFilterChange }) {
     const [active, setActive] = useState(options[0]);
 
     useEffect(() => {
-        if(onFilterChange) onFilterChange(active);
+        if (onFilterChange) onFilterChange(active);
     }, [active, onFilterChange]);
 
     return (

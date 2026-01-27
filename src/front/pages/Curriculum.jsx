@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import "../styles/curriculum.css";
+import AdminCV from "./AdminCV";
 
 const translations = {
     en: {
@@ -142,6 +143,7 @@ function Curriculums() {
 
     return (
         <>
+            <AdminCV />
             <div className="container-center">
                 <div className="input-section">
                     <h1>{t.cvBuilder}</h1>

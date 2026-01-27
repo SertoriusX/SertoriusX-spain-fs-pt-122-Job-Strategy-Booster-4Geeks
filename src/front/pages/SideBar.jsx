@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import NavBarButton from "../components/NavBarButton";
+import NavBarButton from "../components/navbar/NavBarButton.jsx";
 import "../styles/navbar.css";
 
 import {
@@ -10,6 +10,7 @@ import {
     faGear,
     faCircleQuestion,
     faFileLines,
+    faInfoCircle
 } from "@fortawesome/free-solid-svg-icons";
 
 import { UserContext } from "../hooks/UserContextProvier.jsx";
@@ -17,6 +18,8 @@ import { useNavigate } from "react-router-dom";
 import LoadingScreen from "../components/LoadingScreen";
 
 function Sidebar() {
+
+
     const [loading, setLoading] = useState(false);
     const { logOut } = useContext(UserContext);
     const navigate = useNavigate();
@@ -58,6 +61,9 @@ function Sidebar() {
                         to="/"
                         onClick={() => handleNavigation("/")}
                     />
+
+
+
                     <NavBarButton
                         icon={faClipboardList}
                         label="postulations"
@@ -83,6 +89,12 @@ function Sidebar() {
             <div className="general">
                 <h4>General</h4>
                 <div className="tools_buttons">
+                    <NavBarButton
+                        icon={faInfoCircle}
+                        label="About"
+                        to="/about"
+                        onClick={() => handleNavigation("/about")}
+                    />
                     <NavBarButton
                         icon={faGear}
                         label={"Ajustes"}

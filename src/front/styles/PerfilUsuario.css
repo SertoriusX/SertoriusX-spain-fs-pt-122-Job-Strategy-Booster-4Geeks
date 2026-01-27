@@ -1,7 +1,7 @@
 .perfil-container {
   width: 100%;
   min-height: 100vh;
-  background: #f3f4f6;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed, #9333ea);
   padding: 40px;
   display: flex;
   justify-content: center;
@@ -585,7 +585,7 @@
   left: 0;
   right: 0;
   height: 130px;
-  background: linear-gradient(to right, #2563eb, #3b82f6);
+  background: linear-gradient(135deg, #4f46e5, #7c3aed, #9333ea);
   overflow: hidden;
 }
 
@@ -628,4 +628,27 @@
   opacity: 0.15;
   bottom: -80px;
   right: 260px;
+}
+.bio-section {
+  background: #f9fafb;
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  border: 1px solid #e5e7eb;
+}
+
+.bio-section h2 {
+    text-align: center;
+
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 12px;
+}
+
+.bio-section p {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #374151;
+  white-space: pre-line;
 }

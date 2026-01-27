@@ -2,6 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { getPostulationById, removePostulation } from '../Fetch/postulationFecth';
 import { useGetAuthorizationHeader } from '../hooks/useGetAuthorizationHeader';
+import { useNavigate, useParams } from 'react-router-dom';
+import useGetAuthorizationHeader from '../../hooks/useGetAuthorizationHeader';
+import { getPostulationById, removePostulation } from '../../Fetch/postulationFecth';
+import "../../styles/JobDetail.css"
 
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -43,7 +47,7 @@ export default function JobsDetail() {
         };
 
         fetchPostulation();
-    }, [id, authorizationHeader]);
+    }, [id]);
 
     if (!postulation) return <p>Postulation not found</p>;
 

@@ -1,0 +1,22 @@
+it_skills = [
+    "Programación en Python",
+    "Java",
+    "JavaScript",
+    "C++",
+    "SQL",
+    "Desarrollo web",
+    "Administración de bases de datos",
+    "Linux",
+    "Redes y seguridad informática",
+    "Cloud Computing (AWS, Azure, Google Cloud)",
+    "Docker",
+    "Kubernetes",
+    "DevOps",
+    "Análisis de datos",
+    "Machine Learning",
+    "Inteligencia Artificial",
+    "Gestión de proyectos (Scrum, Agile)",
+    "Git y control de versiones",
+    "Testing y QA",
+    "Soporte técnico"
+]

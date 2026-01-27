@@ -1,10 +1,10 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot, faCalendarDays, faEuroSign, faPeopleGroup, faClipboardList } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 
 function JobCard2({ post }) {
-
+    const navigate = useNavigate()
     const formatDate = (date) => {
         if (!date) return ""
         const dateFormated = date.split(' ').slice(0, 4).join(' ')
@@ -19,9 +19,7 @@ function JobCard2({ post }) {
                     <span className="status">{post.postulation_state}</span>
                     <span className="category">{post.company_name}</span>
                 </div>
-                <Link to={`/postulations/${post.id}`}>
-                    <button className="view_details">Detalles</button>
-                </Link>
+                <button onClick={() => navigate(`/post/${post.id}`)} className="view_details">Detalles</button>
             </div>
 
             <div className="application_card_title">

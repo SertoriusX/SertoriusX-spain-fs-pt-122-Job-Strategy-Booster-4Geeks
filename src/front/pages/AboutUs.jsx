@@ -1,4 +1,4 @@
-import './AboutUs.css';
+import '../styles/AboutUs.css';
 
 import trackerImage from '../components/assets/images/tracker-team.jpg';
 import chico1 from '../components/assets/images/chico1.jpg';
