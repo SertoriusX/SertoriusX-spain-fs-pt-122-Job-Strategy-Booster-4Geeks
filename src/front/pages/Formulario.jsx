@@ -4,11 +4,12 @@ import { FiSave, FiX, FiLogOut } from "react-icons/fi";
 
 import { createNewPostulation } from '../Fetch/postulationFecth'
 import { useGetAuthorizationHeader } from "../hooks/useGetAuthorizationHeader";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 
 export default function Formulario() {
     const authorizationHeader = useGetAuthorizationHeader();
+    const navigate = useNavigate()
     const [formData, setFormData] = useState({
         postulation_state: "open",
         company_name: "",
@@ -254,11 +255,9 @@ export default function Formulario() {
                             <button type="submit" className="icon-button">
                                 <FiSave />
                             </button>
-                            <Link to='/Jobs'>
-                                <button type="button" className="icon-button secondary">
-                                    <FiX />
-                                </button>
-                            </Link>
+                            <button onClick={() => navigate(-1)} type="button" className="icon-button secondary">
+                                <FiX />
+                            </button>
                         </div>
 
                     </div>

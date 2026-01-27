@@ -16,6 +16,8 @@ import Formulario from "./pages/Formulario";
 import JobsDetail from "./pages/JobsDetail";
 import AboutUs from "./pages/AboutUs";
 import ListadoAplicaciones from "./pages/ApplicationTimeline.jsx";
+import Stepper from "./components/CreateRouteMap.jsx";
+
 import { useState } from "react";
 
 
@@ -26,7 +28,11 @@ export const router = createBrowserRouter(
     <Route path="/" element={<App />} errorElement={<h1>Not found!</h1>}>
 
       <Route index element={<HomePage />} />
-      <Route path="postulations" element={<Jobs />} />
+      <Route path="postulations">
+        <Route index element={<Jobs />} />
+        <Route path=":id" element={<JobsDetail />} />
+        <Route path="formulario" element={<Formulario />} />
+      </Route>
       <Route path="curriculum" element={<Curriculums />} />
       <Route path="interview" element={<Interview />} />
       <Route path="register" element={<Registration />} />
@@ -34,8 +40,8 @@ export const router = createBrowserRouter(
       <Route path="perfil" element={<PerfilUsuario />} />
       <Route path="about" element={<AboutUs />} />
       <Route path="timeline" element={<ListadoAplicaciones />} />
-      <Route path="/postulations/:id" element={<JobsDetail />} />
-      <Route path="formulario" element={<Formulario />} />
+
+      <Route path="postulations/:id/create-stepper" element={<Stepper />} />
 
     </Route>
 
