@@ -582,7 +582,7 @@ def create_or_replace_route_map(id):
     stage_list = request.get_json()
 
     if not stage_list or not isinstance(stage_list, list):
-        return jsonify({'error': 'Data must be a stages list'}), 400
+        return jsonify({'error': 'Data must be a list of stage objects'}), 400
 
     postulation = Postulations.query.get(id)
     if not postulation:
@@ -591,14 +591,32 @@ def create_or_replace_route_map(id):
     Stages.query.filter_by(postulation_id=id).delete()
 
     new_stages = []
-    for stage_name in stage_list:
-        if not isinstance(stage_name, str) or not stage_name.strip():
+    for stage_data in stage_list:
+        if not isinstance(stage_data, dict):
             continue
+
+        stage_name = stage_data.get('stage_name')
+        if not stage_name or not isinstance(stage_name, str):
+            continue
+
+
+        date_completed_stage = None
+        raw_date = stage_data.get('date_completed_stage')
+        if raw_date:
+            try:
+                date_completed_stage = datetime.strptime(raw_date, '%Y-%m-%d').date()
+            except ValueError:
+                return jsonify({
+                    'error': f'Invalid date format for stage "{stage_name}". Use YYYY-MM-DD'
+                }), 400
 
         stage = Stages(
             stage_name=stage_name.strip(),
-            postulation=postulation
+            stage_completed=bool(stage_data.get('stage_completed', False)),
+            date_completed_stage=date_completed_stage,
+            postulation_id=id
         )
+
         db.session.add(stage)
         new_stages.append(stage)
 
@@ -608,6 +626,7 @@ def create_or_replace_route_map(id):
         "message": "Stages saved successfully",
         "stages": [s.serialize() for s in new_stages]
     }), 200
+
 
 @api.route('/postulations/<int:id>/route-map', methods=['DELETE'])
 @jwt_required()
