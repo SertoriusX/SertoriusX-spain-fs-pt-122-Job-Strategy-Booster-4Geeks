@@ -43,7 +43,7 @@ export default function UploadImageOnly() {
             const res = await axios.post(`${backendUrl}/ocr-postulation`, fd, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            navigate("/jobs"),
+            navigate("/postulations"),
 
                 setSuccess("Image uploaded and data extracted successfully!");
             console.log("Response data:", res.data);

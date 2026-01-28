@@ -52,6 +52,7 @@ export default function Jobs() {
           <MenuButttons options={options} onFilterChange={handleFilterChange} selected={selectedFilter} />
           <button className='advance_filter'>Filtros Avanzados</button>
         </div>
+
         <Link to='/img-post'><button className="add_new_postulation" onClick={() => { console.log(postulaciones) }}>Agregar img</button></Link>
         <Link to='/formulario'><button className="add_new_postulation" onClick={() => { console.log(postulaciones) }}>Agregar</button></Link>
       </div>

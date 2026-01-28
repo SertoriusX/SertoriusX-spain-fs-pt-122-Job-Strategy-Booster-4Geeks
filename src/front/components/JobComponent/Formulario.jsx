@@ -10,7 +10,7 @@ import { createNewPostulation } from "../../Fetch/postulationFecth";
 export default function Formulario() {
     const authorizationHeader = useGetAuthorizationHeader();
     const [formData, setFormData] = useState({
-        postulation_state: "",
+        postulation_state: "open",
         company_name: "",
         role: "",
         experience: "",
@@ -70,7 +70,7 @@ export default function Formulario() {
         try {
             const result = await createNewPostulation(payload, authorizationHeader);
             console.log("Postulación creada:", result);
-            navigate("/jobs")
+            navigate("/postulations")
 
         } catch (error) {
             console.error("Error al crear postulación:", error.message);
@@ -96,22 +96,6 @@ export default function Formulario() {
 
                         {/* Row 1 */}
                         <div className="form-row">
-                            <div className="form-group">
-                                <label>Estado</label>
-                                <select
-                                    name="postulation_state"
-                                    value={formData.postulation_state}
-                                    onChange={handleChange}
-                                >
-                                    <option value="">Seleccionar</option>
-                                    <option>abierta</option>
-                                    <option>en proceso</option>
-                                    <option>entrevista</option>
-                                    <option>oferta</option>
-                                    <option>descartado</option>
-                                    <option>aceptada</option>
-                                </select>
-                            </div>
 
                             <div className="form-group">
                                 <label>Empresa</label>
@@ -271,11 +255,9 @@ export default function Formulario() {
                             <button type="submit" className="icon-button">
                                 <FiSave />
                             </button>
-                            <Link to='/Jobs'>
-                                <button type="button" className="icon-button secondary">
-                                    <FiX />
-                                </button>
-                            </Link>
+                            <button onClick={() => navigate(-1)} type="button" className="icon-button secondary">
+                                <FiX />
+                            </button>
                         </div>
 
                     </div>
