@@ -3,6 +3,7 @@ import '../styles/stepper.css'
 import { useNavigate } from "react-router-dom";
 import useGetAuthorizationHeader from "../hooks/useGetAuthorizationHeader";
 import { createNewRoute, getRoutes } from '../Fetch/routeMapFecth'
+import { faL } from "@fortawesome/free-solid-svg-icons";
 
 export const WORK_STAGES = [
     { value: "initial_contact", label: "Toma de contacto inicial" },
@@ -24,6 +25,7 @@ const Stepper = ({ stages, id, setStages }) => {
     const authorizationHeader = useGetAuthorizationHeader()
     const [stageData, setStageData] = useState(WORK_STAGES[0].value)
     const navigate = useNavigate()
+    const [hoverIndex, setHorverIndex] = useState(false)
 
     const handleAddStage = () => {
         setStages(prev => [...prev, stageData]);
@@ -79,7 +81,7 @@ const Stepper = ({ stages, id, setStages }) => {
                         const label = foundStage ? foundStage.label : stageValue;
                         return (
                             <div key={`${stage.stage_name}-${index}`} className={`stage ${!isLast ? "connected" : ""}`}>
-                                <div className="step">{index + 1}</div>
+                                <div onMouseEnter={() => setHorverIndex(index)} onMouseLeave={() => setHorverIndex(null)} className={`step ${hoverIndex === index ? 'hovered' : ''}`}>{hoverIndex === index ? 'X' : index + 1}</div>
                                 <p>{label}</p>
                             </div>
                         );
