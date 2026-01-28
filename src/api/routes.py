@@ -26,7 +26,7 @@ import openai
 import requests  
 from werkzeug.utils import secure_filename
 import re
-
+import random
 CORS(api)
 bcrypt = Bcrypt()
 
@@ -156,8 +156,274 @@ RESOURCES = {
         "https://rxjs.dev",
     ],
 }
+ANSWERS = {
+    "frontend": {
+        "¿Qué es el Virtual DOM y por qué es importante?":
+            "El Virtual DOM es una representación ligera del DOM real que mejora el rendimiento " \
+            "de las actualizaciones en la interfaz de usuario.",
+        "¿Qué es CSS Flexbox y para qué sirve?":
+            "Flexbox es un modelo de diseño CSS que facilita la distribución y alineación de elementos " \
+            "en un contenedor, adaptándose a diferentes tamaños de pantalla.",
+        "¿Qué es un closure en JavaScript?":
+            "Un closure es una función que recuerda el entorno donde fue creada, permitiendo acceder " \
+            "a variables externas aun cuando la función se ejecute fuera de ese contexto.",
+        "¿Cuál es la diferencia entre 'var', 'let' y 'const' en JavaScript?":
+            "'var' tiene alcance global o de función, 'let' y 'const' tienen alcance de bloque; 'const' " \
+            "define variables inmutables.",
+        "¿Qué son las promesas en JavaScript y cómo funcionan?":
+            "Las promesas son objetos que representan la eventual finalización o fallo de una operación asíncrona.",
+        "¿Cómo manejas eventos en JavaScript?":
+            "Se usan listeners para capturar eventos y ejecutar funciones callback cuando ocurren.",
+        "¿Qué es el modelo de caja (box model) en CSS?":
+            "Es la forma en que CSS representa cada elemento como una caja compuesta por contenido, " \
+            "padding, border y margin.",
+        "¿Qué son las media queries y cómo se usan para responsive design?":
+            "Son reglas CSS que aplican estilos condicionales según las características del dispositivo, " \
+            "como ancho de pantalla.",
+        "¿Qué es la herencia en CSS y cómo funciona?":
+            "Es cuando ciertas propiedades CSS se transfieren de un elemento padre a sus hijos automáticamente."
+    },
+    "backend": {
+        "¿Qué es una API REST?":
+            "REST es un estilo arquitectónico para servicios web que usan HTTP para realizar operaciones CRUD.",
+        "¿Qué es una base de datos relacional?":
+            "Es un sistema que almacena datos en tablas con relaciones entre ellas.",
+        "¿Qué son los middlewares en backend?":
+            "Funciones que se ejecutan entre la solicitud y la respuesta para procesar o modificar datos.",
+        "¿Qué diferencias hay entre SQL y NoSQL?":
+            "SQL usa bases de datos estructuradas y NoSQL almacena datos no estructurados o flexibles.",
+        "¿Qué es la autenticación y autorización?":
+            "Autenticación verifica identidad, autorización controla acceso a recursos.",
+        "¿Qué es un token JWT y para qué se usa?":
+            "JWT es un token que permite autenticar y transmitir información segura entre cliente y servidor.",
+        "¿Cómo funciona el manejo de sesiones en aplicaciones web?":
+            "Se guarda información del usuario para mantener su estado entre peticiones.",
+        "¿Qué es un servidor web y cómo funciona?":
+            "Es un software que responde a peticiones HTTP enviando archivos o datos.",
+        "¿Qué es la escalabilidad en backend?":
+            "Capacidad del sistema para manejar mayor carga aumentando recursos."
+    },
+    "react": {
+        "¿Qué es el estado (state) en React?":
+            "El estado es un objeto que almacena datos que pueden cambiar y afectar el renderizado.",
+        "¿Qué es un Hook?":
+            "Funciones que permiten usar estado y otras características de React en componentes funcionales.",
+        "¿Cómo funcionan los componentes funcionales?":
+            "Son funciones que retornan JSX para representar UI y pueden usar hooks para manejar estado.",
+        "¿Qué es el ciclo de vida de un componente en React?":
+            "Son fases por las que pasa un componente desde su creación hasta destrucción.",
+        "¿Qué es Redux y para qué se utiliza?":
+            "Es una librería para manejar el estado global de la aplicación de forma predecible.",
+        "¿Qué es el Context API en React?":
+            "Permite compartir datos entre componentes sin pasar props manualmente.",
+        "¿Cómo optimizas el rendimiento en una aplicación React?":
+            "Usando memoización, evitando renders innecesarios y dividiendo componentes.",
+        "¿Qué son las props y cómo se usan?":
+            "Son propiedades que se pasan a componentes para configurarlos o mostrar datos.",
+        "¿Qué diferencia hay entre componentes controlados y no controlados?":
+            "Controlados tienen su estado gestionado por React, no controlados por el DOM directamente."
+    },
+    "angular": {
+        "¿Qué es un módulo en Angular?":
+            "Un módulo agrupa componentes, servicios y otros módulos para organizar la aplicación.",
+        "¿Qué es un servicio en Angular?":
+            "Clase que proporciona funcionalidad reutilizable y es inyectable en componentes.",
+        "¿Qué es RxJS y cómo se usa?":
+            "Es una librería para programación reactiva con observables para manejar eventos asíncronos.",
+        "¿Qué es el data binding en Angular?":
+            "Sincronización automática de datos entre el modelo y la vista.",
+        "¿Qué son los decoradores en Angular?":
+            "Anotaciones que agregan metadatos a clases y propiedades para configurarlas.",
+        "¿Cómo funcionan los pipes en Angular?":
+            "Transforman datos en plantillas para mostrarlos en un formato adecuado.",
+        "¿Qué es la inyección de dependencias?":
+            "Patrón para suministrar dependencias a clases sin crearlas directamente.",
+        "¿Qué es un componente y cómo se comunica con otros?":
+            "Unidad básica de UI que puede recibir y emitir datos mediante inputs y outputs.",
+        "¿Cómo manejas el enrutamiento en Angular?":
+            "Con el RouterModule, definiendo rutas y navegando entre ellas."
+    },
+    "personal": {
+        "¿Dónde te ves en cinco años?":
+            "Me veo creciendo profesionalmente y aportando valor en proyectos desafiantes.",
+        "¿Cuál es tu mayor fortaleza y debilidad?":
+            "Mi fortaleza es la perseverancia y mi debilidad es que a veces soy muy perfeccionista.",
+        "¿Cómo manejas el estrés o la presión en el trabajo?":
+            "Organizo mis tareas y tomo pausas para mantenerme concentrado.",
+        "Descríbeme una situación en la que hayas tenido que resolver un conflicto.":
+            "Escuché a ambas partes, busqué un acuerdo y mantuve la comunicación abierta.",
+        "¿Por qué quieres trabajar con nosotros?":
+            "Porque admiro su cultura y quiero crecer junto a un equipo talentoso.",
+        "¿Qué te motiva a dar lo mejor de ti?":
+            "El deseo de aprender y superar retos constantemente.",
+        "¿Cómo te mantienes actualizado y mejorando profesionalmente?":
+            "Leo artículos, tomo cursos y participo en comunidades técnicas.",
+        "Cuéntame sobre un error que hayas cometido y cómo lo solucionaste.":
+            "Identifiqué el problema, pedí ayuda y aprendí para no repetirlo.",
+        "¿Prefieres trabajar en equipo o de forma independiente? ¿Por qué?":
+            "Prefiero el equipo porque las ideas se enriquecen colaborando."
+    }
+}
 
+RESOURCES = {
+    "frontend": [
+        "https://roadmap.sh/frontend",
+        "https://frontendmentor.io",
+        "https://cssbattle.dev",
+    ],
+    "backend": [
+        "https://roadmap.sh/backend",
+        "https://leetcode.com",
+        "https://sqlbolt.com",
+    ],
+    "react": [
+        "https://roadmap.sh/react",
+        "https://react.dev/learn",
+        "https://frontendmentor.io",
+    ],
+    "angular": [
+        "https://roadmap.sh/angular",
+        "https://angular.io/tutorial",
+        "https://rxjs.dev",
+    ],
+}
 
+MAX_QUESTIONS = 5
+
+@api.route('/chat', methods=["POST"])
+@jwt_required()
+def chat():
+    try:
+        user_id = get_jwt_identity()
+        data = request.json or {}
+        user_message = data.get("message", "").strip()
+
+        if user_id not in sessions:
+            sessions[user_id] = {
+                "state": "WAIT_READY",
+                "role": None,
+                "question_index": 0,
+                "question_order": []
+            }
+            return jsonify({
+                "response": "👋 ¿Estás listo para una simulación de entrevista? (sí / no)"
+            })
+
+        session = sessions[user_id]
+
+        if session["state"] == "WAIT_READY":
+            if user_message.lower() in ["si", "sí", "yes"]:
+                session["state"] = "WAIT_ROLE"
+                return jsonify({
+                    "response": (
+                        "Perfecto 🚀\n"
+                        "Elige el tipo de entrevista:\n"
+                        "1) Frontend (FE)\n"
+                        "2) Backend (BE)\n"
+                        "3) React\n"
+                        "4) Angular\n"
+                        "5) Preguntas personales"
+                    )
+                })
+
+            if user_message.lower() in ["no", "nop", "nope"]:
+                return jsonify({
+                    "response": "👌 Cuando estés listo escribe 'sí'."
+                })
+
+            return jsonify({"response": "Por favor responde 'sí' o 'no'."})
+
+        if session["state"] == "WAIT_ROLE":
+            roles = {
+                "1": "frontend",
+                "2": "backend",
+                "3": "react",
+                "4": "angular",
+                "5": "personal"
+            }
+
+            if user_message not in roles:
+                return jsonify({"response": "Selecciona una opción válida (1-5)."})
+
+            role = roles[user_message]
+            session["role"] = role
+            session["state"] = "INTERVIEW"
+            session["question_index"] = 0
+
+            questions = QUESTIONS[role]
+            question_order = random.sample(questions, min(MAX_QUESTIONS, len(questions)))
+            session["question_order"] = question_order
+
+            first_question = question_order[0]
+            return jsonify({
+                "response": (
+                    f"🎯 Entrevista {role.upper()} iniciada.\n\n"
+                    f"Pregunta 1:\n{first_question}\n\n"
+                    "Escribe tu respuesta o escribe 'show' para ver una respuesta ejemplo."
+                )
+            })
+
+        if session["state"] == "INTERVIEW":
+            role = session["role"]
+            q_index = session["question_index"]
+            question_order = session["question_order"]
+
+            if q_index >= len(question_order):
+                session["state"] = "FINISHED"
+                resources_list = RESOURCES.get(role, [])
+                resources_text = "\n".join(f"- {r}" for r in resources_list)
+                return jsonify({
+                    "response": (
+                        "✅ ¡Buen trabajo!\n\n"
+                        f"📚 Recursos recomendados para seguir entrenando:\n{resources_text}\n\n"
+                        "¿Quieres otra simulación? (sí / no)"
+                    )
+                })
+
+            current_question = question_order[q_index]
+
+            if user_message.lower() == "show":
+                answer = ANSWERS.get(role, {}).get(current_question)
+                if not answer:
+                    return jsonify({"response": "No hay respuestas ejemplo para esta pregunta."})
+                return jsonify({
+                    "response": f"\nRespuesta ejemplo:\n{answer}\n\n"
+                })
+
+            feedback = "De nada,ahora te muestro suigente pregunta"
+
+            q_index += 1
+            session["question_index"] = q_index
+
+            if q_index < len(question_order):
+                next_question = question_order[q_index]
+                return jsonify({
+                    "response": f"{feedback}\n\nPregunta {q_index + 1}:\n{next_question}\n\nEscribe tu respuesta o 'show' para ver una respuesta ejemplo."
+                })
+            else:
+                session["state"] = "FINISHED"
+                resources_list = RESOURCES.get(role, [])
+                resources_text = "\n".join(f"- {r}" for r in resources_list)
+                return jsonify({
+                    "response": (
+                        f"{feedback}\n\n✅ ¡Buen trabajo!\n\n"
+                        f"📚 Recursos recomendados para seguir entrenando:\n{resources_text}\n\n"
+                        "¿Quieres otra simulación? (sí / no)"
+                    )
+                })
+
+        if session["state"] == "FINISHED":
+            if user_message.lower() in ["si", "sí", "yes"]:
+                session["state"] = "WAIT_ROLE"
+                session["question_index"] = 0
+                session["question_order"] = []
+                return jsonify({"response": "Perfecto 👍 Elige nuevamente una opción (1-5)."})
+
+            return jsonify({"response": "👋 Gracias por practicar. ¡Éxitos!"})
+
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({"response": f"Error: {str(e)}"}), 500
 
 def clean_company_name(line: str, max_length=50) -> str:
     line = re.sub(r"http\S+", "", line)
@@ -332,117 +598,7 @@ def ocr_postulation():
     db.session.commit()
 
     return jsonify(postulation.serialize()), 201
-@api.route('/chat',methods=["POST"])
-@jwt_required()
-def chat():
-    try:
-        user_id = get_jwt_identity()
-        data = request.json or {}
-        user_message = data.get("message", "").lower().strip()
-        
-        if user_id not in sessions:
-            sessions[user_id] = {
-                "state": "WAIT_READY",
-                "role": None,
-                "question_index": 0
-            }
-            return jsonify({
-                "response": "👋 ¿Estás listo para una simulación de entrevista? (sí / no)"
-            })
 
-        session = sessions[user_id]
-
-        if session["state"] == "WAIT_READY":
-            if user_message in ["si", "sí", "yes"]:
-                session["state"] = "WAIT_ROLE"
-                return jsonify({
-                    "response": (
-                        "Perfecto 🚀\n"
-                        "Elige el tipo de entrevista:\n"
-                        "1) Frontend (FE)\n"
-                        "2) Backend (BE)\n"
-                        "3) React\n"
-                        "4) Angular\n"
-                        "5) Preguntas personales"
-                    )
-                })
-
-            if user_message in ["no", "nop", "nope"]:
-                return jsonify({
-                    "response": "👌 Cuando estés listo escribe 'sí'."
-                })
-
-            return jsonify({
-                "response": "Por favor responde únicamente: sí o no."
-            })
-
-        if session["state"] == "WAIT_ROLE":
-            roles = {
-                "1": "frontend",
-                "2": "backend",
-                "3": "react",
-                "4": "angular",
-                "5": "personal"
-            }
-
-            if user_message not in roles:
-                return jsonify({
-                    "response": "Selecciona una opción válida (1-5)."
-                })
-
-            role = roles[user_message]
-            session["role"] = role
-            session["state"] = "INTERVIEW"
-            session["question_index"] = 0
-
-            first_question = QUESTIONS[role][0]
-            return jsonify({
-                "response": (
-                    f"🎯 Entrevista {role.upper()} iniciada.\n\n"
-                    f"Pregunta 1:\n{first_question}"
-                )
-            })
-
-        if session["state"] == "INTERVIEW":
-            role = session["role"]
-            q_index = session.get("question_index", 0)
-
-
-            q_index += 1
-    
-            if q_index < len(QUESTIONS[role]):
-                session["question_index"] = q_index
-                next_question = QUESTIONS[role][q_index]
-                return jsonify({
-                    "response": f"Pregunta {q_index + 1}:\n{next_question}"
-                })
-            else:
-                session["state"] = "FINISHED"
-                resources = "\n".join(f"- {url}" for url in RESOURCES.get(role, []))
-                return jsonify({
-                    "response": (
-                        "✅ ¡Buen trabajo!\n\n"
-                        "📚 Recursos recomendados para seguir entrenando:\n"
-                        f"{resources}\n\n"
-                        "¿Quieres otra simulación? (sí / no)"
-                    )
-                })
-
-        if session["state"] == "FINISHED":
-            if user_message in ["si", "sí", "yes"]:
-                session["state"] = "WAIT_ROLE"
-                session["question_index"] = 0
-                return jsonify({
-                    "response": "Perfecto 👍 Elige nuevamente una opción (1-5)."
-                })
-
-            return jsonify({
-                "response": "👋 Gracias por practicar. ¡Éxitos!"
-            })
-
-    except Exception as e:
-        traceback.print_exc()
-        return jsonify({"response": f"Error: {str(e)}"}), 500
 
 
 def save_uploaded_file(file, upload_folder=None):

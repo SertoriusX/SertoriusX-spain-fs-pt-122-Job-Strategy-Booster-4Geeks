@@ -14,6 +14,21 @@ function Interview() {
     const chatEndRef = useRef(null);
     const { token } = useContext(UserContext);
 
+    // Helper function to convert URLs in text into clickable links
+    function linkify(text) {
+        const urlRegex = /(https?:\/\/[^\s]+)/g;
+        const parts = text.split(urlRegex);
+        return parts.map((part, i) =>
+            urlRegex.test(part) ? (
+                <a key={i} href={part} target="_blank" rel="noopener noreferrer">
+                    {part}
+                </a>
+            ) : (
+                part
+            )
+        );
+    }
+
     const sendMessage = async () => {
         if (!message.trim()) return;
 
@@ -97,10 +112,9 @@ function Interview() {
                                 className={`message-row ${isUser ? "user" : "bot"}`}
                             >
                                 <div
-                                    className={`message-bubble ${isUser ? "user" : "bot"
-                                        }`}
+                                    className={`message-bubble ${isUser ? "user" : "bot"}`}
                                 >
-                                    {entry.text}
+                                    {isUser ? entry.text : linkify(entry.text)}
                                 </div>
                             </div>
                         );
