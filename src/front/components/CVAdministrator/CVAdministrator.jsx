@@ -18,6 +18,16 @@ const CVAdministrator = () => {
     const [saving, setSaving] = useState(false);
     const [showAgregarModal, setShowAgregarModal] = useState(false);
 
+    const [isOpen, setIsOpen] = useState(false);
+
+    const handleToggleCV = () => {
+        setIsOpen(prev => !prev);
+    };
+
+    const handleExportPDF = () => {
+        window.print();
+    };
+
     useEffect(() => {
         if (token) loadCVList();
     }, [token]);
@@ -39,11 +49,16 @@ const CVAdministrator = () => {
             const data = await res.json();
 
             if (data.success && Array.isArray(data.cvs)) {
-                setCvList(data.cvs);
+                const normalizados = data.cvs.map((cv) => ({
+                    id: cv.id,
+                    datos: normalizeCV(cv.datos)
+                }));
 
-                if (data.cvs.length > 0) {
-                    setSelectedCVId(data.cvs[0].id);
-                    setFormData(normalizeCV(data.cvs[0].datos));
+                setCvList(normalizados);
+
+                if (normalizados.length > 0) {
+                    setSelectedCVId(normalizados[0].id);
+                    setFormData(normalizados[0].datos);
                 }
             }
         } catch (err) {
@@ -73,9 +88,41 @@ const CVAdministrator = () => {
         );
     };
 
+    const handleSaveAs = async (nombre) => {
+        const nuevoCV = {
+            ...formData,
+            titulo: nombre,
+            created_at: new Date().toISOString()
+        };
+
+        const res = await fetch(`${backendUrl}/api/cv`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(nuevoCV),
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            const nuevo = {
+                id: data.cv.id,
+                datos: normalizeCV(data.cv.datos)
+            };
+
+            setCvList((prev) => [...prev, nuevo]);
+            setSelectedCVId(nuevo.id);
+            setFormData(nuevo.datos);
+            setIsEditing(false);
+        }
+
+        setSaving(false);
+    };
+
     const createNewCV = () => {
         const nuevo = createEmptyCV();
-        setCvList((prev) => [...prev, nuevo]);
         setSelectedCVId(null);
         setFormData(normalizeCV(nuevo.datos));
         setIsEditing(true);
@@ -92,15 +139,23 @@ const CVAdministrator = () => {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${token}`,
                     },
-                    body: JSON.stringify(formData),
+                    body: JSON.stringify({
+                        ...formData,
+                        created_at: new Date().toISOString()
+                    }),
                 });
 
                 const data = await res.json();
 
                 if (data.success) {
-                    setCvList((prev) => [...prev, data.cv]);
-                    setSelectedCVId(data.cv.id);
-                    setFormData(normalizeCV(data.cv.datos));
+                    const nuevo = {
+                        id: data.cv.id,
+                        datos: normalizeCV(data.cv.datos)
+                    };
+
+                    setCvList((prev) => [...prev, nuevo]);
+                    setSelectedCVId(nuevo.id);
+                    setFormData(nuevo.datos);
                     setIsEditing(false);
                 }
 
@@ -114,16 +169,25 @@ const CVAdministrator = () => {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify({
+                    ...formData,
+                    created_at: cvList.find((cv) => cv.id === selectedCVId)?.created_at
+                }),
             });
 
             const data = await res.json();
 
             if (data.success) {
+                const actualizado = {
+                    id: data.cv.id,
+                    datos: normalizeCV(data.cv.datos)
+                };
+
                 setCvList((prev) =>
-                    prev.map((cv) => (cv.id === selectedCVId ? data.cv : cv))
+                    prev.map((cv) => (cv.id === selectedCVId ? actualizado : cv))
                 );
-                setFormData(normalizeCV(data.cv.datos));
+
+                setFormData(actualizado.datos);
                 setIsEditing(false);
             }
         } catch (err) {
@@ -180,28 +244,11 @@ const CVAdministrator = () => {
         setShowAgregarModal(false);
     };
 
-    const handleAddFrom = (id) => {
-        const original = cvList.find((cv) => cv.id === id);
-        if (!original) return;
-
-        const copia = cloneCV(original);
-        copia.datos = normalizeCV(copia.datos);
-        copia.datos.titulo = "";
-
-        setCvList((prev) => [...prev, copia]);
-        setSelectedCVId(null);
-        setFormData(copia.datos);
-        setIsEditing(true);
-    };
 
     return (
         <div className="cv-admin-container">
-
             {showAgregarModal && (
-                <ModalAgregarCV
-                    cvList={cvList}
-                    onSelect={handleSelectForAdd}
-                    onClose={() => setShowAgregarModal(false)}
+                <ModalAgregarCV cvList={cvList} onSelect={handleSelectForAdd} onClose={() => setShowAgregarModal(false)}
                 />
             )}
 
@@ -218,8 +265,7 @@ const CVAdministrator = () => {
                 <thead>
                     <tr>
                         <th>Nombre del CV</th>
-                        <th>Creado</th>
-                        <th>Acciones</th>
+                        <th style={{ width: "160px" }}>Acciones</th>
                     </tr>
                 </thead>
 
@@ -227,13 +273,11 @@ const CVAdministrator = () => {
                     {cvList.map((cv) => (
                         <tr key={cv.id}>
                             <td>{cv.datos.titulo || "Sin título"}</td>
-                            <td>{new Date(cv.created_at).toLocaleDateString()}</td>
 
                             <td>
                                 <div className="cv-actions-row">
                                     <button onClick={() => handleView(cv.id)}>👁️</button>
                                     <button onClick={() => handleEdit(cv.id)}>🖉</button>
-                                    <button onClick={() => handleAddFrom(cv.id)}>📄</button>
                                     <button onClick={() => deleteCV(cv.id)}>🗑️</button>
                                 </div>
                             </td>
@@ -243,6 +287,19 @@ const CVAdministrator = () => {
             </table>
 
             <main className="cv-main">
+
+                {formData && (
+                    <div className="cv-inner-actions">
+                        <button onClick={handleToggleCV}>
+                            {isOpen ? "Cerrar CV" : "Abrir CV"}
+                        </button>
+
+                        <button onClick={handleExportPDF}>
+                            PDF
+                        </button>
+                    </div>
+                )}
+
                 {isLoading ? (
                     <p>Cargando...</p>
                 ) : isEditing ? (
@@ -250,20 +307,20 @@ const CVAdministrator = () => {
                         formData={formData}
                         updateCurrentCV={updateCurrentCV}
                         setIsEditing={setIsEditing}
-                        saveCV={saveCV}
                         saving={saving}
+                        onSave={handleSaveAs}
                     />
                 ) : formData ? (
-                    <CVPreview
-                        formData={formData}
-                        setIsEditing={setIsEditing}
-                        deleteCV={deleteCV}
-                        cloneCV={cloneCV}
-                    />
+                    isOpen && (
+                        <CVPreview
+                            formData={formData}
+                        />
+                    )
                 ) : (
                     <p>No hay CV seleccionado</p>
                 )}
             </main>
+
         </div>
     );
 };

@@ -1,5 +1,8 @@
 import React from "react";
-import { Plus, X } from "lucide-react";
+import { Plus, XCircle } from "lucide-react";
+import { Building2 } from "lucide-react";
+
+
 
 const ExperienceSection = ({ formData, updateCurrentCV }) => {
     const addExperience = () => {
@@ -26,7 +29,11 @@ const ExperienceSection = ({ formData, updateCurrentCV }) => {
 
     return (
         <div className="cv-form-section">
-            <h3 className="cv-form-title">Experiencia Laboral</h3>
+            <h3 className="cv-form-title">
+                <Building2 size={18} className="section-icon" />
+                Experiencia Laboral
+            </h3>
+
 
             {(formData.experiencia || []).map((exp, i) => (
                 <div key={i} className="cv-modal-card">
@@ -35,7 +42,7 @@ const ExperienceSection = ({ formData, updateCurrentCV }) => {
                         type="button"
                         onClick={() => removeExperience(i)}
                     >
-                        <X size={16} />
+                        <XCircle size={18} />
                     </button>
 
                     <div className="cv-form-grid">

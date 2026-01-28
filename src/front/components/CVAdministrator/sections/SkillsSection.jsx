@@ -1,5 +1,6 @@
 import React from "react";
-import { Plus, X } from "lucide-react";
+import { Plus, XCircle, Wrench, Globe } from "lucide-react";
+
 
 const SkillsSection = ({ formData, updateCurrentCV }) => {
 
@@ -35,10 +36,18 @@ const SkillsSection = ({ formData, updateCurrentCV }) => {
 
     return (
         <div className="cv-form-section">
-            <h3 className="cv-form-title">Habilidades e Idiomas</h3>
 
-            {/* HABILIDADES */}
-            <h4 className="cv-subtitle">Habilidades</h4>
+            {/* Título principal con icono */}
+            <h3 className="cv-form-title">
+                <Wrench size={18} className="section-icon" />
+                Habilidades e Idiomas
+            </h3>
+
+            {/* SUBSECCIÓN: HABILIDADES */}
+            <h4 className="cv-subtitle">
+                <Wrench size={18} className="section-icon" />
+                Habilidades
+            </h4>
 
             {(formData.habilidades || []).map((skill, i) => (
                 <div key={i} className="cv-tag-row">
@@ -54,7 +63,7 @@ const SkillsSection = ({ formData, updateCurrentCV }) => {
                         type="button"
                         onClick={() => removeSkill(i)}
                     >
-                        <X size={16} />
+                        <XCircle size={18} />
                     </button>
                 </div>
             ))}
@@ -63,8 +72,11 @@ const SkillsSection = ({ formData, updateCurrentCV }) => {
                 <Plus size={18} /> Agregar habilidad
             </button>
 
-            {/* IDIOMAS */}
-            <h4 className="cv-subtitle">Idiomas</h4>
+            {/* SUBSECCIÓN: IDIOMAS */}
+            <h4 className="cv-subtitle">
+                <Globe size={18} className="section-icon" />
+                Idiomas
+            </h4>
 
             {(formData.idiomas || []).map((lang, i) => (
                 <div key={i} className="cv-tag-row">
@@ -78,9 +90,9 @@ const SkillsSection = ({ formData, updateCurrentCV }) => {
                     <button
                         className="cv-tag-remove"
                         type="button"
-                        onClick={() => removeLanguage(i)}
+                        onClick={() => removeLanguage(i)}  // ← CORREGIDO
                     >
-                        <X size={16} />
+                        <XCircle size={18} />
                     </button>
                 </div>
             ))}
@@ -90,6 +102,7 @@ const SkillsSection = ({ formData, updateCurrentCV }) => {
             </button>
         </div>
     );
+
 };
 
 export default SkillsSection;

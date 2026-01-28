@@ -1,5 +1,8 @@
 import React from "react";
-import { Plus, X } from "lucide-react";
+import { Plus, XCircle } from "lucide-react";
+import { GraduationCap } from "lucide-react";
+
+
 
 const EducationSection = ({ formData, updateCurrentCV }) => {
     const addEducation = () => {
@@ -25,17 +28,22 @@ const EducationSection = ({ formData, updateCurrentCV }) => {
 
     return (
         <div className="cv-form-section">
-            <h3 className="cv-form-title">Educación</h3>
+            <h3 className="cv-form-title">
+                <GraduationCap size={18} className="section-icon" />
+                Educación
+            </h3>
+
 
             {formData.educacion.map((edu, i) => (
                 <div key={i} className="cv-modal-card">
                     <button
                         className="cv-modal-close"
                         type="button"
-                        onClick={() => removeEducation(i)}
+                        onClick={() => removeExperience(i)}
                     >
-                        <X size={16} />
+                        <XCircle size={18} />
                     </button>
+
 
                     <div className="cv-form-grid">
                         <div className="cv-form-group">

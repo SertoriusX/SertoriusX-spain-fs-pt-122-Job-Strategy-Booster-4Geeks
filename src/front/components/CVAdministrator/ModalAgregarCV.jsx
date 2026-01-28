@@ -15,7 +15,7 @@ const ModalAgregarCV = ({ cvList, onSelect, onClose }) => {
                         >
                             <span>{cv.datos.titulo || "Sin título"}</span>
                             <span className="modal-date">
-                                {new Date(cv.created_at).toLocaleDateString()}
+                                {cv.created_at ? new Date(cv.created_at).toLocaleDateString() : ""}
                             </span>
                         </li>
                     ))}
@@ -30,4 +30,3 @@ const ModalAgregarCV = ({ cvList, onSelect, onClose }) => {
 };
 
 export default ModalAgregarCV;
-

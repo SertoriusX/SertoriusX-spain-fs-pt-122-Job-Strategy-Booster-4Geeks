@@ -1,7 +1,13 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Camera } from "lucide-react";
 
 const PersonalInfoSection = ({ formData, updateCurrentCV }) => {
+    const fileInputRef = useRef();
+
+    const handleUploadClick = () => {
+        fileInputRef.current.click();
+    };
+
     const handlePhotoUpload = (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -15,32 +21,30 @@ const PersonalInfoSection = ({ formData, updateCurrentCV }) => {
         <div className="cv-form-section">
             <h3 className="cv-form-title">Información Personal</h3>
 
-            <div className="cv-form-group">
-                <label>Nombre del CV</label>
+            {/* FOTO A LA DERECHA */}
+            <div className="cv-photo-wrapper">
+                {formData.foto && (
+                    <img
+                        src={formData.foto}
+                        alt="Foto de perfil"
+                        className="cv-photo"
+                    />
+                )}
+
+                <button className="photo-upload-btn" onClick={handleUploadClick}>
+                    <Camera size={18} />
+                </button>
+
                 <input
-                    className="cv-input"
-                    value={formData.titulo || ""}
-                    onChange={(e) => updateCurrentCV("titulo", e.target.value)}
-                    placeholder="Ej: CV-BE-Google"
+                    type="file"
+                    accept="image/*"
+                    ref={fileInputRef}
+                    onChange={handlePhotoUpload}
+                    style={{ display: "none" }}
                 />
             </div>
 
-            <div className="cv-profile-upload">
-                <div className="cv-profile-row">
-                    <label htmlFor="profilePhoto" className="btn btn-photo">
-                        <Camera size={20} /> Foto
-                    </label>
-
-                    {formData.foto && (
-                        <img
-                            src={formData.foto}
-                            alt="Foto de perfil"
-                            className="cv-profile-preview-circle"
-                        />
-                    )}
-                </div>
-            </div>
-
+            {/* CAMPOS DEL FORMULARIO */}
             <div className="cv-form-grid">
                 <div className="cv-form-group">
                     <label>Nombre completo</label>
