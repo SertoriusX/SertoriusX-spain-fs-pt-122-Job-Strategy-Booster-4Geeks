@@ -13,7 +13,8 @@ class User(db.Model):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(50), nullable=False)
-    email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
+    email: Mapped[str] = mapped_column(
+        String(120), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(nullable=False)
     profile:Mapped["Profile"] = relationship("Profile", back_populates="user",uselist=False,
         cascade="all, delete-orphan")
@@ -31,14 +32,18 @@ class User(db.Model):
             "is_active": self.is_active
         }
 
+
 class CV(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
     datos: Mapped[str] = mapped_column(db.Text, nullable=False)
-    fecha_creacion: Mapped[datetime] = mapped_column(db.DateTime, default=db.func.current_timestamp())
-    fecha_modificacion: Mapped[datetime] = mapped_column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
+    fecha_creacion: Mapped[datetime] = mapped_column(
+        db.DateTime, default=db.func.current_timestamp())
+    fecha_modificacion: Mapped[datetime] = mapped_column(
+        db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
-    user: Mapped["User"] = relationship("User", backref=db.backref("cvs", lazy=True))
+    user: Mapped["User"] = relationship(
+        "User", backref=db.backref("cvs", lazy=True))
 
     def serialize(self):
         import json
