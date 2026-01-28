@@ -28,10 +28,12 @@ export const getRoutes = async (id, authorizationHeader) => {
 };
 
 export const removeStep = async (id, stageId, authorizationHeader) => {
-  const response = await fetch(`${backendUrl}/postulations/${id}/route-map?stage_id=${stageId}`, {
-    ...authorizationHeader,
-    method: "DELETE",
-  });
+  const response = await fetch(`${backendUrl}/postulations/${id}/route-map?stage_id=${stageId}`,
+    {
+      ...authorizationHeader,
+      method: "DELETE",
+    },
+  );
 
   if (!response.ok) {
     const error = await response.json();

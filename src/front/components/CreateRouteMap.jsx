@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import '../styles/stepper.css'
 import { useNavigate } from "react-router-dom";
 import useGetAuthorizationHeader from "../hooks/useGetAuthorizationHeader";
-import { createNewRoute, getRoutes } from '../Fetch/routeMapFecth'
+import { createNewRoute, removeStep } from '../Fetch/routeMapFecth'
 import { faL } from "@fortawesome/free-solid-svg-icons";
 
 export const WORK_STAGES = [
@@ -28,9 +28,15 @@ const Stepper = ({ stages, id, setStages }) => {
     const [hoverIndex, setHorverIndex] = useState(false)
 
     const handleAddStage = () => {
-        setStages(prev => [...prev, stageData]);
+        const newStage = {
+            stage_name: stageData,
+            stage_completed: false,
+            date_completed_stage: null
+        };
+
+        setStages(prev => [...prev, newStage]);
         setStageData(WORK_STAGES[0].value);
-        console.log(stages)
+        console.log("Stages actuales:", [...stages, newStage]);
     }
 
     const handleSubmit = async (e) => {
@@ -38,11 +44,25 @@ const Stepper = ({ stages, id, setStages }) => {
             console.warn("No hay stages para enviar");
             return;
         }
+        const data = await createNewRoute(stages, id, authorizationHeader);
+        if (data.stages) {
+            setStages(data.stages);
+        }
+        navigate(-1);
+    };
 
-        const stagesList = await createNewRoute(stages, id, authorizationHeader);
-        console.log('Nuevo mapa creado', stagesList);
-        navigate(-1)
-    }
+
+    const handleRemoveStage = async (indexToRemove) => {
+        const stageToRemove = stages[indexToRemove];
+        if (!stageToRemove) return;
+        if (stageToRemove.id) {
+            const stageId = stageToRemove.id
+            await removeStep(id, stageId, authorizationHeader);
+        }
+        setStages(prev => prev.filter((_, i) => i !== indexToRemove));
+    };
+
+    useEffect(() => { }, [setStages])
 
 
     return (
@@ -81,7 +101,7 @@ const Stepper = ({ stages, id, setStages }) => {
                         const label = foundStage ? foundStage.label : stageValue;
                         return (
                             <div key={`${stage.stage_name}-${index}`} className={`stage ${!isLast ? "connected" : ""}`}>
-                                <div onMouseEnter={() => setHorverIndex(index)} onMouseLeave={() => setHorverIndex(null)} className={`step ${hoverIndex === index ? 'hovered' : ''}`}>{hoverIndex === index ? 'X' : index + 1}</div>
+                                <div onClick={() => handleRemoveStage(index)} onMouseEnter={() => setHorverIndex(index)} onMouseLeave={() => setHorverIndex(null)} className={`step ${hoverIndex === index ? 'hovered' : ''}`}>{hoverIndex === index ? 'X' : index + 1}</div>
                                 <p>{label}</p>
                             </div>
                         );
@@ -93,16 +113,3 @@ const Stepper = ({ stages, id, setStages }) => {
 };
 
 export default Stepper
-
-/* date_completed_stage
-: 
-null
-id
-: 
-33
-stage_completed
-: 
-false
-stage_name
-: 
-"initial_contact" */
