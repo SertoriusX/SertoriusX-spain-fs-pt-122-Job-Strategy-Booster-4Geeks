@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import '../styles/stepper.css'
 import { useNavigate } from "react-router-dom";
+import useGetAuthorizationHeader from "../hooks/useGetAuthorizationHeader";
+import { createNewRoute, getRoutes } from '../Fetch/routeMapFecth'
 
 export const WORK_STAGES = [
     { value: "initial_contact", label: "Toma de contacto inicial" },
@@ -18,14 +20,28 @@ export const WORK_STAGES = [
     { value: "process_closure", label: "Cierre del proceso" }
 ];
 
-const Stepper = ({ stages, setStages }) => {
+const Stepper = ({ stages, id, setStages }) => {
+    const authorizationHeader = useGetAuthorizationHeader()
     const [stageData, setStageData] = useState(WORK_STAGES[0].value)
     const navigate = useNavigate()
 
     const handleAddStage = () => {
         setStages(prev => [...prev, stageData]);
         setStageData(WORK_STAGES[0].value);
+        console.log(stages)
     }
+
+    const handleSubmit = async (e) => {
+        if (stages.length === 0) {
+            console.warn("No hay stages para enviar");
+            return;
+        }
+
+        const stagesList = await createNewRoute(stages, id, authorizationHeader);
+        console.log('Nuevo mapa creado', stagesList);
+        navigate(-1)
+    }
+
 
     return (
         <div className="stages_container">
@@ -33,7 +49,7 @@ const Stepper = ({ stages, setStages }) => {
                 <h3>Tu proceso</h3>
                 <div className="options_buttons">
                     <button onClick={() => navigate(-1)} className="discard_btn">Descartar</button>
-                    <button className="save_btn">Guardar</button>
+                    <button onClick={handleSubmit} className="save_btn">Guardar</button>
                 </div>
             </div>
             <div className="selector_container">
@@ -58,9 +74,11 @@ const Stepper = ({ stages, setStages }) => {
                 ) : (
                     stages.map((stage, index) => {
                         const isLast = index === stages.length - 1;
-                        const label = WORK_STAGES.find(s => s.value === stage).label;
+                        const stageValue = stage.stage_name || stage;
+                        const foundStage = WORK_STAGES.find(s => s.value === stageValue);
+                        const label = foundStage ? foundStage.label : stageValue;
                         return (
-                            <div key={`${stage}-${index}`} className={`stage ${!isLast ? "connected" : ""}`}>
+                            <div key={`${stage.stage_name}-${index}`} className={`stage ${!isLast ? "connected" : ""}`}>
                                 <div className="step">{index + 1}</div>
                                 <p>{label}</p>
                             </div>
@@ -73,3 +91,16 @@ const Stepper = ({ stages, setStages }) => {
 };
 
 export default Stepper
+
+/* date_completed_stage
+: 
+null
+id
+: 
+33
+stage_completed
+: 
+false
+stage_name
+: 
+"initial_contact" */

@@ -8,6 +8,7 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Stepper from '../CreateRouteMap';
 import RouteMapPreview from '../RouteMapPreview';
+import { getRoutes } from '../../Fetch/routeMapFecth';
 
 export default function JobsDetail() {
     const { id } = useParams();
@@ -33,18 +34,17 @@ export default function JobsDetail() {
     }
 
     const closeStepper = () => {
-        if(isRouteMap){
+        if (isRouteMap) {
             if (stages.length > 0) {
                 const confirmationClose = window.confirm('Si cierras el modificador de rutas, no se guardaran datos, quieres cerrarlo de todas maneras?')
                 if (!confirmationClose) return
             }
             setStages([])
             navigate(-1)
-        }else{
+        } else {
             navigate(`/postulations/${id}/route-map`);
         }
     }
-
 
 
     useEffect(() => {
@@ -57,6 +57,20 @@ export default function JobsDetail() {
         };
 
         fetchPostulation();
+    }, [id]);
+
+
+    useEffect(() => {
+        const getRouteMap = async () => {
+            try {
+                const routeMapList = await getRoutes(id, authorizationHeader)
+                setStages(routeMapList.stages)
+                console.log(routeMapList.stages)
+            } catch (error) {
+                console.error("Error fetching route map:", error)
+            }
+        }
+        getRouteMap()
     }, [id]);
 
     if (!postulation) return <p>Postulation not found</p>;
@@ -85,7 +99,7 @@ export default function JobsDetail() {
 
             <div className="rode_map_details">
                 {isRouteMap
-                    ? <Stepper stages={stages} setStages={setStages} />
+                    ? <Stepper stages={stages} id={id} setStages={setStages} />
                     : <RouteMapPreview stages={stages} />
                 }
             </div>

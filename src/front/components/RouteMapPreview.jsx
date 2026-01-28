@@ -12,9 +12,11 @@ const RouteMapPreview = ({ stages }) => (
             ) : (
                 stages.map((stage, index) => {
                     const isLast = index === stages.length - 1;
-                    const label = WORK_STAGES.find(s => s.value === stage).label;
+                    const stageValue = stage.stage_name || stage;
+                    const foundStage = WORK_STAGES.find(s => s.value === stageValue);
+                    const label = foundStage ? foundStage.label : stageValue;
                     return (
-                        <div key={`${stage}-${index}`} className={`stage ${!isLast ? "connected" : ""}`}>
+                        <div key={`${stage.stage_name}-${index}`} className={`stage ${!isLast ? "connected" : ""}`}>
                             <div className="step">{index + 1}</div>
                             <p>{label}</p>
                         </div>
