@@ -66,9 +66,9 @@ function Sidebar() {
 
                     <NavBarButton
                         icon={faClipboardList}
-                        label="Postulaciones"
+                        label="postulations"
                         to="/Jobs"
-                        onClick={() => handleNavigation("/Jobs")}
+                        onClick={() => handleNavigation("/postulations")}
                     />
                     <NavBarButton
                         icon={faBookBookmark}
