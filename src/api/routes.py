@@ -1,8 +1,14 @@
+import requests
+import traceback
+from werkzeug.utils import secure_filename
+import openai
+import os
+from dotenv import load_dotenv
 from flask_bcrypt import Bcrypt
 from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import db, User, CV
-from flask import Flask, request, jsonify, url_for, Blueprint,send_from_directory
-from api.models import db, User, Postulations,Profile
+from flask import Flask, request, jsonify, url_for, Blueprint, send_from_directory
+from api.models import db, User, Postulations, Profile
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
@@ -12,25 +18,20 @@ from api.data_mock.mock_data import jobs
 from datetime import datetime
 
 api = Blueprint('api', __name__)
-from dotenv import load_dotenv
-import os
-import traceback 
-import openai
-import requests  
-from werkzeug.utils import secure_filename
 
 CORS(api)
 bcrypt = Bcrypt()
 
-bcrypt = Bcrypt()  
+bcrypt = Bcrypt()
 
-load_dotenv()  
+load_dotenv()
 api_key = ("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")
-bcrypt = Bcrypt() 
+bcrypt = Bcrypt()
 
 
 openai.api_key = api_key
 GOOGLE_API_KEY = "AIzaSyC-8znGPyiPtg52au8Qm8m1NQehlPLS_uI"
+
 
 @api.route('/translate', methods=['POST'])
 def translate():
@@ -60,6 +61,7 @@ def translate():
 
         return jsonify({"error": str(err), "details": response.text}), 500
 
+
 @api.route('/chat', methods=['POST'])
 def chat():
     try:
@@ -81,9 +83,9 @@ def chat():
         return jsonify({"response": bot_reply})
 
     except Exception as e:
-        traceback.print_exc()  
+        traceback.print_exc()
         return jsonify({"response": f"Error: {str(e)}"}), 500
-    
+
 
 def save_uploaded_file(file, upload_folder=None):
     if not file:
@@ -117,7 +119,7 @@ def handle_hello():
 """ ---------- REGISTER ENDPOINT ----------- """
 
 
-@api.route('/register', methods=["POST"])
+@api.route('/register', methods=['POST', 'GET'])
 def register():
     data = request.get_json()
     username = data.get('username')
@@ -488,7 +490,6 @@ def delete_postulation(id):
     return jsonify({"message": "Postulation has been removed"})
 
 
-
 @api.route("/postulacion/count", methods=["GET"])
 @jwt_required()
 def status_count():
@@ -496,82 +497,88 @@ def status_count():
     postulacion = Postulations.query.filter_by(user_id=current_user).count()
     return jsonify({"postulation": postulacion})
 
+
 @api.route("/postulacion/abierta", methods=["GET"])
 @jwt_required()
 def status_abierta_get():
     current_user = get_jwt_identity()
-    postulacion = Postulations.query.filter_by(user_id=current_user, postulation_state="abierta").count()
+    postulacion = Postulations.query.filter_by(
+        user_id=current_user, postulation_state="abierta").count()
     return jsonify({"abierta": postulacion})
+
 
 @api.route("/postulacion/en_proceso", methods=["GET"])
 @jwt_required()
 def status_en_proceso_get():
     current_user = get_jwt_identity()
-    postulacion = Postulations.query.filter_by(user_id=current_user, postulation_state="en proceso").count()
+    postulacion = Postulations.query.filter_by(
+        user_id=current_user, postulation_state="en proceso").count()
     return jsonify({"en_proceso": postulacion})
+
 
 @api.route("/postulacion/entrevista", methods=["GET"])
 @jwt_required()
 def status_entrevista_get():
     current_user = get_jwt_identity()
-    postulacion = Postulations.query.filter_by(user_id=current_user, postulation_state="entrevista").count()
+    postulacion = Postulations.query.filter_by(
+        user_id=current_user, postulation_state="entrevista").count()
     return jsonify({"entrevista": postulacion})
+
 
 @api.route("/postulacion/oferta", methods=["GET"])
 @jwt_required()
 def status_oferta_get():
     current_user = get_jwt_identity()
-    postulacion = Postulations.query.filter_by(user_id=current_user, postulation_state="oferta").count()
+    postulacion = Postulations.query.filter_by(
+        user_id=current_user, postulation_state="oferta").count()
     return jsonify({"oferta": postulacion})
+
 
 @api.route("/postulacion/descartado", methods=["GET"])
 @jwt_required()
 def status_descartado_get():
     current_user = get_jwt_identity()
-    postulacion = Postulations.query.filter_by(user_id=current_user, postulation_state="descartado").count()
+    postulacion = Postulations.query.filter_by(
+        user_id=current_user, postulation_state="descartado").count()
     return jsonify({"descartado": postulacion})
+
 
 @api.route("/postulacion/aceptada", methods=["GET"])
 @jwt_required()
 def status_aceptada_get():
     current_user = get_jwt_identity()
-    postulacion = Postulations.query.filter_by(user_id=current_user, postulation_state="aceptada").count()
+    postulacion = Postulations.query.filter_by(
+        user_id=current_user, postulation_state="aceptada").count()
     return jsonify({"aceptada": postulacion})
 
 
-
-
-
-
-@api.route("/profile",methods=["GET"])
+@api.route("/profile", methods=["GET"])
 @jwt_required()
 def profile_get():
-    current_user=get_jwt_identity()
+    current_user = get_jwt_identity()
     profile = Profile.query.filter_by(user_id=current_user).first()
     if profile is None:
         return jsonify({"msg": "Profile not found"}), 404
     return jsonify(profile.serialize()), 200
 
 
-
-@api.route("/profile",methods=["POST"])
+@api.route("/profile", methods=["POST"])
 @jwt_required()
 def profile_post():
-    current_user=get_jwt_identity()
+    current_user = get_jwt_identity()
     first_name = request.form.get("first_name")
     last_name = request.form.get("last_name")
     bio = request.form.get("bio")
-    skill = request.form.getlist("skill")   
+    skill = request.form.getlist("skill")
     img_profile = request.files.get("img_profile")
     image_filename = save_uploaded_file(
-    img_profile, upload_folder=os.getenv('UPLOAD_FOLDER', '/tmp/uploads'))
+        img_profile, upload_folder=os.getenv('UPLOAD_FOLDER', '/tmp/uploads'))
 
-    
     if not first_name and not last_name and not skill and not bio:
-        return jsonify({"msg":"Missing something the field"})
-    if not isinstance(skill,list):
-        return jsonify({"msg":"is list"})
-    new_profile=Profile(
+        return jsonify({"msg": "Missing something the field"})
+    if not isinstance(skill, list):
+        return jsonify({"msg": "is list"})
+    new_profile = Profile(
 
         first_name=first_name,
         last_name=last_name,
@@ -585,28 +592,28 @@ def profile_post():
     return jsonify(new_profile.serialize()), 200
 
 
-
-@api.route("/profile/<int:id>",methods=["PUT"])
+@api.route("/profile/<int:id>", methods=["PUT"])
 @jwt_required()
 def profile_update(id):
-    current_user=get_jwt_identity()
+    current_user = get_jwt_identity()
     profile = Profile.query.filter_by(user_id=current_user).first()
     first_name = request.form.get("first_name")
     last_name = request.form.get("last_name")
     bio = request.form.get("bio")
-    skill = request.form.getlist("skill")   
+    skill = request.form.getlist("skill")
     img_profile = request.files.get("img_profile")
-    if not isinstance(skill,list):
-        return jsonify({"msg":"is list"})
+    if not isinstance(skill, list):
+        return jsonify({"msg": "is list"})
     if first_name:
-        profile.first_name=first_name
+        profile.first_name = first_name
     if last_name:
-        profile.last_name=last_name
+        profile.last_name = last_name
     if skill:
-        profile.skill=skill
+        profile.skill = skill
     if img_profile:
-        profile.img_profile=save_uploaded_file(img_profile, upload_folder=os.getenv('UPLOAD_FOLDER', '/tmp/uploads'))
+        profile.img_profile = save_uploaded_file(
+            img_profile, upload_folder=os.getenv('UPLOAD_FOLDER', '/tmp/uploads'))
     if bio:
-        profile.bio=bio
+        profile.bio = bio
     db.session.commit()
     return jsonify(profile.serialize()), 200

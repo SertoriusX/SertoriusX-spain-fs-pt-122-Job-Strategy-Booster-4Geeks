@@ -24,6 +24,7 @@ flask-migrate = "*"
 python-dotenv = "*"
 openai = "*"
 colorama = "*"
+requests = "*"
 
 [requires]
 python_version = "3.13"

@@ -35,22 +35,23 @@ const SkillsSection = ({ formData, updateCurrentCV }) => {
     };
 
     return (
-        <div className="cv-form-section">
-
-            {/* Título principal con icono */}
-            <h3 className="cv-form-title">
+        <div className="cv-section-block">
+            <h3 className="cv-section-title">
                 <Wrench size={18} className="section-icon" />
                 Habilidades e Idiomas
             </h3>
 
-            {/* SUBSECCIÓN: HABILIDADES */}
             <h4 className="cv-subtitle">
                 <Wrench size={18} className="section-icon" />
                 Habilidades
             </h4>
 
+            {(formData.habilidades || []).length === 0 && (
+                <p className="cv-section-empty">Aún no has agregado habilidades.</p>
+            )}
+
             {(formData.habilidades || []).map((skill, i) => (
-                <div key={i} className="cv-tag-row">
+                <div key={i} className="cv-item cv-item-row">
                     <input
                         className="cv-input"
                         value={skill}
@@ -59,7 +60,7 @@ const SkillsSection = ({ formData, updateCurrentCV }) => {
                     />
 
                     <button
-                        className="cv-tag-remove"
+                        className="cv-item-remove"
                         type="button"
                         onClick={() => removeSkill(i)}
                     >
@@ -68,18 +69,21 @@ const SkillsSection = ({ formData, updateCurrentCV }) => {
                 </div>
             ))}
 
-            <button className="btn btn-outline" type="button" onClick={addSkill}>
+            <button className="cv-add-btn" type="button" onClick={addSkill}>
                 <Plus size={18} /> Agregar habilidad
             </button>
 
-            {/* SUBSECCIÓN: IDIOMAS */}
             <h4 className="cv-subtitle">
                 <Globe size={18} className="section-icon" />
                 Idiomas
             </h4>
 
+            {(formData.idiomas || []).length === 0 && (
+                <p className="cv-section-empty">Aún no has agregado idiomas.</p>
+            )}
+
             {(formData.idiomas || []).map((lang, i) => (
-                <div key={i} className="cv-tag-row">
+                <div key={i} className="cv-item cv-item-row">
                     <input
                         className="cv-input"
                         value={lang}
@@ -88,19 +92,20 @@ const SkillsSection = ({ formData, updateCurrentCV }) => {
                     />
 
                     <button
-                        className="cv-tag-remove"
+                        className="cv-item-remove"
                         type="button"
-                        onClick={() => removeLanguage(i)}  // ← CORREGIDO
+                        onClick={() => removeLanguage(i)}
                     >
                         <XCircle size={18} />
                     </button>
                 </div>
             ))}
 
-            <button className="btn btn-outline" type="button" onClick={addLanguage}>
+            <button className="cv-add-btn" type="button" onClick={addLanguage}>
                 <Plus size={18} /> Agregar idioma
             </button>
         </div>
+
     );
 
 };

@@ -1,15 +1,17 @@
 import React from "react";
-import { FileText, Plus, Copy, Trash2, Pencil } from "lucide-react";
+import { FileText, Plus, Trash2, Pencil } from "lucide-react";
 
 const Sidebar = ({
     cvList,
     selectedCVId,
     selectCV,
     createNewCV,
-    cloneCV,
     deleteCV,
-    setIsEditing
+    setIsEditing,
+    isEditing
 }) => {
+    if (isEditing) return null;
+
     const selectedCV = cvList.find((cv) => cv.id === selectedCVId);
 
     return (
@@ -46,13 +48,6 @@ const Sidebar = ({
                         onClick={() => setIsEditing(true)}
                     >
                         <Pencil size={16} /> Editar
-                    </button>
-
-                    <button
-                        className="btn btn-secondary btn-full"
-                        onClick={cloneCV}
-                    >
-                        <Copy size={16} /> Clonar
                     </button>
 
                     <button

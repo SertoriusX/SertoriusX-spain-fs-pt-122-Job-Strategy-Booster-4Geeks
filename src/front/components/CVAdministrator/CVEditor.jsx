@@ -27,7 +27,6 @@ const CVEditor = ({ formData, updateCurrentCV, setIsEditing, saving, onSave }) =
             <EducationSection formData={formData} updateCurrentCV={updateCurrentCV} />
             <SkillsSection formData={formData} updateCurrentCV={updateCurrentCV} />
 
-           
             <div className="save-wrapper">
 
                 <div className="cv-editor-footer">
@@ -43,7 +42,7 @@ const CVEditor = ({ formData, updateCurrentCV, setIsEditing, saving, onSave }) =
                     <button
                         className="btn btn-primary"
                         type="button"
-                        onClick={() => onSave(formData?.titulo)}
+                        onClick={() => onSave(formData)}
                         disabled={saving}
                     >
                         {saving ? "Guardando..." : (
@@ -87,7 +86,11 @@ const CVEditor = ({ formData, updateCurrentCV, setIsEditing, saving, onSave }) =
                             <button
                                 className="circle-btn"
                                 onClick={() => {
-                                    onSave(cvName);
+                                    onSave({
+                                        ...formData,
+                                        titulo: cvName,
+                                        id: null
+                                    });
                                     setShowSaveAs(false);
                                 }}
                                 title="Guardar"

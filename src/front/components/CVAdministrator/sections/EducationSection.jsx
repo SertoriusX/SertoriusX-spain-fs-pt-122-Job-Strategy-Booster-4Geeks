@@ -27,23 +27,25 @@ const EducationSection = ({ formData, updateCurrentCV }) => {
     };
 
     return (
-        <div className="cv-form-section">
-            <h3 className="cv-form-title">
+        <div className="cv-section-block">
+            <h3 className="cv-section-title">
                 <GraduationCap size={18} className="section-icon" />
                 Educación
             </h3>
 
+            {(formData.educacion || []).length === 0 && (
+                <p className="cv-section-empty">Aún no has agregado educación.</p>
+            )}
 
-            {formData.educacion.map((edu, i) => (
-                <div key={i} className="cv-modal-card">
+            {(formData.educacion || []).map((edu, i) => (
+                <div key={i} className="cv-item">
                     <button
-                        className="cv-modal-close"
+                        className="cv-item-remove"
                         type="button"
-                        onClick={() => removeExperience(i)}
+                        onClick={() => removeEducation(i)}
                     >
                         <XCircle size={18} />
                     </button>
-
 
                     <div className="cv-form-grid">
                         <div className="cv-form-group">
@@ -59,7 +61,7 @@ const EducationSection = ({ formData, updateCurrentCV }) => {
                         </div>
 
                         <div className="cv-form-group">
-                            <label>Título</label>
+                            <label>Título / Carrera</label>
                             <input
                                 className="cv-input"
                                 value={edu.titulo}
@@ -82,13 +84,27 @@ const EducationSection = ({ formData, updateCurrentCV }) => {
                             />
                         </div>
                     </div>
+
+                    <div className="cv-form-group">
+                        <label>Descripción</label>
+                        <textarea
+                            className="cv-input cv-textarea"
+                            value={edu.descripcion}
+                            onChange={(e) =>
+                                updateEducation(i, "descripcion", e.target.value)
+                            }
+                            placeholder="Describe logros, proyectos o especializaciones..."
+                            rows="3"
+                        />
+                    </div>
                 </div>
             ))}
 
-            <button className="btn btn-outline" type="button" onClick={addEducation}>
+            <button className="cv-add-btn" type="button" onClick={addEducation}>
                 <Plus size={18} /> Agregar educación
             </button>
         </div>
+
     );
 };
 

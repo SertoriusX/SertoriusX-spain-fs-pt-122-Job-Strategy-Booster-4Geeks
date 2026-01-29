@@ -5,6 +5,11 @@ import CVEditor from "./CVEditor.jsx";
 import { createEmptyCV, cloneCV } from "./utils/cvHelpers.js";
 import "../../styles/CVAdministrator.css";
 import ModalAgregarCV from "./ModalAgregarCV.jsx";
+import { Pencil, Trash2, FileText } from "lucide-react";
+import { useOutletContext } from "react-router-dom";
+
+
+
 
 const CVAdministrator = () => {
     const { token } = useContext(UserContext);
@@ -13,7 +18,7 @@ const CVAdministrator = () => {
     const [cvList, setCvList] = useState([]);
     const [selectedCVId, setSelectedCVId] = useState(null);
     const [formData, setFormData] = useState(null);
-    const [isEditing, setIsEditing] = useState(false);
+    const { isEditing, setIsEditing } = useOutletContext();
     const [isLoading, setIsLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [showAgregarModal, setShowAgregarModal] = useState(false);
@@ -24,9 +29,16 @@ const CVAdministrator = () => {
         setIsOpen(prev => !prev);
     };
 
-    const handleExportPDF = () => {
-        window.print();
+    const handleExportPDF = (id) => {
+        selectCV(id);
+        setIsEditing(false);
+        setIsOpen(true);
+
+        setTimeout(() => {
+            window.print();
+        }, 300);
     };
+
 
     useEffect(() => {
         if (token) loadCVList();
@@ -43,7 +55,7 @@ const CVAdministrator = () => {
     const loadCVList = async () => {
         setIsLoading(true);
         try {
-            const res = await fetch(`${backendUrl}/api/cv`, {
+            const res = await fetch(`${backendUrl}/cv`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             const data = await res.json();
@@ -88,14 +100,16 @@ const CVAdministrator = () => {
         );
     };
 
-    const handleSaveAs = async (nombre) => {
+    const handleSaveAs = async (cvData) => {
+        setSaving(true);
+
         const nuevoCV = {
-            ...formData,
-            titulo: nombre,
+            ...cvData,
+            id: null,
             created_at: new Date().toISOString()
         };
 
-        const res = await fetch(`${backendUrl}/api/cv`, {
+        const res = await fetch(`${backendUrl}/cv`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -121,6 +135,7 @@ const CVAdministrator = () => {
         setSaving(false);
     };
 
+
     const createNewCV = () => {
         const nuevo = createEmptyCV();
         setSelectedCVId(null);
@@ -133,7 +148,7 @@ const CVAdministrator = () => {
 
         try {
             if (!selectedCVId) {
-                const res = await fetch(`${backendUrl}/api/cv`, {
+                const res = await fetch(`${backendUrl}/cv`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -163,7 +178,7 @@ const CVAdministrator = () => {
                 return;
             }
 
-            const res = await fetch(`${backendUrl}/api/cv/${selectedCVId}`, {
+            const res = await fetch(`${backendUrl}/cv/${selectedCVId}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -201,7 +216,7 @@ const CVAdministrator = () => {
         if (!confirm("¿Seguro que deseas eliminar este CV?")) return;
 
         try {
-            await fetch(`${backendUrl}/api/cv/${cvId}`, {
+            await fetch(`${backendUrl}/cv/${cvId}`, {
                 method: "DELETE",
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -248,7 +263,7 @@ const CVAdministrator = () => {
     return (
         <div className="cv-admin-container">
             {showAgregarModal && (
-                <ModalAgregarCV cvList={cvList} onSelect={handleSelectForAdd} onClose={() => setShowAgregarModal(false)}
+                <ModalAgregarCV cvList={cvList} onClose={() => setShowAgregarModal(false)}
                 />
             )}
 
@@ -257,46 +272,52 @@ const CVAdministrator = () => {
 
                 <div className="cv-topbar-actions">
                     <button onClick={createNewCV}>+ Nuevo CV</button>
-                    <button onClick={() => setShowAgregarModal(true)}>Agregar</button>
                 </div>
             </div>
 
-            <table className="cv-table">
-                <thead>
-                    <tr>
-                        <th>Nombre del CV</th>
-                        <th style={{ width: "160px" }}>Acciones</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {cvList.map((cv) => (
-                        <tr key={cv.id}>
-                            <td>{cv.datos.titulo || "Sin título"}</td>
-
-                            <td>
-                                <div className="cv-actions-row">
-                                    <button onClick={() => handleView(cv.id)}>👁️</button>
-                                    <button onClick={() => handleEdit(cv.id)}>🖉</button>
-                                    <button onClick={() => deleteCV(cv.id)}>🗑️</button>
-                                </div>
-                            </td>
+            {!isEditing && (
+                <table className="cv-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre del CV</th>
+                            <th style={{ width: "160px" }}>Acciones</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+
+                    <tbody>
+                        {cvList.map((cv) => (
+                            <tr key={cv.id}>
+                                <td>{cv.datos.titulo || "Sin título"}</td>
+
+                                <td>
+                                    <div className="cv-actions-row">
+                                        <button onClick={() => handleEdit(cv.id)}>
+                                            <Pencil size={18} />
+                                        </button>
+
+                                        <button onClick={() => deleteCV(cv.id)}>
+                                            <Trash2 size={18} />
+                                        </button>
+
+                                        <button onClick={() => handleExportPDF(cv.id)}>
+                                            <FileText size={18} />
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            )}
+
 
             <main className="cv-main">
 
                 {formData && (
                     <div className="cv-inner-actions">
-                        <button onClick={handleToggleCV}>
-                            {isOpen ? "Cerrar CV" : "Abrir CV"}
-                        </button>
 
-                        <button onClick={handleExportPDF}>
-                            PDF
-                        </button>
+
+
                     </div>
                 )}
 
