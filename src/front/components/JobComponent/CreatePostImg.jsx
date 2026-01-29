@@ -12,15 +12,25 @@ export default function UploadImageOnly() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+
     const handleImage = (e) => {
         const file = e.target.files[0];
         if (!file) return;
+
+        // Revoke old preview to avoid memory leaks
+        if (preview) URL.revokeObjectURL(preview);
+
         setImage(file);
         setPreview(URL.createObjectURL(file));
+
+        // Clear previous messages on new image selection
+        setError("");
+        setSuccess("");
     };
 
     useEffect(() => {
+        // Cleanup on unmount
         return () => {
             if (preview) URL.revokeObjectURL(preview);
         };
@@ -43,21 +53,23 @@ export default function UploadImageOnly() {
             const res = await axios.post(`${backendUrl}/ocr-postulation`, fd, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            navigate("/postulations"),
 
-                setSuccess("Image uploaded and data extracted successfully!");
+            setSuccess("Image uploaded and data extracted successfully!");
             console.log("Response data:", res.data);
+
+            // Navigate after success
+            navigate("/postulations");
         } catch (err) {
             console.error(err);
             setError("OCR failed. Please try another image.");
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
     };
 
     return (
         <div style={{ maxWidth: 400, margin: "auto", padding: 20 }}>
-            <h2>Subir imagen </h2>
+            <h2>Subir imagen</h2>
 
             <input type="file" accept="image/*" onChange={handleImage} />
             {preview && (
@@ -66,7 +78,11 @@ export default function UploadImageOnly() {
                 </div>
             )}
 
-            <button onClick={upload} disabled={loading} style={{ marginTop: 10 }}>
+            <button
+                onClick={upload}
+                disabled={loading || !image}
+                style={{ marginTop: 10 }}
+            >
                 {loading ? "Subiendo..." : "Subir & Extracto"}
             </button>
 

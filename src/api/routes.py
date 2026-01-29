@@ -433,7 +433,7 @@ def clean_company_name(line: str, max_length=50) -> str:
     return line[:max_length]
 
 
-def extract_postulation_fields(text):
+def extract_postulation_fields(text: str) -> dict:
     clean_text = text.replace("€", " €").replace("$", " $")
     lines = [l.strip() for l in clean_text.split("\n") if len(l.strip()) > 3]
     full_text = " ".join(lines).lower()
@@ -452,6 +452,17 @@ def extract_postulation_fields(text):
         "job_description": clean_text[:800]
     }
 
+    # ---------------- PLATFORM DETECTION ----------------
+    if "linkedin" in full_text:
+        data["platform"] = "LinkedIn"
+    if "indeed" in full_text:
+        data["platform"] = "Indeed"
+    elif "sefcarm" in full_text or "sefoficinavirtual" in full_text:
+        data["platform"] = "Sefcarm"
+    else:
+        data["platform"] = "Unknown"
+
+    # ---------------- ROLE & COMPANY ----------------
     for line in lines:
         if " at " in line.lower():
             parts = re.split(r"\s+at\s+", line, flags=re.IGNORECASE)
@@ -460,90 +471,61 @@ def extract_postulation_fields(text):
                 data["company_name"] = clean_company_name(parts[1])
                 break
 
-    if not data["company_name"]:
-        for line in lines:
-            if "empresa" in line.lower():
-                data["company_name"] = clean_company_name(line)
-                break
+    if data["platform"] == "Indeed" and not data["company_name"]:
+        if lines:
+            data["company_name"] = clean_company_name(lines[0])
+        if len(lines) > 1:
+            data["role"] = lines[1].strip()
 
     if not data["company_name"] and lines:
         data["company_name"] = clean_company_name(lines[0])
 
-
-    if not data["role"]:
-        for line in lines:
-            if any(k in line.lower() for k in ["limpieza", "personal", "operario"]):
-                data["role"] = line.strip()
-                break
-
     if not data["role"] and len(lines) > 1:
-        data["role"] = lines[1]
+        data["role"] = lines[1].strip()
 
-
-   
+    # ---------------- CITY ----------------
     city_match = re.search(r"municipio:\s*([a-záéíóúñ]+)", full_text)
     if city_match:
         data["city"] = city_match.group(1).title()
-
-    if not data["city"]:
-        city_match2 = re.search(r"\(([^)]*murcia[^)]*)\)", full_text)
-        if city_match2:
-            data["city"] = "Murcia"
-
-    if not data["city"]:
+    else:
         for city in ["murcia", "barcelona", "madrid", "valencia", "sevilla", "santander"]:
             if city in full_text:
                 data["city"] = city.title()
                 break
 
-
-  
-    if "linkedin" in full_text:
-        data["platform"] = "Linkedin"
-    elif "sefcarm" in full_text or "sefoficinavirtual" in full_text:
-        data["platform"] = "Sefcarm"
-
-
-
-    if "presencial" in full_text or "on-site" in full_text:
+    # ---------------- WORK TYPE ----------------
+    if any(k in full_text for k in ["presencial", "on-site", "lunes a viernes"]):
         data["work_type"] = "Presencial"
-    elif "remoto" in full_text or "remote" in full_text:
+    elif any(k in full_text for k in ["remoto", "remote"]):
         data["work_type"] = "Remoto"
-    elif "híbrido" in full_text or "hybrid" in full_text:
+    elif any(k in full_text for k in ["híbrido", "hybrid"]):
         data["work_type"] = "Híbrido"
 
-    if "lunes a viernes" in full_text:
-        data["work_type"] = "Presencial"
-
-
-
+    # ---------------- EXPERIENCE ----------------
     exp_match = re.search(r"experiencia.*?(\d+)\s*(meses|años)", full_text)
     if exp_match:
         num = int(exp_match.group(1))
         data["experience"] = num if "meses" in exp_match.group(2) else num * 12
 
-
+    # ---------------- SALARY ----------------
     salary_match = re.search(r"(\d{3,5})\s*euros", full_text)
     if salary_match:
         data["salary"] = int(salary_match.group(1))
 
-
+    # ---------------- APPLICATIONS ----------------
     applied_match = re.search(r"más de (\d+)\s+solicitudes", full_text)
     if applied_match:
         data["candidates_applied"] = int(applied_match.group(1))
 
-
-   
+    # ---------------- REQUIREMENTS ----------------
     for line in lines:
-        if any(kw in line.lower() for kw in ["se requiere", "tener", "poseer", "estar inscrito"]):
-            data["requirements"].append(line.strip())
+        if any(k in line.lower() for k in [
+            "se requiere", "tener", "poseer",
+            "estar inscrito", "aptitudes", "habilidades"
+        ]):
+            data["requirements"].append(line)
 
-    for line in lines:
-        if any(kw in line.lower() for kw in ["aptitudes", "habilidades"]):
-            data["requirements"].append(line.strip())
-
-
-
+    # ---------------- URL ----------------
     url_match = re.search(r"(https?://[^\s]+)", text)
     if url_match:
         data["postulation_url"] = url_match.group(1)
@@ -963,29 +945,21 @@ def status_en_proceso_get():
 
 
 @api.route("/postulacion/entrevista", methods=["GET"])
-@jwt_required()
 def status_entrevista_get():
-    current_user = get_jwt_identity()
-    postulacion = Postulations.query.filter_by(
-        user_id=current_user, postulation_state="entrevista").count()
+    postulacion = Stages.query.filter_by( stage_name="hr_interview").count()
     return jsonify({"entrevista": postulacion})
 
 
 @api.route("/postulacion/oferta", methods=["GET"])
-@jwt_required()
 def status_oferta_get():
-    current_user = get_jwt_identity()
-    postulacion = Postulations.query.filter_by(
-        user_id=current_user, postulation_state="oferta").count()
+    postulacion = Stages.query.filter_by(
+         stage_name="offer").count()
     return jsonify({"oferta": postulacion})
 
 
 @api.route("/postulacion/descartado", methods=["GET"])
-@jwt_required()
 def status_descartado_get():
-    current_user = get_jwt_identity()
-    postulacion = Postulations.query.filter_by(
-        user_id=current_user, postulation_state="descartado").count()
+    postulacion = Stages.query.filter_by( stage_name="process_closure").count()
     return jsonify({"descartado": postulacion})
 
 
