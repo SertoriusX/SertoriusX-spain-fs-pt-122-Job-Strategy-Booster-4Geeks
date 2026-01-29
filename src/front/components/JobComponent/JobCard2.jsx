@@ -17,14 +17,15 @@ function JobCard2({ post }) {
             <div className="card_header">
                 <div className="header_title">
                     <span className="status">{post.postulation_state}</span>
-                    <span className="category">{post.company_name}</span>
+                    {post.platform == "Linkedin" ? (<>                    <span className="category">{post.company_name}</span>
+                    </>) : (<> <span className="category">{post.role}</span></>)}
                 </div>
                 <button onClick={() => navigate(`/postulations/${post.id}`)} className="view_details">Detalles</button>
             </div>
 
             <div className="application_card_title">
                 <div className="title">
-                    <h2>{post.role}</h2>
+                    {post.platform == "Indeed" ? (<> <h2>{post.role}</h2></>) : (<> <h2>{post.company_name}</h2></>)}
                     <div className="created_at">
                         <h4><FontAwesomeIcon icon={faLocationDot} />{post.city}</h4>
                         <h4><FontAwesomeIcon icon={faCalendarDays} />{formatDate(post.inscription_date)}</h4>
