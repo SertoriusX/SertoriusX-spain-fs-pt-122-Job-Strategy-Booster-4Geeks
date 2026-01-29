@@ -20,56 +20,30 @@ export default function JobsDetail() {
 
     const handleDelete = async () => {
         if (!postulation) return;
-        try {
-            await removePostulation(postulation.id, authorizationHeader);
-            console.log('Postulation eliminada correctamente');
-            navigate('/postulations');
-        } catch (error) {
-            console.error('Error eliminando la postulación:', error);
-        }
+        await removePostulation(postulation.id, authorizationHeader);
+        navigate('/postulations');
+
     };
 
     const formatLink = (link) => {
         return link.split('/').slice(0, 3).join('')
     }
 
-    /*     const closeStepper = () => {
-            if (isRouteMap) {
-                if (stages.length > 0) {
-                    const confirmationClose = window.confirm('Si cierras el modificador de rutas, no se guardaran datos, quieres cerrarlo de todas maneras?')
-                    if (!confirmationClose) return
-                }
-                setStages([])
-                navigate(-1)
-            } else {
-                ;
-            }
-        }
-     */
-
     useEffect(() => {
         const fetchPostulation = async () => {
             const result = await getPostulationById(id, authorizationHeader);
             setPostulation({
                 ...result,
-                requirements: result.requirements || []
+                requirements: result.requirements
             });
         };
 
-        fetchPostulation();
-    }, [id]);
-
-
-    useEffect(() => {
         const getRouteMap = async () => {
-            try {
-                const routeMapList = await getRoutes(id, authorizationHeader)
-                setStages(routeMapList.stages)
-                console.log(routeMapList.stages)
-            } catch (error) {
-                console.error("Error fetching route map:", error)
-            }
+            const routeMapList = await getRoutes(id, authorizationHeader)
+            setStages(routeMapList.stages)
         }
+
+        fetchPostulation();
         getRouteMap()
     }, [id]);
 
@@ -101,11 +75,9 @@ export default function JobsDetail() {
             <div className="rode_map_details">
                 {isRouteMap
                     ? <Stepper stages={stages} id={id} setStages={setStages} />
-                    : <RouteMapPreview stages={stages} />
+                    : <RouteMapPreview stages={stages} id={id} setStages={setStages} />
                 }
             </div>
-
-
 
             <div className="postulation_content">
                 <div className="general_details_left">

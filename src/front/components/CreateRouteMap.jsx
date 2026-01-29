@@ -3,7 +3,7 @@ import '../styles/stepper.css'
 import { useNavigate } from "react-router-dom";
 import useGetAuthorizationHeader from "../hooks/useGetAuthorizationHeader";
 import { createNewRoute, removeStep } from '../Fetch/routeMapFecth'
-import { faL } from "@fortawesome/free-solid-svg-icons";
+
 
 export const WORK_STAGES = [
     { value: "initial_contact", label: "Toma de contacto inicial" },
@@ -24,27 +24,32 @@ export const WORK_STAGES = [
 const Stepper = ({ stages, id, setStages }) => {
     const authorizationHeader = useGetAuthorizationHeader()
     const navigate = useNavigate()
-    const [localStages, setLocalStages] = useState(() => [...stages])
     const [stageData, setStageData] = useState(WORK_STAGES[0].value)
     const [hoverIndex, setHorverIndex] = useState(false)
 
     const handleAddStage = () => {
         const newStage = {
-            stage_name: stageData,
+            date_completed_stage: null,
             stage_completed: false,
-            date_completed_stage: null
+            stage_name: stageData
         };
 
-        setLocalStages(prev => [...prev, newStage]);
+        setStages(prev => [...prev, newStage]);
         setStageData(WORK_STAGES[0].value);
     }
 
-    const handleSubmit = async (e) => {
-        if (localStages.length === 0) {
-            console.warn("No hay stages para enviar");
-            return;
-        }
-        const data = await createNewRoute(localStages, id, authorizationHeader);
+
+    const handleSubmit = async () => {
+        if (stages.length === 0) return;
+
+        const stagesToSend = stages.map(({ stage_name, stage_completed, date_completed_stage }) => ({
+            stage_name,
+            stage_completed,
+            date_completed_stage: stage_completed
+                ? new Date().toISOString().split('T')[0] : null
+        }));
+
+        const data = await createNewRoute(stagesToSend, id, authorizationHeader);
         if (data.stages) {
             setStages(data.stages);
         }
@@ -53,18 +58,18 @@ const Stepper = ({ stages, id, setStages }) => {
 
 
     const handleRemoveStage = async (indexToRemove) => {
-        const stageToRemove = localStages[indexToRemove];
+        const stageToRemove = stages[indexToRemove];
         if (!stageToRemove) return;
 
         if (stageToRemove.id) {
             const stageId = stageToRemove.id
             await removeStep(id, stageId, authorizationHeader);
         }
-        setLocalStages(prev => prev.filter((_, i) => i !== indexToRemove));
+        setStages(prev => prev.filter((_, i) => i !== indexToRemove));
     };
 
     const handleDiscard = () => {
-        setLocalStages([...stages]); // opcional (reset)
+        setStages(prev => [...prev]);
         navigate(-1);
     };
 
@@ -81,7 +86,7 @@ const Stepper = ({ stages, id, setStages }) => {
             <div className="selector_container">
                 <select
                     value={stageData}
-                    onChange={(e) => setStageData(prev => (e.target.value))}
+                    onChange={(e) => setStageData(e.target.value)}
                 >
                     {WORK_STAGES.map(stage => (
                         <option key={stage.value} value={stage.value}>
@@ -95,11 +100,11 @@ const Stepper = ({ stages, id, setStages }) => {
                 </button>
             </div>
             <div className="stepper">
-                {localStages.length === 0 ? (
+                {stages.length === 0 ? (
                     <h4>No tienes un proceso creado</h4>
                 ) : (
-                    localStages.map((stage, index) => {
-                        const isLast = index === localStages.length - 1;
+                    stages.map((stage, index) => {
+                        const isLast = index === stages.length - 1;
                         const stageValue = stage.stage_name || stage;
                         const foundStage = WORK_STAGES.find(s => s.value === stageValue);
                         const label = foundStage ? foundStage.label : stageValue;
@@ -107,6 +112,9 @@ const Stepper = ({ stages, id, setStages }) => {
                             <div key={`${stage.stage_name}-${index}`} className={`stage ${!isLast ? "connected" : ""}`}>
                                 <div onClick={() => handleRemoveStage(index)} onMouseEnter={() => setHorverIndex(index)} onMouseLeave={() => setHorverIndex(null)} className={`step ${hoverIndex === index ? 'hovered' : ''}`}>{hoverIndex === index ? 'X' : index + 1}</div>
                                 <p>{label}</p>
+                                {stage.stage_completed && stage.date_completed_stage && (
+                                    <p>{new Date(stage.date_completed_stage).toLocaleDateString()}</p>
+                                )}
                             </div>
                         );
                     })
