@@ -14,6 +14,7 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 import json
 from datetime import datetime
 from api.data_mock.mock_data import jobs
+
 from datetime import datetime,date
 import pytesseract
 from PIL import Image
@@ -1088,12 +1089,12 @@ def create_or_replace_route_map(id):
         if not stage_name or not isinstance(stage_name, str):
             continue
 
-
         date_completed_stage = None
         raw_date = stage_data.get('date_completed_stage')
         if raw_date:
             try:
-                date_completed_stage = datetime.strptime(raw_date, '%Y-%m-%d').date()
+                date_completed_stage = datetime.strptime(
+                    raw_date, '%Y-%m-%d').date()
             except ValueError:
                 return jsonify({
                     'error': f'Invalid date format for stage "{stage_name}". Use YYYY-MM-DD'
@@ -1142,3 +1143,55 @@ def remove_stage(id):
     db.session.commit()
 
     return jsonify({'message': 'Stage has been removed'}), 200
+
+
+@api.route('/postulations/<int:id>/route-map', methods=['PUT'])
+@jwt_required()
+def complete_next_stage(id):
+    action = request.args.get('action')
+    current_user = get_jwt_identity()
+
+    if action not in ('next','prev'):
+        return jsonify({'error': 'Invalid action'}), 400
+
+    postulation = Postulations.query.filter_by(
+        id=id,
+        user_id=current_user
+    ).first()
+
+    if not postulation:
+        return jsonify({"error": "Postulation not found"}), 404
+    
+    if action == 'next':
+        stage = Stages.query.filter_by(
+            postulation_id=id,
+            stage_completed=False
+        ).order_by(Stages.id.asc()).first()
+
+        if not stage:
+            return jsonify({"message": "All stages are already completed"}), 200
+
+        stage.stage_completed = True
+        stage.date_completed_stage = datetime.utcnow().date()
+
+        message = f'Stage "{stage.stage_name}" marked as completed'
+
+    else :
+        stage = Stages.query.filter_by(
+        postulation_id=id,
+        stage_completed=True
+        ).order_by(Stages.id.desc()).first()
+
+        if not stage:
+            return jsonify({"message": "No completed stages to revert"}), 200
+
+        stage.stage_completed = False
+        stage.date_completed_stage = None
+        message = f'Stage "{stage.stage_name}" reverted'
+
+    db.session.commit()
+
+    return jsonify({
+        "message": message,
+        "stage": stage.serialize()
+    }), 200

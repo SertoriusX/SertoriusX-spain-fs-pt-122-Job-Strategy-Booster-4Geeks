@@ -28,7 +28,8 @@ export const getRoutes = async (id, authorizationHeader) => {
 };
 
 export const removeStep = async (id, stageId, authorizationHeader) => {
-  const response = await fetch(`${backendUrl}/postulations/${id}/route-map?stage_id=${stageId}`,
+  const response = await fetch(
+    `${backendUrl}/postulations/${id}/route-map?stage_id=${stageId}`,
     {
       ...authorizationHeader,
       method: "DELETE",
@@ -37,7 +38,23 @@ export const removeStep = async (id, stageId, authorizationHeader) => {
 
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(error.error || "Error fetching postulation");
+    throw new Error(error);
+  }
+  return await response.json();
+};
+
+export const updateStage = async (id, action, authorizationHeader) => {
+  const response = await fetch(
+    `${backendUrl}/postulations/${id}/route-map?action=${action}`,
+    {
+      ...authorizationHeader,
+      method: "PUT",
+    },
+  );
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error);
   }
 
   return await response.json();
