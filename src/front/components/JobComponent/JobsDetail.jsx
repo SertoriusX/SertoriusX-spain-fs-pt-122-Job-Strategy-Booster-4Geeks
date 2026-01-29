@@ -39,7 +39,7 @@ export default function JobsDetail() {
                 const confirmationClose = window.confirm('Si cierras el modificador de rutas, no se guardaran datos, quieres cerrarlo de todas maneras?')
                 if (!confirmationClose) return
             }
-            setStages([])
+            setStages(stages)
             navigate(-1)
         } else {
             navigate(`/postulations/${id}/route-map`);

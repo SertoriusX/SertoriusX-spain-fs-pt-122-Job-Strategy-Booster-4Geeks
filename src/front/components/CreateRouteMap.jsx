@@ -23,8 +23,9 @@ export const WORK_STAGES = [
 
 const Stepper = ({ stages, id, setStages }) => {
     const authorizationHeader = useGetAuthorizationHeader()
-    const [stageData, setStageData] = useState(WORK_STAGES[0].value)
     const navigate = useNavigate()
+    const [localStages, setLocalStages] = useState(() => [...stages])
+    const [stageData, setStageData] = useState(WORK_STAGES[0].value)
     const [hoverIndex, setHorverIndex] = useState(false)
 
     const handleAddStage = () => {
@@ -34,17 +35,16 @@ const Stepper = ({ stages, id, setStages }) => {
             date_completed_stage: null
         };
 
-        setStages(prev => [...prev, newStage]);
+        setLocalStages(prev => [...prev, newStage]);
         setStageData(WORK_STAGES[0].value);
-        console.log("Stages actuales:", [...stages, newStage]);
     }
 
     const handleSubmit = async (e) => {
-        if (stages.length === 0) {
+        if (localStages.length === 0) {
             console.warn("No hay stages para enviar");
             return;
         }
-        const data = await createNewRoute(stages, id, authorizationHeader);
+        const data = await createNewRoute(localStages, id, authorizationHeader);
         if (data.stages) {
             setStages(data.stages);
         }
@@ -53,16 +53,20 @@ const Stepper = ({ stages, id, setStages }) => {
 
 
     const handleRemoveStage = async (indexToRemove) => {
-        const stageToRemove = stages[indexToRemove];
+        const stageToRemove = localStages[indexToRemove];
         if (!stageToRemove) return;
+
         if (stageToRemove.id) {
             const stageId = stageToRemove.id
             await removeStep(id, stageId, authorizationHeader);
         }
-        setStages(prev => prev.filter((_, i) => i !== indexToRemove));
+        setLocalStages(prev => prev.filter((_, i) => i !== indexToRemove));
     };
 
-    useEffect(() => { }, [setStages])
+    const handleDiscard = () => {
+        setLocalStages([...stages]); // opcional (reset)
+        navigate(-1);
+    };
 
 
     return (
@@ -70,7 +74,7 @@ const Stepper = ({ stages, id, setStages }) => {
             <div className="header">
                 <h3>Tu proceso</h3>
                 <div className="options_buttons">
-                    <button onClick={() => navigate(-1)} className="discard_btn">Descartar</button>
+                    <button onClick={handleDiscard} className="discard_btn">Descartar</button>
                     <button onClick={handleSubmit} className="save_btn">Guardar</button>
                 </div>
             </div>
@@ -91,11 +95,11 @@ const Stepper = ({ stages, id, setStages }) => {
                 </button>
             </div>
             <div className="stepper">
-                {stages.length === 0 ? (
+                {localStages.length === 0 ? (
                     <h4>No tienes un proceso creado</h4>
                 ) : (
-                    stages.map((stage, index) => {
-                        const isLast = index === stages.length - 1;
+                    localStages.map((stage, index) => {
+                        const isLast = index === localStages.length - 1;
                         const stageValue = stage.stage_name || stage;
                         const foundStage = WORK_STAGES.find(s => s.value === stageValue);
                         const label = foundStage ? foundStage.label : stageValue;
