@@ -53,9 +53,8 @@
 .main_content {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: auto;
   width: 100%;
-  overflow: scroll;
   gap: 10px;
 }
 .header_bar{

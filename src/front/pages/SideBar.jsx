@@ -48,8 +48,10 @@ function Sidebar() {
     return (
         <div className="side_bar">
             <div className="header">
-                <div className="logo"></div>
-                <p>Trakeando</p>
+                <div onClick={() => handleNavigation('/')}>
+                    <img width={"220px"} src="/public/img/sycjob_transparent.png" alt="" />
+                </div>
+                <br />
             </div>
 
             <div className="nav_bar">
@@ -57,7 +59,7 @@ function Sidebar() {
                 <div className="nav_bar_buttons">
                     <NavBarButton
                         icon={faHouse}
-                        label="Home"
+                        label="Inicio"
                         to="/"
                         onClick={() => handleNavigation("/")}
                     />
@@ -66,15 +68,15 @@ function Sidebar() {
 
                     <NavBarButton
                         icon={faClipboardList}
-                        label="Postulaciones"
+                        label="postulations"
                         to="/Jobs"
-                        onClick={() => handleNavigation("/Jobs")}
+                        onClick={() => handleNavigation("/postulations")}
                     />
                     <NavBarButton
                         icon={faBookBookmark}
                         label="Curriculums"
-                        to="/Curriculum"
-                        onClick={() => handleNavigation("/Curriculum")}
+                        to="/admin-cv"
+                        onClick={() => handleNavigation("/admin-cv")}
                     />
                     <NavBarButton
                         icon={faHandshake}
@@ -91,7 +93,7 @@ function Sidebar() {
                 <div className="tools_buttons">
                     <NavBarButton
                         icon={faInfoCircle}
-                        label="About"
+                        label="Sobre nosotras"
                         to="/about"
                         onClick={() => handleNavigation("/about")}
                     />

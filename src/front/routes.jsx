@@ -15,11 +15,12 @@ import AboutUs from "./pages/AboutUs";
 import AdminCV from "./pages/AdminCV";
 
 
-import { useState } from "react";
 import EditProfile from "./components/ProfileComponents/EditProfile.jsx";
 import LoginForm from "./components/user/LoginForm.jsx";
 import Formulario from "./components/JobComponent/Formulario.jsx";
 import JobsDetail from "./components/JobComponent/JobsDetail.jsx"
+import Stepper from './components/CreateRouteMap.jsx'
+import CreatePostImg from "./components/JobComponent/CreatePostImg.jsx";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -27,19 +28,26 @@ export const router = createBrowserRouter(
     <Route path="/" element={<App />} errorElement={<h1>Not found!</h1>}>
 
       <Route index element={<HomePage />} />
-      <Route path="jobs" element={<Jobs />} />
+      <Route path="postulations">
+        <Route index element={<Jobs />} />
+        <Route path=":id" element={<JobsDetail />} />
+        <Route path="/postulations/:id/route-map" element={<JobsDetail />} />
+        <Route path="formulario" element={<Formulario />} />
+      </Route>
+      <Route path="postulations/:id/create-stepper" element={<Stepper />} />
       <Route path="curriculum" element={<Curriculums />} />
       <Route path="interview" element={<Interview />} />
       <Route path="register" element={<Registration />} />
-      <Route path="jobId" element={<JobsDetail />} />
-      <Route path="formulario" element={<Formulario />} />
+
       <Route path="login" element={<LoginForm />} />
       <Route path="perfil" element={<PerfilUsuario />} />
       <Route path="about" element={<AboutUs />} />
+      {/* <Route path="timeline" element={<ListadoAplicaciones />} /> */}
       <Route path="admin-cv" element={<AdminCV />} />
       <Route path="about" element={<AboutUs />} />
-      <Route path="/post/:id" element={<JobsDetail />} />
       <Route path="formulario" element={<Formulario />} />
+      <Route path="img-post" element={<CreatePostImg />} />
+
 
       <Route path="perfil/:id/edit" element={<EditProfile />} />
 

@@ -25,6 +25,8 @@ python-dotenv = "*"
 openai = "*"
 colorama = "*"
 requests = "*"
+pytesseract = "*"
+pillow = "*"
 reportlab = "*"
 
 [requires]
