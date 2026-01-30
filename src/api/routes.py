@@ -1,3 +1,4 @@
+import re
 import traceback
 from werkzeug.utils import secure_filename
 import requests
@@ -7,7 +8,7 @@ from dotenv import load_dotenv
 from flask_bcrypt import Bcrypt
 from api.models import db, User, CV
 from flask import Flask, request, jsonify, url_for, Blueprint, send_from_directory
-from api.models import db, User, Postulations, Profile, Stages
+from api.models import db, User, Postulations, Profile, Stages, TodoList
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
@@ -15,18 +16,11 @@ import json
 from datetime import datetime
 from api.data_mock.mock_data import jobs
 
-from datetime import datetime,date
+from datetime import datetime, date
 import pytesseract
 from PIL import Image
 
 api = Blueprint('api', __name__)
-from dotenv import load_dotenv
-import os
-import traceback 
-import openai
-import requests  
-from werkzeug.utils import secure_filename
-import re
 
 CORS(api)
 bcrypt = Bcrypt()
@@ -36,9 +30,9 @@ bcrypt = Bcrypt()
 load_dotenv()
 api_key = ("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")
 bcrypt = Bcrypt()
-load_dotenv()  
+load_dotenv()
 api_key = ("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")
-bcrypt = Bcrypt() 
+bcrypt = Bcrypt()
 
 
 openai.api_key = api_key
@@ -46,6 +40,7 @@ GOOGLE_API_KEY = "AIzaSyC-8znGPyiPtg52au8Qm8m1NQehlPLS_uI"
 
 sessions = {}
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+
 
 @api.route('/translate', methods=['POST'])
 def translate():
@@ -120,8 +115,7 @@ QUESTIONS = {
         "¿Qué es la inyección de dependencias?",
         "¿Qué es un componente y cómo se comunica con otros?",
         "¿Cómo manejas el enrutamiento en Angular?"
-    ]
-    ,"personal": [
+    ], "personal": [
         "¿Dónde te ves en cinco años?",
         "¿Cuál es tu mayor fortaleza y debilidad?",
         "¿Cómo manejas el estrés o la presión en el trabajo?",
@@ -157,7 +151,6 @@ RESOURCES = {
         "https://rxjs.dev",
     ],
 }
-
 
 
 def clean_company_name(line: str, max_length=50) -> str:
@@ -204,7 +197,6 @@ def extract_postulation_fields(text):
     if not data["company_name"] and lines:
         data["company_name"] = clean_company_name(lines[0])
 
-
     if not data["role"]:
         for line in lines:
             if any(k in line.lower() for k in ["limpieza", "personal", "operario"]):
@@ -214,8 +206,6 @@ def extract_postulation_fields(text):
     if not data["role"] and len(lines) > 1:
         data["role"] = lines[1]
 
-
-   
     city_match = re.search(r"municipio:\s*([a-záéíóúñ]+)", full_text)
     if city_match:
         data["city"] = city_match.group(1).title()
@@ -231,14 +221,10 @@ def extract_postulation_fields(text):
                 data["city"] = city.title()
                 break
 
-
-  
     if "linkedin" in full_text:
         data["platform"] = "Linkedin"
     elif "sefcarm" in full_text or "sefoficinavirtual" in full_text:
         data["platform"] = "Sefcarm"
-
-
 
     if "presencial" in full_text or "on-site" in full_text:
         data["work_type"] = "Presencial"
@@ -250,25 +236,19 @@ def extract_postulation_fields(text):
     if "lunes a viernes" in full_text:
         data["work_type"] = "Presencial"
 
-
-
     exp_match = re.search(r"experiencia.*?(\d+)\s*(meses|años)", full_text)
     if exp_match:
         num = int(exp_match.group(1))
         data["experience"] = num if "meses" in exp_match.group(2) else num * 12
 
-
     salary_match = re.search(r"(\d{3,5})\s*euros", full_text)
     if salary_match:
         data["salary"] = int(salary_match.group(1))
-
 
     applied_match = re.search(r"más de (\d+)\s+solicitudes", full_text)
     if applied_match:
         data["candidates_applied"] = int(applied_match.group(1))
 
-
-   
     for line in lines:
         if any(kw in line.lower() for kw in ["se requiere", "tener", "poseer", "estar inscrito"]):
             data["requirements"].append(line.strip())
@@ -276,8 +256,6 @@ def extract_postulation_fields(text):
     for line in lines:
         if any(kw in line.lower() for kw in ["aptitudes", "habilidades"]):
             data["requirements"].append(line.strip())
-
-
 
     url_match = re.search(r"(https?://[^\s]+)", text)
     if url_match:
@@ -333,14 +311,16 @@ def ocr_postulation():
     db.session.commit()
 
     return jsonify(postulation.serialize()), 201
-@api.route('/chat',methods=["POST"])
+
+
+@api.route('/chat', methods=["POST"])
 @jwt_required()
 def chat():
     try:
         user_id = get_jwt_identity()
         data = request.json or {}
         user_message = data.get("message", "").lower().strip()
-        
+
         if user_id not in sessions:
             sessions[user_id] = {
                 "state": "WAIT_READY",
@@ -408,9 +388,8 @@ def chat():
             role = session["role"]
             q_index = session.get("question_index", 0)
 
-
             q_index += 1
-    
+
             if q_index < len(QUESTIONS[role]):
                 session["question_index"] = q_index
                 next_question = QUESTIONS[role][q_index]
@@ -419,7 +398,8 @@ def chat():
                 })
             else:
                 session["state"] = "FINISHED"
-                resources = "\n".join(f"- {url}" for url in RESOURCES.get(role, []))
+                resources = "\n".join(
+                    f"- {url}" for url in RESOURCES.get(role, []))
                 return jsonify({
                     "response": (
                         "✅ ¡Buen trabajo!\n\n"
@@ -1021,7 +1001,7 @@ def complete_next_stage(id):
     action = request.args.get('action')
     current_user = get_jwt_identity()
 
-    if action not in ('next','prev'):
+    if action not in ('next', 'prev'):
         return jsonify({'error': 'Invalid action'}), 400
 
     postulation = Postulations.query.filter_by(
@@ -1031,7 +1011,7 @@ def complete_next_stage(id):
 
     if not postulation:
         return jsonify({"error": "Postulation not found"}), 404
-    
+
     if action == 'next':
         stage = Stages.query.filter_by(
             postulation_id=id,
@@ -1046,10 +1026,10 @@ def complete_next_stage(id):
 
         message = f'Stage "{stage.stage_name}" marked as completed'
 
-    else :
+    else:
         stage = Stages.query.filter_by(
-        postulation_id=id,
-        stage_completed=True
+            postulation_id=id,
+            stage_completed=True
         ).order_by(Stages.id.desc()).first()
 
         if not stage:
@@ -1065,3 +1045,46 @@ def complete_next_stage(id):
         "message": message,
         "stage": stage.serialize()
     }), 200
+
+
+"""----------- TO DO ROUTES ------------ """
+@api.route('/', methods=['GET'])
+@jwt_required()
+def get_todos():
+    current_user = get_jwt_identity()
+    todos = TodoList.query.filter_by(user_id=current_user).all()
+
+    if not todos:
+        return jsonify([]), 200
+
+    return jsonify([{
+        "id": t.id,
+        "todo_name": t.todo_name,
+        "todo_complete": t.todo_complete
+    } for t in todos]), 200
+
+
+
+@api.route('/', methods=['POST'])
+@jwt_required()
+def create_new_todo():
+    data = request.get_json()
+    current_user = get_jwt_identity()
+
+    if not data or not data.get('todo_name'):
+        return jsonify({"error": "todo_name is required"}), 400
+
+    new_todo = TodoList(
+        todo_name=data.get('todo_name'),
+        todo_complete=data.get('todo_complete', False),
+        user_id=current_user
+    )
+
+    db.session.add(new_todo)
+    db.session.commit()
+
+    return jsonify({
+        "id": new_todo.id,
+        "todo_name": new_todo.todo_name,
+        "todo_complete": new_todo.todo_complete
+    }), 201

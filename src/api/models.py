@@ -76,13 +76,7 @@ class Postulations(db.Model):
     platform: Mapped[str] = mapped_column(String(100), nullable=False)
     postulation_url: Mapped[str] = mapped_column(String(2000), nullable=False)
     work_type: Mapped[str] = mapped_column(String(50), nullable=False)
-<<<<<<< HEAD
     requirements: Mapped[List[str]] = mapped_column(JSON, nullable=False)
-=======
-
-    requirements: Mapped[List[str]] = mapped_column(JSON, nullable=False,default=[])    
-    
->>>>>>> 273286c451d5490ade9522477dd6b81ba2aec308
     candidates_applied: Mapped[int] = mapped_column(Integer, nullable=False)
     available_positions: Mapped[int] = mapped_column(Integer, nullable=False)
     job_description: Mapped[str] = mapped_column(Text, nullable=False)
@@ -94,26 +88,6 @@ class Postulations(db.Model):
 
     def serialize(self):
         return {
-<<<<<<< HEAD
-            "id": self.id,
-            "postulation_state": self.postulation_state,
-            "company_name": self.company_name,
-            "role": self.role,
-            "experience": self.experience,
-            "inscription_date": self.inscription_date.isoformat() if self.inscription_date else None,
-            "city": self.city,
-            "salary": self.salary,
-            "platform": self.platform,
-            "postulation_url": self.postulation_url,
-            "work_type": self.work_type,
-            "requirements": self.requirements,
-            "candidates_applied": self.candidates_applied,
-            "available_positions": self.available_positions,
-            "job_description": self.job_description,
-            "stages": [stage.serialize() for stage in self.stages]
-        }
-
-=======
         "id": self.id,
         "postulation_state": self.postulation_state,
         "company_name": self.company_name,
@@ -133,7 +107,6 @@ class Postulations(db.Model):
     }
     def __str__(self):
         return self.user.username if self.user else f"User ID {self.user_id}"
->>>>>>> 273286c451d5490ade9522477dd6b81ba2aec308
 
 class Profile(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)

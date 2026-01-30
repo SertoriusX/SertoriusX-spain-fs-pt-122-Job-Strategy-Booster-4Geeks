@@ -6,7 +6,7 @@ function ShowTodo({ todoList }) {
         todoList.map((todo, index) => {
             return (
                 <div key={`${todo}-${index}`} className="todo_item">
-                    <p>{todo}</p>
+                    <p>{todo.todo_name}</p>
                     <div className="action_buttons">
                         <button className="complete_task"><FontAwesomeIcon icon={faCheck} /> </button>
                         <button className="remove_task"><FontAwesomeIcon icon={faTrash} /></button>
