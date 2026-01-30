@@ -1,7 +1,32 @@
+:root {
+  --back-color: #ffffff;
+  --card-color: #d9d9d9;
+  --font-color: #1b1b1b;
+  --ligther-font-color: #6f6f6f;
+  --main-color: #2b4eeb;
+  --main-color-hover: #6b82ec;
+}
+
+[data-theme="dark"] {
+  --back-color: #0f1115;
+  --card-color: #1c1f26;
+  --font-color: #e6e6e6;
+  --ligther-font-color: #a1a1aa;
+  --main-color: #4c6fff;
+  --main-color-hover: #6e8bff;
+}
+
+
 .perfil-container {
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(135deg, #4f46e5, #7c3aed, #9333ea);
+ background: linear-gradient(
+    135deg,
+    var(--back-color),
+    color-mix(in srgb, var(--back-color) 92%, var(--main-color) 8%),
+    color-mix(in srgb, var(--back-color) 88%, var(--main-color) 12%),
+    var(--card-color)
+  );
   padding: 40px;
   display: flex;
   justify-content: center;
@@ -27,7 +52,7 @@
 }
 
 .profile-card {
-  background: white;
+  background: var(--back-color);
   padding: 28px;
   border-radius: 18px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.08);
@@ -38,6 +63,14 @@
   align-items: center;
 }
 
+.name,
+.section-title,
+.page-title,
+.modal-content h2,
+.bio-section h2,
+.application-details h3 {
+  color: var(--back-color);
+}   
 .avatar-wrapper {
   position: relative;
   display: flex;
@@ -447,7 +480,6 @@
   margin-top: 16px;
   border-radius: 12px;
   border: 1px solid #e5e7eb;
-  overflow: hidden;
 }
 
 .application-row {
@@ -585,50 +617,15 @@
   left: 0;
   right: 0;
   height: 130px;
-  background: linear-gradient(135deg, #4f46e5, #7c3aed, #9333ea);
-  overflow: hidden;
+ background: linear-gradient(
+    135deg,
+    var(--back-color),
+    color-mix(in srgb, var(--back-color) 92%, var(--main-color) 8%),
+    color-mix(in srgb, var(--back-color) 88%, var(--main-color) 12%),
+    var(--card-color)
+  );
 }
 
-.banner-circle {
-  position: absolute;
-  border-radius: 50%;
-}
-
-.banner-circle-1 {
-  width: 260px;
-  height: 260px;
-  background-color: #1d4ed8;
-  opacity: 0.3;
-  top: -80px;
-  left: -80px;
-}
-
-.banner-circle-2 {
-  width: 195px;
-  height: 195px;
-  background-color: #60a5fa;
-  opacity: 0.2;
-  top: -40px;
-  left: 130px;
-}
-
-.banner-circle-3 {
-  width: 290px;
-  height: 290px;
-  background-color: #1e3a8a;
-  opacity: 0.25;
-  top: -130px;
-  right: -130px;
-}
-
-.banner-circle-4 {
-  width: 225px;
-  height: 225px;
-  background-color: #93c5fd;
-  opacity: 0.15;
-  bottom: -80px;
-  right: 260px;
-}
 .bio-section {
   background: #f9fafb;
   border-radius: 16px;

@@ -93,7 +93,6 @@ export default function PerfilUsuario() {
         <div className="perfil-container">
             <div className="perfil-layout">
 
-                {/* LEFT COLUMN */}
                 <aside className="perfil-sidebar">
                     {profile && (
                         <ProfileRead
@@ -101,16 +100,15 @@ export default function PerfilUsuario() {
                             backendUrl={backendUrl}
                             parseSkills={parseSkills}
                             navigate={navigate}
-                            layout="sidebar"   // optional prop
+                            layout="sidebar"
                         />
                     )}
                 </aside>
 
-                {/* RIGHT COLUMN */}
                 <main className="perfil-main-content">
                     {profile && (
                         <div className="bio-section">
-                            <h2>About Me</h2>
+                            <h2>Sobre Mi</h2>
                             <p>{profile.bio}</p>
                         </div>
                     )}

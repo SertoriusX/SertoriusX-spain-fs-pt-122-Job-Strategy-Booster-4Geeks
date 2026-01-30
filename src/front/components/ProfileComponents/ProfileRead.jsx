@@ -20,7 +20,7 @@ export default function ProfileRead({ profile, backendUrl, parseSkills, navigate
                     </div>
 
                     <div className="profile-edit-card">
-                        <div className="section-title">Skills</div>
+                        <div className="section-title">Habilidades</div>
                         <div className="skills-grid">
                             {parseSkills(profile.skill).length === 0 ? (
                                 <span className="skill-badge" style={{ opacity: 0.5 }}>
@@ -38,7 +38,8 @@ export default function ProfileRead({ profile, backendUrl, parseSkills, navigate
                             className="edit-profile-button"
                             onClick={() => navigate(`/perfil/${profile.id}/edit`)}
                         >
-                            Edit Profile
+                            Editar perfil
+
                         </button>
                     </div>
                 </div>

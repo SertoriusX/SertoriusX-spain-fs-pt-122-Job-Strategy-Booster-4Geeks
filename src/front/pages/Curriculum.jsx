@@ -143,7 +143,7 @@ function Curriculums() {
 
     return (
         <>
-            <AdminCV />
+
             <div className="container-center">
                 <div className="input-section">
                     <h1>{t.cvBuilder}</h1>

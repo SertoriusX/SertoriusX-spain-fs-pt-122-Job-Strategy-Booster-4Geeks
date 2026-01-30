@@ -1,14 +1,14 @@
 """empty message
 
-<<<<<<<< HEAD:migrations/versions/3c67d1106105_.py
-Revision ID: 3c67d1106105
+<<<<<<<< HEAD:migrations/versions/4815ba4096e1_.py
+Revision ID: 4815ba4096e1
 Revises: 
-Create Date: 2026-01-30 18:04:49.129799
+Create Date: 2026-01-28 16:05:38.565718
 ========
-Revision ID: 3b3d3d09b903
+Revision ID: b36b4e90d680
 Revises: 
-Create Date: 2026-01-28 16:30:37.071161
->>>>>>>> 9ba6f38b2db4cc73cf6c947c8350542a73419333:migrations/versions/3b3d3d09b903_.py
+Create Date: 2026-01-28 12:28:55.220205
+>>>>>>>> ceci/main:migrations/versions/b36b4e90d680_.py
 
 """
 from alembic import op
@@ -16,11 +16,11 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-<<<<<<<< HEAD:migrations/versions/3c67d1106105_.py
-revision = '3c67d1106105'
+<<<<<<<< HEAD:migrations/versions/4815ba4096e1_.py
+revision = '4815ba4096e1'
 ========
-revision = '3b3d3d09b903'
->>>>>>>> 9ba6f38b2db4cc73cf6c947c8350542a73419333:migrations/versions/3b3d3d09b903_.py
+revision = 'b36b4e90d680'
+>>>>>>>> ceci/main:migrations/versions/b36b4e90d680_.py
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -61,7 +61,7 @@ def upgrade():
     sa.Column('requirements', sa.JSON(), nullable=False),
     sa.Column('candidates_applied', sa.Integer(), nullable=False),
     sa.Column('available_positions', sa.Integer(), nullable=False),
-    sa.Column('job_description', sa.Text(), nullable=False),
+    sa.Column('job_description', sa.String(length=500), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
