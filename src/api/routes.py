@@ -24,9 +24,9 @@ from PIL import Image
 api = Blueprint('api', __name__)
 from dotenv import load_dotenv
 import os
-import traceback 
+import traceback
 import openai
-import requests  
+import requests
 from werkzeug.utils import secure_filename
 import re
 import random
@@ -38,9 +38,9 @@ bcrypt = Bcrypt()
 load_dotenv()
 api_key = ("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")
 bcrypt = Bcrypt()
-load_dotenv()  
+load_dotenv()
 api_key = ("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")
-bcrypt = Bcrypt() 
+bcrypt = Bcrypt()
 
 
 openai.api_key = api_key
@@ -705,100 +705,331 @@ def user_detail():
 
 @api.route("/cv", methods=["GET"])
 @jwt_required()
-def get_cv():
+def get_all_cvs():
     try:
         current_user_id = get_jwt_identity()
-        cv = CV.query.filter_by(user_id=current_user_id).first()
-
-        if not cv:
-            return jsonify({'success': False, 'message': 'CV no encontrado'}), 404
-
-        datos = json.loads(cv.datos)
+        cvs = CV.query.filter_by(user_id=current_user_id).all()
 
         return jsonify({
-            'success': True,
-            'datos': datos,
-            'fecha_creacion': cv.fecha_creacion.isoformat() if cv.fecha_creacion else None,
-            'fecha_modificacion': cv.fecha_modificacion.isoformat() if cv.fecha_modificacion else None
+            "success": True,
+            "cvs": [cv.serialize() for cv in cvs]
         }), 200
 
-    except json.JSONDecodeError as e:
-        return jsonify({'success': False, 'message': 'Error al leer los datos del CV'}), 500
+    except Exception as e:
+        print(f"ERROR: {e}")
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@api.route("/cv/<int:cv_id>", methods=["GET"])
+@jwt_required()
+def get_cv_by_id(cv_id):
+    try:
+        current_user_id = get_jwt_identity()
+        cv = CV.query.filter_by(id=cv_id, user_id=current_user_id).first()
+
+        if not cv:
+            return jsonify({"success": False, "message": "CV no encontrado"}), 404
+
+        return jsonify({"success": True, "cv": cv.serialize()}), 200
 
     except Exception as e:
-        print(f"Error: {e}")
-        import traceback
-        traceback.print_exc()
-        return jsonify({'success': False, 'message': str(e)}), 500
+        print(f"ERROR: {e}")
+        return jsonify({"success": False, "message": str(e)}), 500
 
 
 @api.route("/cv", methods=["POST"])
 @jwt_required()
-def save_cv():
+def create_cv():
     try:
         current_user_id = get_jwt_identity()
         data = request.get_json()
 
         if not data:
-            return jsonify({'success': False, 'message': 'No se enviaron datos'}), 400
+            return jsonify({"success": False, "message": "No se enviaron datos"}), 400
 
-        if not data.get('nombre'):
-            return jsonify({'success': False, 'message': 'El nombre es obligatorio'}), 400
+        nuevo_cv = CV(
+            user_id=current_user_id,
+            datos=json.dumps(data, ensure_ascii=False),
+            fecha_creacion=datetime.utcnow(),
+            fecha_modificacion=datetime.utcnow()
+        )
 
-        if not data.get('email'):
-            return jsonify({'success': False, 'message': 'El email es obligatorio'}), 400
-
-        if not data.get('telefono'):
-            return jsonify({'success': False, 'message': 'El teléfono es obligatorio'}), 400
-
-        json_data = json.dumps(data, ensure_ascii=False)
-        cv = CV.query.filter_by(user_id=current_user_id).first()
-
-        if cv:
-            cv.datos = json_data
-            cv.fecha_modificacion = datetime.utcnow()
-        else:
-            cv = CV(
-                user_id=current_user_id,
-                datos=json_data,
-                fecha_creacion=datetime.utcnow(),
-                fecha_modificacion=datetime.utcnow()
-            )
-            db.session.add(cv)
-
+        db.session.add(nuevo_cv)
         db.session.commit()
 
-        return jsonify({'success': True, 'message': 'CV guardado correctamente', 'cv_id': cv.id}), 200
+        return jsonify({
+            "success": True,
+            "cv": nuevo_cv.serialize()
+        }), 201
 
     except Exception as e:
         print(f"ERROR: {e}")
-        import traceback
-        traceback.print_exc()
         db.session.rollback()
-        return jsonify({'success': False, 'message': f'Error al guardar: {str(e)}'}), 500
+        return jsonify({"success": False, "message": str(e)}), 500
 
 
-@api.route("/cv", methods=["DELETE"])
+@api.route("/cv/<int:cv_id>", methods=["PUT"])
 @jwt_required()
-def delete_cv():
+def update_cv(cv_id):
     try:
         current_user_id = get_jwt_identity()
-        cv = CV.query.filter_by(user_id=current_user_id).first()
+        data = request.get_json()
+
+        cv = CV.query.filter_by(id=cv_id, user_id=current_user_id).first()
 
         if not cv:
-            return jsonify({'success': False, 'message': 'CV no encontrado'}), 404
+            return jsonify({"success": False, "message": "CV no encontrado"}), 404
+
+        cv.datos = json.dumps(data, ensure_ascii=False)
+        cv.fecha_modificacion = datetime.utcnow()
+
+        db.session.commit()
+
+        return jsonify({
+            "success": True,
+            "cv": cv.serialize()
+        }), 200
+
+    except Exception as e:
+        print(f"ERROR: {e}")
+        db.session.rollback()
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@api.route("/cv/<int:cv_id>", methods=["DELETE"])
+@jwt_required()
+def delete_cv(cv_id):
+    try:
+        current_user_id = get_jwt_identity()
+        cv = CV.query.filter_by(id=cv_id, user_id=current_user_id).first()
+
+        if not cv:
+            return jsonify({"success": False, "message": "CV no encontrado"}), 404
 
         db.session.delete(cv)
         db.session.commit()
 
-        return jsonify({'success': True, 'message': 'CV eliminado correctamente'}), 200
+        return jsonify({"success": True, "message": "CV eliminado correctamente"}), 200
 
     except Exception as e:
         print(f"ERROR: {e}")
-        import traceback
-        traceback.print_exc()
         db.session.rollback()
-        return jsonify({'success': False, 'message': f'Error al eliminar: {str(e)}'}), 500
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+
+@api.route("/cv/<int:cv_id>/pdf", methods=["GET"])
+@jwt_required()
+def generate_cv_pdf(cv_id):
+    try:
+        current_user_id = get_jwt_identity()
+        cv = CV.query.filter_by(id=cv_id, user_id=current_user_id).first()
+
+        if not cv:
+            return jsonify({"success": False, "message": "CV no encontrado"}), 404
+
+        datos = json.loads(cv.datos)
+
+        def normalizar_periodos(lista):
+            for item in lista:
+                periodo = item.get("periodo", "")
+                if periodo:
+                    partes = periodo.replace("–", "-").split("-")
+                    if len(partes) == 2:
+                        item["inicio"] = partes[0].strip()
+                        item["fin"] = partes[1].strip()
+                    else:
+                        item["inicio"] = periodo
+                        item["fin"] = ""
+                item.setdefault("inicio", "")
+                item.setdefault("fin", "")
+
+        datos.setdefault("perfil", datos.get("resumen", ""))
+        datos.setdefault("habilidades", [])
+        datos.setdefault("experiencia", [])
+        datos.setdefault("educacion", [])
+        datos.setdefault("ubicacion", "")
+        datos.setdefault("linkedin", "")
+        datos.setdefault("github", "")
+
+        normalizar_periodos(datos["experiencia"])
+        normalizar_periodos(datos["educacion"])
+
+        buffer = BytesIO()
+        p = canvas.Canvas(buffer, pagesize=A4)
+
+        width, height = A4
+        x_margin = 60
+        y = height - 80
+
+        title_color = HexColor("#005A9C")
+        text_color = HexColor("#2E2E2E")
+        muted_color = HexColor("#555555")
+        border_color = HexColor("#CCCCCC")
+
+        p.setStrokeColor(border_color)
+        p.setLineWidth(1)
+        p.rect(x_margin - 20, 50, width - (x_margin - 20)
+               * 2, height - 120, stroke=1, fill=0)
+
+        foto_base64 = datos.get("foto", "")
+        text_x = x_margin
+        text_y = y
+
+        if foto_base64:
+            try:
+                if foto_base64.startswith("data:image"):
+                    foto_base64 = foto_base64.split(",")[1]
+                foto_bytes = base64.b64decode(foto_base64)
+                foto_image = ImageReader(BytesIO(foto_bytes))
+                foto_width = 110
+                foto_height = 110
+                foto_x = x_margin
+                foto_y = y
+                p.drawImage(foto_image, foto_x, foto_y - foto_height, foto_width,
+                            foto_height, preserveAspectRatio=True, mask='auto')
+                text_x = foto_x + foto_width + 25
+                text_y = foto_y
+            except:
+                text_x = x_margin
+                text_y = y
+
+        nombre = datos.get("nombre", "")[:60]
+        font_size = 22
+        max_nombre_width = width - text_x - x_margin
+        while p.stringWidth(nombre, "Helvetica-Bold", font_size) > max_nombre_width and font_size > 12:
+            font_size -= 1
+
+        p.setFont("Helvetica-Bold", font_size)
+        p.setFillColor(title_color)
+        p.drawString(text_x, text_y, nombre)
+        text_y -= font_size + 4
+
+        p.setFont("Helvetica", 11)
+        p.setFillColor(muted_color)
+
+        if datos.get("email"):
+            p.drawString(text_x, text_y, f"Email: {datos['email']}")
+            text_y -= 16
+        if datos.get("telefono"):
+            p.drawString(text_x, text_y, f"Teléfono: {datos['telefono']}")
+            text_y -= 16
+        if datos.get("direccion"):
+            p.drawString(text_x, text_y, f"Dirección: {datos['direccion']}")
+            text_y -= 16
+        if datos.get("ubicacion"):
+            p.drawString(text_x, text_y, f"Ubicación: {datos['ubicacion']}")
+            text_y -= 16
+        if datos.get("linkedin"):
+            p.drawString(text_x, text_y, f"LinkedIn: {datos['linkedin']}")
+            text_y -= 16
+        if datos.get("github"):
+            p.drawString(text_x, text_y, f"GitHub: {datos['github']}")
+            text_y -= 16
+
+        y = min(y - 130, text_y - 40)
+
+        p.setStrokeColor(border_color)
+        p.setLineWidth(0.5)
+        p.line(x_margin - 10, y, width - x_margin + 10, y)
+        y -= 30
+
+        from reportlab.platypus import Paragraph
+        from reportlab.lib.styles import getSampleStyleSheet
+
+        styles = getSampleStyleSheet()
+        style = styles["Normal"]
+        style.fontName = "Helvetica"
+        style.fontSize = 11
+        style.textColor = text_color
+        style.leading = 14
+
+        def seccion(titulo):
+            nonlocal y
+            p.setFont("Helvetica-Bold", 13)
+            p.setFillColor(title_color)
+            p.drawString(x_margin, y, titulo.upper())
+            y -= 8
+            p.setStrokeColor(border_color)
+            p.setLineWidth(0.3)
+            p.line(x_margin, y, width - x_margin, y)
+            y -= 20
+
+        if datos["perfil"]:
+            seccion("Perfil profesional")
+            para = Paragraph(datos["perfil"], style)
+            w, h = para.wrap(width - 2 * x_margin, height)
+            para.drawOn(p, x_margin, y - h)
+            y -= h + 20
+
+        if datos["experiencia"]:
+            seccion("Experiencia")
+            for exp in datos["experiencia"]:
+                if exp.get("puesto"):
+                    p.setFont("Helvetica-Bold", 11)
+                    p.setFillColor(text_color)
+                    p.drawString(x_margin, y, exp["puesto"])
+                    y -= 14
+                if exp.get("empresa"):
+                    p.setFont("Helvetica", 11)
+                    p.setFillColor(muted_color)
+                    p.drawString(x_margin, y, exp["empresa"])
+                    y -= 14
+                periodo = f"{exp['inicio']} – {exp['fin']}".strip(" –")
+                if periodo:
+                    p.setFont("Helvetica-Oblique", 10)
+                    p.setFillColor(muted_color)
+                    p.drawString(x_margin, y, periodo)
+                    y -= 12
+                if exp.get("descripcion"):
+                    para = Paragraph(exp["descripcion"], style)
+                    w, h = para.wrap(width - 2 * x_margin, height)
+                    para.drawOn(p, x_margin, y - h)
+                    y -= h + 10
+                y -= 6
+            y -= 10
+
+        if datos["educacion"]:
+            seccion("Educación")
+            for edu in datos["educacion"]:
+                if edu.get("titulo"):
+                    p.setFont("Helvetica-Bold", 11)
+                    p.setFillColor(text_color)
+                    p.drawString(x_margin, y, edu["titulo"])
+                    y -= 14
+                if edu.get("institucion"):
+                    p.setFont("Helvetica", 11)
+                    p.setFillColor(muted_color)
+                    p.drawString(x_margin, y, edu["institucion"])
+                    y -= 14
+                periodo = f"{edu['inicio']} – {edu['fin']}".strip(" –")
+                if periodo:
+                    p.setFont("Helvetica-Oblique", 10)
+                    p.setFillColor(muted_color)
+                    p.drawString(x_margin, y, periodo)
+                    y -= 12
+                y -= 6
+            y -= 10
+
+        if datos["habilidades"]:
+            seccion("Habilidades")
+            skills = " · ".join(datos["habilidades"])
+            para = Paragraph(skills, style)
+            w, h = para.wrap(width - 2 * x_margin, height)
+            para.drawOn(p, x_margin, y - h)
+            y -= h + 10
+
+        p.showPage()
+        p.save()
+
+        buffer.seek(0)
+        pdf_content = buffer.getvalue()
+
+        return Response(pdf_content, mimetype="application/pdf", headers={"Content-Disposition": f"inline; filename=cv-{cv_id}.pdf"})
+
+    except Exception as e:
+        print(f"ERROR: {e}")
+        return jsonify({"success": False, "message": str(e)}), 500
 
 
 @api.route("/cv/export", methods=["GET"])
@@ -961,50 +1192,22 @@ def status_count():
     return jsonify({"postulation": postulacion})
 
 
-@api.route("/postulacion/abierta", methods=["GET"])
-@jwt_required()
-def status_abierta_get():
-    current_user = get_jwt_identity()
-    postulacion = Postulations.query.filter_by(
-        user_id=current_user, postulation_state="abierta").count()
-    return jsonify({"abierta": postulacion})
-
-
-@api.route("/postulacion/en_proceso", methods=["GET"])
-@jwt_required()
-def status_en_proceso_get():
-    current_user = get_jwt_identity()
-    postulacion = Postulations.query.filter_by(
-        user_id=current_user, postulation_state="en proceso").count()
-    return jsonify({"en_proceso": postulacion})
-
-
-@api.route("/postulacion/entrevista", methods=["GET"])
+@api.route("/status", methods=["GET"])
 def status_entrevista_get():
-    postulacion = Stages.query.filter_by( stage_name="hr_interview").count()
-    return jsonify({"entrevista": postulacion})
+    entrevista = Stages.query.filter_by( stage_name="hr_interview").count()
+    offer = Stages.query.filter_by(stage_name="offer").count()
+    process_closure = Stages.query.filter_by( stage_name="process_closure").count()
+    aceptada = Postulations.query.filter_by( postulation_state="aceptada").count()
+    return jsonify({"entrevista": entrevista,
+                    "offer":offer,
+                    "descartado": process_closure,
+                    "aceptada": aceptada
+                    })
 
 
-@api.route("/postulacion/oferta", methods=["GET"])
-def status_oferta_get():
-    postulacion = Stages.query.filter_by(
-         stage_name="offer").count()
-    return jsonify({"oferta": postulacion})
 
 
-@api.route("/postulacion/descartado", methods=["GET"])
-def status_descartado_get():
-    postulacion = Stages.query.filter_by( stage_name="process_closure").count()
-    return jsonify({"descartado": postulacion})
 
-
-@api.route("/postulacion/aceptada", methods=["GET"])
-@jwt_required()
-def status_aceptada_get():
-    current_user = get_jwt_identity()
-    postulacion = Postulations.query.filter_by(
-        user_id=current_user, postulation_state="aceptada").count()
-    return jsonify({"aceptada": postulacion})
 
 
 @api.route("/profile", methods=["GET"])
@@ -1195,7 +1398,7 @@ def complete_next_stage(id):
 
     if not postulation:
         return jsonify({"error": "Postulation not found"}), 404
-    
+
     if action == 'next':
         stage = Stages.query.filter_by(
             postulation_id=id,

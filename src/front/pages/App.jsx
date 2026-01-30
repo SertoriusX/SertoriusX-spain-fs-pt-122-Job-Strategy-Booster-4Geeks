@@ -13,6 +13,7 @@ export default function App() {
     const { token, user, theme, toggleTheme, profile } = useContext(UserContext);
     const [loading, setLoading] = useState(true);
     const [language, setLanguage] = useState("en");
+    const [isEditing, setIsEditing] = useState(false);
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const [open, setOpen] = useState(false);
 
@@ -71,7 +72,11 @@ export default function App() {
     return (
         <div className="main_container" id="google_translate_element">
             <div className="display_component">
-                <Sidebar />
+                <Sidebar
+                    isEditing={isEditing}
+                    setIsEditing={setIsEditing}
+                />
+
                 <div className="main_content">
                     <div className="header_bar">
                         <div className="user_data">
@@ -131,7 +136,8 @@ export default function App() {
                             </Link>
                         </div>
                     </div>
-                    <Outlet />
+                   <Outlet context={{ isEditing, setIsEditing }} />
+
                 </div>
             </div>
         </div>
