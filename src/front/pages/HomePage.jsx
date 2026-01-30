@@ -11,6 +11,7 @@ import useGetAuthorizationHeader from "../hooks/useGetAuthorizationHeader";
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { UserContext } from "../hooks/UserContextProvier";
+import { Todo } from "../components/home/TodoConponents.jsx/Todo";
 
 
 function HomePage() {
@@ -57,10 +58,6 @@ function HomePage() {
 		})
 	}, [])
 
-
-
-
-
 	useEffect(() => {
 		const fetchPostulations = async () => {
 			const result = await getPostulations(authorizationHeader);
@@ -87,7 +84,9 @@ function HomePage() {
 			<div className="calendar">
 				<Calendar />
 			</div>
-			<div className="todo_list">hola</div>
+			<div className="todo_list">
+				<Todo />
+			</div>
 		</div>
 	);
 }
