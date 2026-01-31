@@ -1,3 +1,4 @@
+import re
 import traceback
 from werkzeug.utils import secure_filename
 import requests
@@ -9,7 +10,7 @@ from dotenv import load_dotenv
 from flask_bcrypt import Bcrypt
 from api.models import db, User, CV
 from flask import Flask, request, jsonify, url_for, Blueprint, send_from_directory
-from api.models import db, User, Postulations, Profile, Stages
+from api.models import db, User, Postulations, Profile, Stages, TodoList
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
@@ -17,7 +18,7 @@ import json
 from datetime import datetime
 from api.data_mock.mock_data import jobs
 
-from datetime import datetime,date
+from datetime import datetime, date
 import pytesseract
 from PIL import Image
 
@@ -48,6 +49,7 @@ GOOGLE_API_KEY = "AIzaSyC-8znGPyiPtg52au8Qm8m1NQehlPLS_uI"
 
 sessions = {}
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+
 
 @api.route('/translate', methods=['POST'])
 def translate():
@@ -122,8 +124,7 @@ QUESTIONS = {
         "¿Qué es la inyección de dependencias?",
         "¿Qué es un componente y cómo se comunica con otros?",
         "¿Cómo manejas el enrutamiento en Angular?"
-    ]
-    ,"personal": [
+    ], "personal": [
         "¿Dónde te ves en cinco años?",
         "¿Cuál es tu mayor fortaleza y debilidad?",
         "¿Cómo manejas el estrés o la presión en el trabajo?",
@@ -305,7 +306,13 @@ def nivel_por_puntaje(avg_score):
     else:
         return "Junior"
 
-
+def clean_company_name(line: str, max_length=50) -> str:
+    line = re.sub(r"http\S+", "", line)
+    line = re.sub(r"\d+", "", line)
+    line = re.sub(r"[^\w\s.,-]", "", line)
+    line = line.strip()
+    return line[:max_length]
+  
 @api.route("/chat", methods=["POST"])
 @jwt_required()
 def chat():
@@ -577,10 +584,15 @@ def extract_postulation_fields(text: str) -> dict:
     if not data["company_name"] and lines:
         data["company_name"] = clean_company_name(lines[0])
 
-    if not data["role"] and len(lines) > 1:
-        data["role"] = lines[1].strip()
+    if not data["role"]:
+        for line in lines:
+            if any(k in line.lower() for k in ["limpieza", "personal", "operario"]):
+                data["role"] = line.strip()
+                break
 
-    # ---------------- CITY ----------------
+    if not data["role"] and len(lines) > 1:
+        data["role"] = lines[1]
+
     city_match = re.search(r"municipio:\s*([a-záéíóúñ]+)", full_text)
     if city_match:
         data["city"] = city_match.group(1).title()
@@ -590,6 +602,12 @@ def extract_postulation_fields(text: str) -> dict:
                 data["city"] = city.title()
                 break
 
+    if "linkedin" in full_text:
+        data["platform"] = "Linkedin"
+    elif "sefcarm" in full_text or "sefoficinavirtual" in full_text:
+        data["platform"] = "Sefcarm"
+
+    if "presencial" in full_text or "on-site" in full_text:
     # ---------------- WORK TYPE ----------------
     if any(k in full_text for k in ["presencial", "on-site", "lunes a viernes"]):
         data["work_type"] = "Presencial"
@@ -597,6 +615,8 @@ def extract_postulation_fields(text: str) -> dict:
         data["work_type"] = "Remoto"
     elif any(k in full_text for k in ["híbrido", "hybrid"]):
         data["work_type"] = "Híbrido"
+    if "lunes a viernes" in full_text:
+        data["work_type"] = "Presencial"
 
     # ---------------- EXPERIENCE ----------------
     exp_match = re.search(r"experiencia.*?(\d+)\s*(meses|años)", full_text)
@@ -613,6 +633,14 @@ def extract_postulation_fields(text: str) -> dict:
     applied_match = re.search(r"más de (\d+)\s+solicitudes", full_text)
     if applied_match:
         data["candidates_applied"] = int(applied_match.group(1))
+
+    for line in lines:
+        if any(kw in line.lower() for kw in ["se requiere", "tener", "poseer", "estar inscrito"]):
+            data["requirements"].append(line.strip())
+
+    for line in lines:
+        if any(kw in line.lower() for kw in ["aptitudes", "habilidades"]):
+            data["requirements"].append(line.strip())
 
     # ---------------- REQUIREMENTS ----------------
     for line in lines:
@@ -677,6 +705,119 @@ def ocr_postulation():
     db.session.commit()
 
     return jsonify(postulation.serialize()), 201
+
+
+@api.route('/chat', methods=["POST"])
+@jwt_required()
+def chat():
+    try:
+        user_id = get_jwt_identity()
+        data = request.json or {}
+        user_message = data.get("message", "").lower().strip()
+
+        if user_id not in sessions:
+            sessions[user_id] = {
+                "state": "WAIT_READY",
+                "role": None,
+                "question_index": 0
+            }
+            return jsonify({
+                "response": "👋 ¿Estás listo para una simulación de entrevista? (sí / no)"
+            })
+
+        session = sessions[user_id]
+
+        if session["state"] == "WAIT_READY":
+            if user_message in ["si", "sí", "yes"]:
+                session["state"] = "WAIT_ROLE"
+                return jsonify({
+                    "response": (
+                        "Perfecto 🚀\n"
+                        "Elige el tipo de entrevista:\n"
+                        "1) Frontend (FE)\n"
+                        "2) Backend (BE)\n"
+                        "3) React\n"
+                        "4) Angular\n"
+                        "5) Preguntas personales"
+                    )
+                })
+
+            if user_message in ["no", "nop", "nope"]:
+                return jsonify({
+                    "response": "👌 Cuando estés listo escribe 'sí'."
+                })
+
+            return jsonify({
+                "response": "Por favor responde únicamente: sí o no."
+            })
+
+        if session["state"] == "WAIT_ROLE":
+            roles = {
+                "1": "frontend",
+                "2": "backend",
+                "3": "react",
+                "4": "angular",
+                "5": "personal"
+            }
+
+            if user_message not in roles:
+                return jsonify({
+                    "response": "Selecciona una opción válida (1-5)."
+                })
+
+            role = roles[user_message]
+            session["role"] = role
+            session["state"] = "INTERVIEW"
+            session["question_index"] = 0
+
+            first_question = QUESTIONS[role][0]
+            return jsonify({
+                "response": (
+                    f"🎯 Entrevista {role.upper()} iniciada.\n\n"
+                    f"Pregunta 1:\n{first_question}"
+                )
+            })
+
+        if session["state"] == "INTERVIEW":
+            role = session["role"]
+            q_index = session.get("question_index", 0)
+
+            q_index += 1
+
+            if q_index < len(QUESTIONS[role]):
+                session["question_index"] = q_index
+                next_question = QUESTIONS[role][q_index]
+                return jsonify({
+                    "response": f"Pregunta {q_index + 1}:\n{next_question}"
+                })
+            else:
+                session["state"] = "FINISHED"
+                resources = "\n".join(
+                    f"- {url}" for url in RESOURCES.get(role, []))
+                return jsonify({
+                    "response": (
+                        "✅ ¡Buen trabajo!\n\n"
+                        "📚 Recursos recomendados para seguir entrenando:\n"
+                        f"{resources}\n\n"
+                        "¿Quieres otra simulación? (sí / no)"
+                    )
+                })
+
+        if session["state"] == "FINISHED":
+            if user_message in ["si", "sí", "yes"]:
+                session["state"] = "WAIT_ROLE"
+                session["question_index"] = 0
+                return jsonify({
+                    "response": "Perfecto 👍 Elige nuevamente una opción (1-5)."
+                })
+
+            return jsonify({
+                "response": "👋 Gracias por practicar. ¡Éxitos!"
+            })
+
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({"response": f"Error: {str(e)}"}), 500
 
 
 
@@ -1450,7 +1591,7 @@ def complete_next_stage(id):
     action = request.args.get('action')
     current_user = get_jwt_identity()
 
-    if action not in ('next','prev'):
+    if action not in ('next', 'prev'):
         return jsonify({'error': 'Invalid action'}), 400
 
     postulation = Postulations.query.filter_by(
@@ -1475,10 +1616,10 @@ def complete_next_stage(id):
 
         message = f'Stage "{stage.stage_name}" marked as completed'
 
-    else :
+    else:
         stage = Stages.query.filter_by(
-        postulation_id=id,
-        stage_completed=True
+            postulation_id=id,
+            stage_completed=True
         ).order_by(Stages.id.desc()).first()
 
         if not stage:
@@ -1494,3 +1635,97 @@ def complete_next_stage(id):
         "message": message,
         "stage": stage.serialize()
     }), 200
+
+
+"""----------- TO DO ROUTES ------------ """
+
+
+@api.route('/', methods=['GET'])
+@jwt_required()
+def get_todos():
+    current_user = get_jwt_identity()
+
+    todos = (
+        TodoList.query
+        .filter_by(user_id=current_user)
+        .order_by(TodoList.id.asc())
+        .all()
+    )
+
+    if not todos:
+        return jsonify([]), 200
+
+    return jsonify([{
+        "id": t.id,
+        "todo_name": t.todo_name,
+        "todo_complete": t.todo_complete
+    } for t in todos]), 200
+
+
+@api.route('/', methods=['POST'])
+@jwt_required()
+def create_new_todo():
+    data = request.get_json()
+    current_user = get_jwt_identity()
+
+    if not data or not data.get('todo_name'):
+        return jsonify({"error": "todo_name is required"}), 400
+
+    new_todo = TodoList(
+        todo_name=data.get('todo_name'),
+        todo_complete=data.get('todo_complete', False),
+        user_id=current_user
+    )
+
+    db.session.add(new_todo)
+    db.session.commit()
+
+    return jsonify({
+        "id": new_todo.id,
+        "todo_name": new_todo.todo_name,
+        "todo_complete": new_todo.todo_complete
+    }), 201
+
+
+@api.route('/', methods=['PUT'])
+@jwt_required()
+def update_status():
+    current_user = get_jwt_identity()
+    todo_id = request.args.get('id', type=int)
+
+    todo = TodoList.query.filter_by(
+        id=todo_id,
+        user_id=current_user
+    ).first()
+
+    if not todo:
+        return jsonify({'error': 'todo not found'}), 400
+
+    todo.todo_complete = not todo.todo_complete
+
+    db.session.commit()
+
+    return jsonify({'id': todo.id, 'message': 'todo updated'})
+
+
+@api.route('/', methods=['DELETE'])
+@jwt_required()
+def delete_todo():
+    current_user = get_jwt_identity()
+
+    todo_id = request.args.get('id', type=int)
+    if not todo_id:
+        return jsonify({'error': 'todo id is mandatory'}), 400
+
+    todo = TodoList.query.filter_by(
+        id=todo_id,
+        user_id=current_user
+    ).first()
+
+    if not todo:
+        return jsonify({'error': 'todo not found'}), 400
+
+    db.session.delete(todo)
+    db.session.commit()
+
+    return jsonify({'message': 'Todo removed'}), 200

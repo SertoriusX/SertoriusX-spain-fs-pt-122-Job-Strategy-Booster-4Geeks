@@ -2,7 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import String, Boolean, ForeignKey, Integer, Float, JSON, DateTime, Date,Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
-from datetime import datetime,date
+from datetime import datetime, date
 from typing import List, Any
 
 db = SQLAlchemy()
@@ -16,13 +16,16 @@ class User(db.Model):
     email: Mapped[str] = mapped_column(
         String(120), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(nullable=False)
-    profile:Mapped["Profile"] = relationship("Profile", back_populates="user",uselist=False,
-        cascade="all, delete-orphan")
+    profile: Mapped["Profile"] = relationship("Profile", back_populates="user", uselist=False,
+                                              cascade="all, delete-orphan")
 
     is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False)
 
     postulations: Mapped[list["Postulations"]] = relationship(
         "Postulations", back_populates="user", cascade="all, delete-orphan")
+
+    todo_list: Mapped[List['TodoList']] = relationship(
+        'TodoList', back_populates='user', cascade="all, delete-orphan")
 
     def serialize(self):
         return {
@@ -57,7 +60,7 @@ class CV(db.Model):
 
     def __str__(self):
         return self.username
-    
+
 
 class Postulations(db.Model):
     __tablename__ = "postulations"
@@ -73,16 +76,15 @@ class Postulations(db.Model):
     platform: Mapped[str] = mapped_column(String(100), nullable=False)
     postulation_url: Mapped[str] = mapped_column(String(2000), nullable=False)
     work_type: Mapped[str] = mapped_column(String(50), nullable=False)
-
-    requirements: Mapped[List[str]] = mapped_column(JSON, nullable=False,default=[])    
-    
+    requirements: Mapped[List[str]] = mapped_column(JSON, nullable=False)
     candidates_applied: Mapped[int] = mapped_column(Integer, nullable=False)
     available_positions: Mapped[int] = mapped_column(Integer, nullable=False)
     job_description: Mapped[str] = mapped_column(Text, nullable=False)
 
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     user: Mapped["User"] = relationship("User", back_populates="postulations")
-    stages: Mapped[List['Stages']] = relationship('Stages', back_populates='postulation', cascade="all, delete-orphan")
+    stages: Mapped[List['Stages']] = relationship(
+        'Stages', back_populates='postulation', cascade="all, delete-orphan")
 
     def serialize(self):
         return {
@@ -107,44 +109,63 @@ class Postulations(db.Model):
         return self.user.username if self.user else f"User ID {self.user_id}"
 
 class Profile(db.Model):
-        id: Mapped[int] = mapped_column(primary_key=True)
-        first_name: Mapped[str] = mapped_column(String(50), nullable=False)
-        last_name: Mapped[str] = mapped_column(String(50), nullable=False)
-        img_profile: Mapped[str] = mapped_column(String(50), nullable=False)
-        bio: Mapped[str] = mapped_column(String(999999), nullable=False)
-        skill: Mapped[List[str]] = mapped_column(JSON, nullable=False, default=list)
-        user_id:Mapped[int]=mapped_column(ForeignKey("user.id"))
-        user:Mapped["User"] = relationship("User", back_populates="profile",uselist=False)
-        def serialize(self):
-            return {
-                "id": self.id,
-                "first_name": self.first_name,
-                "last_name": self.last_name,
-                "img_profile":self.img_profile,
-                "bio": self.bio,
-                "skill": self.skill,
-                
-            }
-        def __str__(self):
-            return f"{ self.first_name} {self.last_name}"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    first_name: Mapped[str] = mapped_column(String(50), nullable=False)
+    last_name: Mapped[str] = mapped_column(String(50), nullable=False)
+    img_profile: Mapped[str] = mapped_column(String(50), nullable=False)
+    bio: Mapped[str] = mapped_column(String(999999), nullable=False)
+    skill: Mapped[List[str]] = mapped_column(
+        JSON, nullable=False, default=list)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    user: Mapped["User"] = relationship(
+        "User", back_populates="profile", uselist=False)
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "img_profile": self.img_profile,
+            "bio": self.bio,
+            "skill": self.skill,
+
+        }
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
 
 
 class Stages(db.Model):
-    __tablename__= 'stages'
+    __tablename__ = 'stages'
 
     id: Mapped[int] = mapped_column(primary_key=True)
     stage_name: Mapped[str] = mapped_column(String(100), nullable=False)
     date_completed_stage: Mapped[date] = mapped_column(Date, nullable=True)
-    stage_completed: Mapped[bool] = mapped_column(Boolean,nullable=False, default=False)
+    stage_completed: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False)
 
-    postulation_id: Mapped[int] = mapped_column(ForeignKey('postulations.id'),nullable=False)
-    postulation: Mapped['Postulations'] = relationship('Postulations', back_populates='stages')
-     
+    postulation_id: Mapped[int] = mapped_column(
+        ForeignKey('postulations.id'), nullable=False)
+    postulation: Mapped['Postulations'] = relationship(
+        'Postulations', back_populates='stages')
+
     def serialize(self):
-        return{
+        return {
             'id': self.id,
             'stage_name': self.stage_name,
             'date_completed_stage': self.date_completed_stage,
-            'stage_completed': self.stage_completed,
-            
-            }
+            'stage_completed': self.stage_completed
+        }
+
+
+class TodoList(db.Model):
+    __tablename__ = 'todo_list'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    todo_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    todo_complete: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False)
+
+    user_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False)
+    user: Mapped['User'] = relationship('User', back_populates='todo_list')
+
