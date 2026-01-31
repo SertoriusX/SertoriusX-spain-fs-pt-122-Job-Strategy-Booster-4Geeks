@@ -91,7 +91,7 @@ export default function PerfilUsuario() {
 
     return (
         <div className="perfil-container">
-            <div className="perfil-layout">
+            <div className={profile ? "perfil-have" : "perfil-layout"}>
 
                 <aside className="perfil-sidebar">
                     {profile && (

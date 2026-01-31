@@ -33,7 +33,16 @@
   font-family: 'Inter', sans-serif;
   position: relative;
 }
-
+.perfil-have {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 40px;
+  width: 100%;
+  max-width: 1500px;
+  margin-top: 70px;
+  position: relative;
+  z-index: 1;
+}
 .perfil-layout {
   display: grid;
   grid-template-columns: 320px 1fr;
@@ -41,6 +50,7 @@
   width: 100%;
   max-width: 1500px;
   margin-top: 70px;
+  margin-right:250px;
   position: relative;
   z-index: 1;
 }

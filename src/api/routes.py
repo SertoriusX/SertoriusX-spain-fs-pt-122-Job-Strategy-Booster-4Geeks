@@ -290,60 +290,73 @@ RESOURCES = {
         "https://rxjs.dev",
     ],
 }
-
 MAX_QUESTIONS = 5
+sessions = {}
+
+
 def similarity(a, b):
     return SequenceMatcher(None, a.lower(), b.lower()).ratio()
 
-# Función para determinar nivel según promedio de scores
 def nivel_por_puntaje(avg_score):
-    if avg_score > 0.75:
+    if avg_score >= 0.75:
         return "Senior"
-    elif avg_score > 0.5:
-        return "Mid-level"
+    elif avg_score >= 0.5:
+        return "Intermedio"
     else:
         return "Junior"
 
-@api.route('/chat', methods=["POST"])
+
+@api.route("/chat", methods=["POST"])
 @jwt_required()
 def chat():
     try:
         user_id = get_jwt_identity()
-        data = request.json or {}
-        user_message = data.get("message", "").strip()
+        user_message = (request.json or {}).get("message", "").strip()
+
 
         if user_id not in sessions:
             sessions[user_id] = {
-                "state": "WAIT_READY",
+                "state": "SALUDO_INICIAL",
                 "role": None,
                 "question_index": 0,
                 "question_order": [],
-                "scores": [] 
+                "scores": []
             }
-            return jsonify({"response": "👋 ¿Estás listo para una simulación de entrevista? (sí / no)"})
+            return jsonify({
+                "response": "Hola, ¿cómo puedo ayudarte?"
+            })
 
         session = sessions[user_id]
 
-        if session["state"] == "WAIT_READY":
-            if user_message.lower() in ["si", "sí", "yes"]:
-                session["state"] = "WAIT_ROLE"
+
+        if session["state"] == "SALUDO_INICIAL":
+
+            session["state"] = "ESPERANDO_LISTO"
+            return jsonify({
+                "response": "¿Estás listo para una simulación de entrevista? (sí / no)"
+            })
+
+
+        if session["state"] == "ESPERANDO_LISTO":
+            if user_message.lower() in ["sí", "si", "s"]:
+                session["state"] = "ESPERANDO_ROL"
                 return jsonify({
                     "response": (
-                        "Perfecto 🚀\n"
                         "Elige el tipo de entrevista:\n"
-                        "1) Frontend (FE)\n"
-                        "2) Backend (BE)\n"
+                        "1) Frontend\n"
+                        "2) Backend\n"
                         "3) React\n"
                         "4) Angular\n"
-                        "5) Preguntas personales"
+                        "5) Personal"
                     )
                 })
-            elif user_message.lower() in ["no", "nop", "nope"]:
-                return jsonify({"response": "👌 Cuando estés listo escribe 'sí'."})
+            elif user_message.lower() in ["no", "n"]:
+                return jsonify({"response": "Cuando estés listo, dime 'sí' para comenzar."})
             else:
-                return jsonify({"response": "Por favor responde 'sí' o 'no'."})
+                return jsonify({"response": "Por favor responde con 'sí' o 'no'."})
 
-        if session["state"] == "WAIT_ROLE":
+
+        if session["state"] == "ESPERANDO_ROL":
             roles = {
                 "1": "frontend",
                 "2": "backend",
@@ -353,119 +366,168 @@ def chat():
             }
 
             if user_message not in roles:
-                return jsonify({"response": "Selecciona una opción válida (1-5)."})
+                return jsonify({"response": "Por favor elige una opción válida (1–5)."})
 
             role = roles[user_message]
             session["role"] = role
-            session["state"] = "INTERVIEW"
+            session["state"] = "ENTREVISTA"
             session["question_index"] = 0
             session["scores"] = []
 
-            questions = QUESTIONS[role]
-            question_order = random.sample(questions, min(MAX_QUESTIONS, len(questions)))
-            session["question_order"] = question_order
+            preguntas = QUESTIONS[role]
+            session["question_order"] = random.sample(
+                preguntas, min(MAX_QUESTIONS, len(preguntas))
+            )
 
-            first_question = question_order[0]
             return jsonify({
-                "response": (
-                    f"🎯 Entrevista {role.upper()} iniciada.\n\n"
-                    f"Pregunta 1:\n{first_question}\n\n"
-                    "Escribe tu respuesta o escribe 'show' para ver una respuesta ejemplo."
-                )
+                "response": f"Pregunta 1:\n{session['question_order'][0]}"
             })
 
-        if session["state"] == "INTERVIEW":
+
+        if session["state"] == "ENTREVISTA":
             role = session["role"]
             q_index = session["question_index"]
             question_order = session["question_order"]
 
-            if q_index >= len(question_order):
-                session["state"] = "FINISHED"
-                avg_score = sum(session["scores"]) / len(session["scores"]) if session["scores"] else 0
-                nivel = nivel_por_puntaje(avg_score)
-
-                resources_list = RESOURCES.get(role, [])
-                resources_text = "\n".join(f"- {r}" for r in resources_list)
-                return jsonify({
-                    "response": (
-                        f"✅ ¡Buen trabajo!\n"
-                        f"Nivel aproximado: {nivel}\n"
-                        f"Puntaje promedio: {avg_score:.2f}\n\n"
-                        f"📚 Recursos recomendados para seguir entrenando:\n{resources_text}\n\n"
-                        "¿Quieres otra simulación? (sí / no)"
-                    )
-                })
-
             current_question = question_order[q_index]
+            ejemplo_respuesta = ANSWERS.get(role, {}).get(current_question)
 
-            if user_message.lower() == "show":
-                answer = ANSWERS.get(role, {}).get(current_question)
-                if not answer:
-                    return jsonify({"response": "No hay respuestas ejemplo para esta pregunta."})
-                return jsonify({
-                    "response": f"📌 Respuesta ejemplo:\n{answer}\n\nAhora responde con tus propias palabras 🙂"
-                })
-
-            example_answer = ANSWERS.get(role, {}).get(current_question)
-            feedback = "Gracias por tu respuesta 👍"
             score = 0.0
 
-            if example_answer:
-                score = similarity(user_message, example_answer)
+            if ejemplo_respuesta:
+                score = similarity(user_message, ejemplo_respuesta)
                 session["scores"].append(score)
 
-                if score > 0.75:
-                    feedback = "🔥 ¡Muy bien! Tu respuesta es muy cercana a la ideal."
-                elif score > 0.5:
-                    feedback = "👍 Vas por buen camino, la idea principal está correcta."
+                if score >= 0.75:
+                    feedback = "Buena respuesta."
+                elif score >= 0.5:
+                    feedback = "Necesitas estudiar un poco más esto."
                 else:
-                    feedback = "👌 Bien, aunque podrías profundizar un poco más."
+                    feedback = "Respuesta insuficiente."
             else:
-                session["scores"].append(score)
+                session["scores"].append(0)
+                feedback = "Respuesta recibida."
 
             session["question_index"] += 1
 
-            if session["question_index"] < len(question_order):
-                next_question = question_order[session["question_index"]]
-                return jsonify({
-                    "response": f"{feedback}\n\nPregunta {session['question_index'] + 1}:\n{next_question}\n\nEscribe tu respuesta o 'show' para ver una respuesta ejemplo."
-                })
-            else:
-                session["state"] = "FINISHED"
-                avg_score = sum(session["scores"]) / len(session["scores"]) if session["scores"] else 0
+            if session["question_index"] >= len(session["question_order"]):
+                session["state"] = "FINALIZADO"
+
+                avg_score = (
+                    sum(session["scores"]) / len(session["scores"])
+                    if session["scores"] else 0
+                )
                 nivel = nivel_por_puntaje(avg_score)
-                resources_list = RESOURCES.get(role, [])
-                resources_text = "\n".join(f"- {r}" for r in resources_list)
+                resources = RESOURCES.get(role, [])
+                recursos_texto = "\n".join(f"- {r}" for r in resources)
 
-                return jsonify({
-                    "response": (
-                        f"{feedback}\n\n✅ ¡Buen trabajo!\n"
-                        f"Nivel aproximado: {nivel}\n"
-                        f"Puntaje promedio: {avg_score:.2f}\n\n"
-                        f"📚 Recursos recomendados para seguir entrenando:\n{resources_text}\n\n"
-                        "¿Quieres otra simulación? (sí / no)"
-                    )
-                })
-
-        if session["state"] == "FINISHED":
-            if user_message.lower() in ["si", "sí", "yes"]:
-                session["state"] = "WAIT_ROLE"
+                session["state"] = "ESPERANDO_LISTO"
                 session["question_index"] = 0
                 session["question_order"] = []
                 session["scores"] = []
-                return jsonify({"response": "Perfecto 👍 Elige nuevamente una opción (1-5)."})
+
+                return jsonify({
+                    "response": (
+                        f"{feedback}\n\n"
+                        "Has completado la entrevista.\n\n"
+                        f"Nivel: {nivel}\n"
+                        f"Puntaje promedio: {avg_score:.2f}\n\n"
+                        f"Recursos recomendados:\n{recursos_texto}\n\n"
+                        "¿Quieres iniciar otra entrevista? (sí / no)"
+                    )
+                })
+
+            session["state"] = "PREGUNTAR_SIGUIENTE"
+
+            return jsonify({
+                "response": (
+                    f"{feedback}\n\n"
+                    "¿Qué quieres hacer ahora?\n"
+                    "1) Siguiente pregunta\n"
+                    "2) Salir y ver recursos"
+                )
+            })
+
+
+        if session["state"] == "PREGUNTAR_SIGUIENTE":
+            if user_message == "1":
+                if session["question_index"] < len(session["question_order"]):
+                    siguiente_pregunta = session["question_order"][session["question_index"]]
+                    session["state"] = "ENTREVISTA"
+                    return jsonify({
+                        "response": f"Siguiente pregunta:\n{siguiente_pregunta}"
+                    })
+                else:
+                    session["state"] = "FINALIZADO"
+
+                    avg_score = (
+                        sum(session["scores"]) / len(session["scores"])
+                        if session["scores"] else 0
+                    )
+                    nivel = nivel_por_puntaje(avg_score)
+                    resources = RESOURCES.get(session["role"], [])
+                    recursos_texto = "\n".join(f"- {r}" for r in resources)
+
+                    session["state"] = "ESPERANDO_LISTO"
+                    session["question_index"] = 0
+                    session["question_order"] = []
+                    session["scores"] = []
+
+                    return jsonify({
+                        "response": (
+                            "Has completado la entrevista.\n\n"
+                            f"Nivel: {nivel}\n"
+                            f"Puntaje promedio: {avg_score:.2f}\n\n"
+                            f"Recursos recomendados:\n{recursos_texto}\n\n"
+                            "¿Quieres iniciar otra entrevista? (sí / no)"
+                        )
+                    })
+
+            elif user_message == "2":
+                session["state"] = "FINALIZADO"
+
+                avg_score = (
+                    sum(session["scores"]) / len(session["scores"])
+                    if session["scores"] else 0
+                )
+                nivel = nivel_por_puntaje(avg_score)
+                resources = RESOURCES.get(session["role"], [])
+                recursos_texto = "\n".join(f"- {r}" for r in resources)
+
+                session["state"] = "ESPERANDO_LISTO"
+                session["question_index"] = 0
+                session["question_order"] = []
+                session["scores"] = []
+
+                return jsonify({
+                    "response": (
+                        "Has finalizado la entrevista.\n\n"
+                        f"Nivel: {nivel}\n"
+                        f"Puntaje promedio: {avg_score:.2f}\n\n"
+                        f"Recursos recomendados:\n{recursos_texto}\n\n"
+                        "¿Quieres iniciar otra entrevista? (sí / no)"
+                    )
+                })
+
             else:
-                return jsonify({"response": "👋 Gracias por practicar. ¡Éxitos!"})
+                return jsonify({
+                    "response": (
+                        "Por favor elige:\n"
+                        "1) Siguiente pregunta\n"
+                        "2) Salir y ver recursos"
+                    )
+                })
+
+
+        session["state"] = "ESPERANDO_LISTO"
+        return jsonify({
+            "response": "¿Quieres iniciar una entrevista? (sí / no)"
+        })
 
     except Exception as e:
         traceback.print_exc()
-        return jsonify({"response": f"Error: {str(e)}"}), 500
-def clean_company_name(line: str, max_length=50) -> str:
-    line = re.sub(r"http\S+", "", line)
-    line = re.sub(r"\d+", "", line)
-    line = re.sub(r"[^\w\s.,-]", "", line)
-    line = line.strip()
-    return line[:max_length]
+        return jsonify({"response": f"Error del servidor: {str(e)}"}), 500
+
 
 
 def extract_postulation_fields(text: str) -> dict:
