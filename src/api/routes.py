@@ -527,108 +527,165 @@ def chat():
     except Exception as e:
         traceback.print_exc()
         return jsonify({"response": f"Error del servidor: {str(e)}"}), 500
+    
+def clean_company_name(line: str, max_length=50) -> str:
+    line = re.sub(r"http\S+", "", line)  
+    line = re.sub(r"\d+", "", line)      
+    line = re.sub(r"[^\w\s.,-]", "", line)  
+    line = line.strip()
+    words = line.split()
+    filtered_words = [w for w in words if len(w) > 2]
+    cleaned_line = " ".join(filtered_words)
 
+    return cleaned_line[:max_length]
 
-
-def extract_postulation_fields(text: str) -> dict:
+def extract_postulation_fields(text: str, platform_hint="Unknown") -> dict:
     clean_text = text.replace("€", " €").replace("$", " $")
     lines = [l.strip() for l in clean_text.split("\n") if len(l.strip()) > 3]
     full_text = " ".join(lines).lower()
+
+    platform_hint_norm = platform_hint.lower() if platform_hint else "unknown"
 
     data = {
         "company_name": None,
         "role": None,
         "city": None,
-        "platform": None,
+        "platform": platform_hint if platform_hint != "Unknown" else "Unknown",
         "work_type": "Unknown",
         "experience": 0,
         "salary": 0,
         "candidates_applied": 0,
         "postulation_url": None,
         "requirements": [],
-        "job_description": clean_text[:800]
+        "job_description": clean_text[:800],
     }
 
-    # ---------------- PLATFORM DETECTION ----------------
-    if "linkedin" in full_text:
-        data["platform"] = "LinkedIn"
-    if "indeed" in full_text:
-        data["platform"] = "Indeed"
-    elif "sefcarm" in full_text or "sefoficinavirtual" in full_text:
-        data["platform"] = "Sefcarm"
+    if platform_hint_norm == "unknown":
+        if "linkedin" in full_text:
+            data["platform"] = "LinkedIn"
+        elif "indeed" in full_text:
+            data["platform"] = "Indeed"
+        elif "sefcarm" in full_text or "sefoficinavirtual" in full_text:
+            data["platform"] = "Sefcarm"
+        elif "infojobs" in full_text:
+            data["platform"] = "InfoJobs"
+        else:
+            data["platform"] = "Unknown"
     else:
-        data["platform"] = "Unknown"
+        platform_map = {
+            "linkedin": "LinkedIn",
+            "indeed": "Indeed",
+            "sefcarm": "Sefcarm",
+            "infojobs": "InfoJobs",   
 
-    # ---------------- ROLE & COMPANY ----------------
-    for line in lines:
-        if " at " in line.lower():
-            parts = re.split(r"\s+at\s+", line, flags=re.IGNORECASE)
-            if len(parts) == 2:
-                data["role"] = parts[0].strip()
-                data["company_name"] = clean_company_name(parts[1])
-                break
+            "unknown": "Unknown"
+        }
+        data["platform"] = platform_map.get(platform_hint_norm, platform_hint)
 
-    if data["platform"] == "Indeed" and not data["company_name"]:
+    platform_lower = data["platform"].lower()
+    if platform_lower == "indeed":
         if lines:
-            data["company_name"] = clean_company_name(lines[0])
+           
+            role_lines = [lines[0].strip()]
+            
+            if len(lines) > 1 and not re.search(r"\d|http", lines[1]):
+                role_lines.append(lines[1].strip())
+                if len(lines) > 2:
+                    data["company_name"] = clean_company_name(lines[2])
+                else:
+                    data["company_name"] = "Unknown"
+            else:
+                if len(lines) > 1:
+                    data["company_name"] = clean_company_name(lines[1])
+                else:
+                    data["company_name"] = "Unknown"
+            
+            data["role"] = " ".join(role_lines)
+
+    elif platform_lower == "linkedin":
+        cleaned_lines = [l for l in lines if len(l) > 3 and re.search(r"[a-zA-Z0-9]", l)]
+
+        found = False
+        for line in cleaned_lines:
+            if " at " in line.lower():
+                parts = re.split(r"\s+at\s+", line, flags=re.IGNORECASE)
+                if len(parts) == 2:
+                    data["company_name"] = clean_company_name(parts[0].strip())
+                    data["role"] = parts[1].strip()
+                    found = True
+                    break
+
+        if not found:
+            if len(cleaned_lines) > 0:
+                data["company_name"] = clean_company_name(cleaned_lines[0])
+            if len(cleaned_lines) > 1:
+                data["role"] = cleaned_lines[1].strip()
+    elif platform_lower == "infojobs":
+        if lines:
+            data["role"] = lines[0].strip()
         if len(lines) > 1:
-            data["role"] = lines[1].strip()
+            data["company_name"] = clean_company_name(lines[1])
+    elif platform_lower == "sefcarm":
+        offer_number_match = re.search(r"oferta[:\s]*([A-Za-z0-9-]+)", full_text, flags=re.IGNORECASE)
+        if offer_number_match:
+            offer_number = offer_number_match.group(1)
+            data["offer_number"] = offer_number 
 
-    if not data["company_name"] and lines:
-        data["company_name"] = clean_company_name(lines[0])
+            data["company_name"] = offer_number
 
-    if not data["role"] and len(lines) > 1:
-        data["role"] = lines[1].strip()
+            offer_line_index = None
+            for i, line in enumerate(lines):
+                if offer_number.lower() in line.lower():
+                    offer_line_index = i
+                    break
+            
+            role_line = None
+            if offer_line_index is not None:
+                for j in range(offer_line_index + 1, len(lines)):
+                    next_line = lines[j].strip()
+                    if not re.search(r"fecha|inicio|finalización|municipio|\d{2}/\d{2}/\d{4}", next_line, re.IGNORECASE) and len(next_line) > 3:
+                        role_line = next_line
+                        break
+            
+            if role_line:
+                data["role"] = role_line
+            else:
+                if offer_line_index is not None and offer_line_index + 1 < len(lines):
+                    data["role"] = lines[offer_line_index + 1].strip()
+                elif lines:
+                    data["role"] = lines[0].strip()
+        else:
+            if lines:
+                data["role"] = lines[0].strip()
+            if len(lines) > 1:
+                data["company_name"] = clean_company_name(lines[1])
 
-    # ---------------- CITY ----------------
-    city_match = re.search(r"municipio:\s*([a-záéíóúñ]+)", full_text)
-    if city_match:
-        data["city"] = city_match.group(1).title()
-    else:
-        for city in ["murcia", "barcelona", "madrid", "valencia", "sevilla", "santander"]:
-            if city in full_text:
-                data["city"] = city.title()
-                break
-
-    # ---------------- WORK TYPE ----------------
-    if any(k in full_text for k in ["presencial", "on-site", "lunes a viernes"]):
-        data["work_type"] = "Presencial"
-    elif any(k in full_text for k in ["remoto", "remote"]):
-        data["work_type"] = "Remoto"
-    elif any(k in full_text for k in ["híbrido", "hybrid"]):
-        data["work_type"] = "Híbrido"
-
-    # ---------------- EXPERIENCE ----------------
     exp_match = re.search(r"experiencia.*?(\d+)\s*(meses|años)", full_text)
     if exp_match:
         num = int(exp_match.group(1))
         data["experience"] = num if "meses" in exp_match.group(2) else num * 12
 
-    # ---------------- SALARY ----------------
     salary_match = re.search(r"(\d{3,5})\s*euros", full_text)
     if salary_match:
         data["salary"] = int(salary_match.group(1))
 
-    # ---------------- APPLICATIONS ----------------
     applied_match = re.search(r"más de (\d+)\s+solicitudes", full_text)
     if applied_match:
         data["candidates_applied"] = int(applied_match.group(1))
 
-    # ---------------- REQUIREMENTS ----------------
+    requirement_keywords = [
+        "se requiere", "tener", "poseer",
+        "estar inscrito", "aptitudes", "habilidades"
+    ]
     for line in lines:
-        if any(k in line.lower() for k in [
-            "se requiere", "tener", "poseer",
-            "estar inscrito", "aptitudes", "habilidades"
-        ]):
+        if any(k in line.lower() for k in requirement_keywords):
             data["requirements"].append(line)
 
-    # ---------------- URL ----------------
     url_match = re.search(r"(https?://[^\s]+)", text)
     if url_match:
         data["postulation_url"] = url_match.group(1)
 
     return data
-
 
 @api.route("/ocr-postulation", methods=["POST"])
 @jwt_required()
@@ -637,6 +694,7 @@ def ocr_postulation():
     if not file:
         return jsonify({"error": "No image file provided"}), 400
 
+    platform_hint = request.form.get("platform", "Unknown")
     current_user = get_jwt_identity()
 
     upload_dir = "uploads"
@@ -644,12 +702,16 @@ def ocr_postulation():
         os.makedirs(upload_dir)
 
     path = os.path.join(upload_dir, file.filename)
-    file.save(path)
+    try:
+        file.save(path)
+        img = Image.open(path)
+        text = pytesseract.image_to_string(img)
+    except Exception as e:
+        return jsonify({"error": f"OCR or file handling failed: {str(e)}"}), 500
 
-    img = Image.open(path)
-    text = pytesseract.image_to_string(img)
+    print("OCR Text:", repr(text))  
 
-    data = extract_postulation_fields(text)
+    data = extract_postulation_fields(text, platform_hint=platform_hint)
 
     requirements = data.get("requirements")
     if not isinstance(requirements, list):
@@ -664,7 +726,7 @@ def ocr_postulation():
         city=data.get("city") or "Unknown",
         salary=data.get("salary", 0),
         platform=data.get("platform") or "Unknown",
-        postulation_url="",
+        postulation_url=data.get("postulation_url") or "",
         work_type=data.get("work_type") or "Unknown",
         requirements=requirements,
         candidates_applied=data.get("candidates_applied") or 0,
@@ -677,7 +739,6 @@ def ocr_postulation():
     db.session.commit()
 
     return jsonify(postulation.serialize()), 201
-
 
 
 def save_uploaded_file(file, upload_folder=None):
