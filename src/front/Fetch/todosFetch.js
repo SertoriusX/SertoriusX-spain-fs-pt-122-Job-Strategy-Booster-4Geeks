@@ -28,3 +28,27 @@ export async function getTodos(authorizationHeader) {
 
   return await response.json();
 }
+
+export async function deleteTodo(id, authorizationHeader) {
+  const response = await fetch(`${backendUrl}?id=${id}`, {
+    ...authorizationHeader,
+    method: "DELETE",
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error);
+  }
+  return await response.json();
+}
+
+export async function updateTodo(id, authorizationHeader) {
+  const response = await fetch(`${backendUrl}?id=${id}`, {
+    ...authorizationHeader,
+    method: "PUT",
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error);
+  }
+  return await response.json();
+}

@@ -1048,11 +1048,19 @@ def complete_next_stage(id):
 
 
 """----------- TO DO ROUTES ------------ """
+
+
 @api.route('/', methods=['GET'])
 @jwt_required()
 def get_todos():
     current_user = get_jwt_identity()
-    todos = TodoList.query.filter_by(user_id=current_user).all()
+
+    todos = (
+        TodoList.query
+        .filter_by(user_id=current_user)
+        .order_by(TodoList.id.asc())
+        .all()
+    )
 
     if not todos:
         return jsonify([]), 200
@@ -1062,7 +1070,6 @@ def get_todos():
         "todo_name": t.todo_name,
         "todo_complete": t.todo_complete
     } for t in todos]), 200
-
 
 
 @api.route('/', methods=['POST'])
@@ -1088,3 +1095,47 @@ def create_new_todo():
         "todo_name": new_todo.todo_name,
         "todo_complete": new_todo.todo_complete
     }), 201
+
+
+@api.route('/', methods=['PUT'])
+@jwt_required()
+def update_status():
+    current_user = get_jwt_identity()
+    todo_id = request.args.get('id', type=int)
+
+    todo = TodoList.query.filter_by(
+        id=todo_id,
+        user_id=current_user
+    ).first()
+
+    if not todo:
+        return jsonify({'error': 'todo not found'}), 400
+
+    todo.todo_complete = not todo.todo_complete
+
+    db.session.commit()
+
+    return jsonify({'id': todo.id, 'message': 'todo updated'})
+
+
+@api.route('/', methods=['DELETE'])
+@jwt_required()
+def delete_todo():
+    current_user = get_jwt_identity()
+
+    todo_id = request.args.get('id', type=int)
+    if not todo_id:
+        return jsonify({'error': 'todo id is mandatory'}), 400
+
+    todo = TodoList.query.filter_by(
+        id=todo_id,
+        user_id=current_user
+    ).first()
+
+    if not todo:
+        return jsonify({'error': 'todo not found'}), 400
+
+    db.session.delete(todo)
+    db.session.commit()
+
+    return jsonify({'message': 'Todo removed'}), 200

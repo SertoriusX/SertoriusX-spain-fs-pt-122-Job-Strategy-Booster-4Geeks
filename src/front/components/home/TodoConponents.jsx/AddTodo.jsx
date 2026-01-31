@@ -5,7 +5,7 @@ import useGetAuthorizationHeader from "../../../hooks/useGetAuthorizationHeader"
 import { useState } from "react";
 
 
-function CreateTodo({ setCreateMode }) {
+function CreateTodo({ setCreateMode, refresTodo }) {
     const authorizationHeader = useGetAuthorizationHeader()
     const [todo, setTodo] = useState({
         todo_name: '',
@@ -21,8 +21,8 @@ function CreateTodo({ setCreateMode }) {
 
     const saveTodo = async () => {
         if (!todo.todo_name.trim()) return;
-        const newTodo = await createNewTodo(todo, authorizationHeader);
-        console.log(newTodo)
+        await createNewTodo(todo, authorizationHeader);
+        refresTodo()
         setCreateMode(false);
     }
     return (

@@ -12,27 +12,30 @@ export function Todo() {
     const [createMode, setCreateMode] = useState(false)
     const [todoList, setTodoList] = useState([])
 
-    useEffect(() => {
-        const fetchTodos = async () => {
-            try {
-                const todos = await getTodos(authorizationHeader)
-                setTodoList(todos)
-            } catch (err) {
-                console.error("Error fetching todos:", err.message)
-            }
+    const fetchTodos = async () => {
+        try {
+            const todos = await getTodos(authorizationHeader)
+            setTodoList(todos)
+        } catch (err) {
+            console.error("Error fetching todos:", err.message)
         }
+        console.log(todoList)
+    }
+
+    useEffect(() => {
+        console.log(todoList)
         fetchTodos()
-    }, [todoList])
+    }, [])
 
     return (
         <>
-            {createMode ? <CreateTodo setCreateMode={setCreateMode} /> :
+            {createMode ? <CreateTodo setCreateMode={setCreateMode} refresTodo={fetchTodos} /> :
                 <div className="todo_header">
                     <h2>Lista de pendientes</h2>
                     <button onClick={() => { setCreateMode(true) }}><FontAwesomeIcon icon={faPlus} /></button>
                 </div>}
             <div className="todo_list_items_container">
-                <ShowTodo todoList={todoList} />
+                <ShowTodo todoList={todoList} refresTodo={fetchTodos} />
             </div>
         </>
     )
