@@ -5,6 +5,7 @@
   --ligther-font-color: #6f6f6f;
   --main-color: #2b4eeb;
   --main-color-hover: #6b82ec;
+  --remove-color-hover: #c94747;
 }
 
 [data-theme="dark"] {
@@ -321,4 +322,99 @@
 .fc .fc-button-primary:focus-visible {
   outline: none !important;
   box-shadow: none !important;
+}
+
+/* ---------- TODO WIDGET STYLES ---------- */
+
+.todo_list {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.todo_list .todo_header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+
+  h2 {
+    margin: 0;
+    color: var(--font-color);
+  }
+}
+
+.todo_list .add_todo_container input {
+  width: 90%;
+}
+
+.add_todo_container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+}
+
+.todo_list_items_container {
+  max-height: 80%;
+  overflow: scroll;
+}
+
+.todo_item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--font-color);
+  background-color: var(--card-color);
+  margin-top: 10px;
+  padding: 10px 15px;
+  border-radius: 10px;
+
+  p {
+    font-size: 15px;
+    margin: 0;
+    width: 70%;
+    height: min-content;
+    overflow-x: scroll;
+  }
+
+  .complete {
+    text-decoration: line-through;
+    color: var(--ligther-font-color);
+  }
+}
+
+.action_buttons {
+  display: flex;
+  button {
+    margin-left: 10px;
+  }
+}
+
+.todo_list button {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--font-color);
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: 0.2s ease;
+  color: var(--font-color);
+  background-color: var(--card-color);
+}
+
+.remove_task:hover {
+  background-color: var(--remove-color-hover);
+}
+
+.complete_task:hover {
+  background-color: var(--main-color-hover);
+}
+
+.save_todo:hover {
+  background-color: var(--main-color);
+  transform: scale(1.1);
 }

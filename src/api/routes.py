@@ -1,3 +1,4 @@
+import re
 import traceback
 from werkzeug.utils import secure_filename
 import requests
@@ -9,7 +10,7 @@ from dotenv import load_dotenv
 from flask_bcrypt import Bcrypt
 from api.models import db, User, CV
 from flask import Flask, request, jsonify, url_for, Blueprint, send_from_directory
-from api.models import db, User, Postulations, Profile, Stages
+from api.models import db, User, Postulations, Profile, Stages, TodoList
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
@@ -17,7 +18,7 @@ import json
 from datetime import datetime
 from api.data_mock.mock_data import jobs
 
-from datetime import datetime,date
+from datetime import datetime, date
 import pytesseract
 from PIL import Image
 
@@ -48,6 +49,7 @@ GOOGLE_API_KEY = "AIzaSyC-8znGPyiPtg52au8Qm8m1NQehlPLS_uI"
 
 sessions = {}
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+
 
 @api.route('/translate', methods=['POST'])
 def translate():
@@ -122,8 +124,7 @@ QUESTIONS = {
         "¿Qué es la inyección de dependencias?",
         "¿Qué es un componente y cómo se comunica con otros?",
         "¿Cómo manejas el enrutamiento en Angular?"
-    ]
-    ,"personal": [
+    ], "personal": [
         "¿Dónde te ves en cinco años?",
         "¿Cuál es tu mayor fortaleza y debilidad?",
         "¿Cómo manejas el estrés o la presión en el trabajo?",
@@ -305,7 +306,13 @@ def nivel_por_puntaje(avg_score):
     else:
         return "Junior"
 
-
+def clean_company_name(line: str, max_length=50) -> str:
+    line = re.sub(r"http\S+", "", line)
+    line = re.sub(r"\d+", "", line)
+    line = re.sub(r"[^\w\s.,-]", "", line)
+    line = line.strip()
+    return line[:max_length]
+  
 @api.route("/chat", methods=["POST"])
 @jwt_required()
 def chat():
@@ -1511,7 +1518,7 @@ def complete_next_stage(id):
     action = request.args.get('action')
     current_user = get_jwt_identity()
 
-    if action not in ('next','prev'):
+    if action not in ('next', 'prev'):
         return jsonify({'error': 'Invalid action'}), 400
 
     postulation = Postulations.query.filter_by(
@@ -1536,10 +1543,10 @@ def complete_next_stage(id):
 
         message = f'Stage "{stage.stage_name}" marked as completed'
 
-    else :
+    else:
         stage = Stages.query.filter_by(
-        postulation_id=id,
-        stage_completed=True
+            postulation_id=id,
+            stage_completed=True
         ).order_by(Stages.id.desc()).first()
 
         if not stage:
@@ -1555,3 +1562,97 @@ def complete_next_stage(id):
         "message": message,
         "stage": stage.serialize()
     }), 200
+
+
+"""----------- TO DO ROUTES ------------ """
+
+
+@api.route('/', methods=['GET'])
+@jwt_required()
+def get_todos():
+    current_user = get_jwt_identity()
+
+    todos = (
+        TodoList.query
+        .filter_by(user_id=current_user)
+        .order_by(TodoList.id.asc())
+        .all()
+    )
+
+    if not todos:
+        return jsonify([]), 200
+
+    return jsonify([{
+        "id": t.id,
+        "todo_name": t.todo_name,
+        "todo_complete": t.todo_complete
+    } for t in todos]), 200
+
+
+@api.route('/', methods=['POST'])
+@jwt_required()
+def create_new_todo():
+    data = request.get_json()
+    current_user = get_jwt_identity()
+
+    if not data or not data.get('todo_name'):
+        return jsonify({"error": "todo_name is required"}), 400
+
+    new_todo = TodoList(
+        todo_name=data.get('todo_name'),
+        todo_complete=data.get('todo_complete', False),
+        user_id=current_user
+    )
+
+    db.session.add(new_todo)
+    db.session.commit()
+
+    return jsonify({
+        "id": new_todo.id,
+        "todo_name": new_todo.todo_name,
+        "todo_complete": new_todo.todo_complete
+    }), 201
+
+
+@api.route('/', methods=['PUT'])
+@jwt_required()
+def update_status():
+    current_user = get_jwt_identity()
+    todo_id = request.args.get('id', type=int)
+
+    todo = TodoList.query.filter_by(
+        id=todo_id,
+        user_id=current_user
+    ).first()
+
+    if not todo:
+        return jsonify({'error': 'todo not found'}), 400
+
+    todo.todo_complete = not todo.todo_complete
+
+    db.session.commit()
+
+    return jsonify({'id': todo.id, 'message': 'todo updated'})
+
+
+@api.route('/', methods=['DELETE'])
+@jwt_required()
+def delete_todo():
+    current_user = get_jwt_identity()
+
+    todo_id = request.args.get('id', type=int)
+    if not todo_id:
+        return jsonify({'error': 'todo id is mandatory'}), 400
+
+    todo = TodoList.query.filter_by(
+        id=todo_id,
+        user_id=current_user
+    ).first()
+
+    if not todo:
+        return jsonify({'error': 'todo not found'}), 400
+
+    db.session.delete(todo)
+    db.session.commit()
+
+    return jsonify({'message': 'Todo removed'}), 200
