@@ -27,6 +27,7 @@ colorama = "*"
 requests = "*"
 pytesseract = "*"
 pillow = "*"
+reportlab = "*"
 
 [requires]
 python_version = "3.13"

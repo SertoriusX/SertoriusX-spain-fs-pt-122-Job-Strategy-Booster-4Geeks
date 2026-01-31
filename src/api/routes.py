@@ -4,6 +4,8 @@ from werkzeug.utils import secure_filename
 import requests
 import openai
 import os
+from difflib import SequenceMatcher
+
 from dotenv import load_dotenv
 from flask_bcrypt import Bcrypt
 from api.models import db, User, CV
@@ -21,7 +23,14 @@ import pytesseract
 from PIL import Image
 
 api = Blueprint('api', __name__)
-
+from dotenv import load_dotenv
+import os
+import traceback
+import openai
+import requests
+from werkzeug.utils import secure_filename
+import re
+import random
 CORS(api)
 bcrypt = Bcrypt()
 
@@ -151,7 +160,151 @@ RESOURCES = {
         "https://rxjs.dev",
     ],
 }
+ANSWERS = {
+    "frontend": {
+        "¿Qué es el Virtual DOM y por qué es importante?":
+            "El Virtual DOM es una representación ligera del DOM real que mejora el rendimiento " \
+            "de las actualizaciones en la interfaz de usuario.",
+        "¿Qué es CSS Flexbox y para qué sirve?":
+            "Flexbox es un modelo de diseño CSS que facilita la distribución y alineación de elementos " \
+            "en un contenedor, adaptándose a diferentes tamaños de pantalla.",
+        "¿Qué es un closure en JavaScript?":
+            "Un closure es una función que recuerda el entorno donde fue creada, permitiendo acceder " \
+            "a variables externas aun cuando la función se ejecute fuera de ese contexto.",
+        "¿Cuál es la diferencia entre 'var', 'let' y 'const' en JavaScript?":
+            "'var' tiene alcance global o de función, 'let' y 'const' tienen alcance de bloque; 'const' " \
+            "define variables inmutables.",
+        "¿Qué son las promesas en JavaScript y cómo funcionan?":
+            "Las promesas son objetos que representan la eventual finalización o fallo de una operación asíncrona.",
+        "¿Cómo manejas eventos en JavaScript?":
+            "Se usan listeners para capturar eventos y ejecutar funciones callback cuando ocurren.",
+        "¿Qué es el modelo de caja (box model) en CSS?":
+            "Es la forma en que CSS representa cada elemento como una caja compuesta por contenido, " \
+            "padding, border y margin.",
+        "¿Qué son las media queries y cómo se usan para responsive design?":
+            "Son reglas CSS que aplican estilos condicionales según las características del dispositivo, " \
+            "como ancho de pantalla.",
+        "¿Qué es la herencia en CSS y cómo funciona?":
+            "Es cuando ciertas propiedades CSS se transfieren de un elemento padre a sus hijos automáticamente."
+    },
+    "backend": {
+        "¿Qué es una API REST?":
+            "REST es un estilo arquitectónico para servicios web que usan HTTP para realizar operaciones CRUD.",
+        "¿Qué es una base de datos relacional?":
+            "Es un sistema que almacena datos en tablas con relaciones entre ellas.",
+        "¿Qué son los middlewares en backend?":
+            "Funciones que se ejecutan entre la solicitud y la respuesta para procesar o modificar datos.",
+        "¿Qué diferencias hay entre SQL y NoSQL?":
+            "SQL usa bases de datos estructuradas y NoSQL almacena datos no estructurados o flexibles.",
+        "¿Qué es la autenticación y autorización?":
+            "Autenticación verifica identidad, autorización controla acceso a recursos.",
+        "¿Qué es un token JWT y para qué se usa?":
+            "JWT es un token que permite autenticar y transmitir información segura entre cliente y servidor.",
+        "¿Cómo funciona el manejo de sesiones en aplicaciones web?":
+            "Se guarda información del usuario para mantener su estado entre peticiones.",
+        "¿Qué es un servidor web y cómo funciona?":
+            "Es un software que responde a peticiones HTTP enviando archivos o datos.",
+        "¿Qué es la escalabilidad en backend?":
+            "Capacidad del sistema para manejar mayor carga aumentando recursos."
+    },
+    "react": {
+        "¿Qué es el estado (state) en React?":
+            "El estado es un objeto que almacena datos que pueden cambiar y afectar el renderizado.",
+        "¿Qué es un Hook?":
+            "Funciones que permiten usar estado y otras características de React en componentes funcionales.",
+        "¿Cómo funcionan los componentes funcionales?":
+            "Son funciones que retornan JSX para representar UI y pueden usar hooks para manejar estado.",
+        "¿Qué es el ciclo de vida de un componente en React?":
+            "Son fases por las que pasa un componente desde su creación hasta destrucción.",
+        "¿Qué es Redux y para qué se utiliza?":
+            "Es una librería para manejar el estado global de la aplicación de forma predecible.",
+        "¿Qué es el Context API en React?":
+            "Permite compartir datos entre componentes sin pasar props manualmente.",
+        "¿Cómo optimizas el rendimiento en una aplicación React?":
+            "Usando memoización, evitando renders innecesarios y dividiendo componentes.",
+        "¿Qué son las props y cómo se usan?":
+            "Son propiedades que se pasan a componentes para configurarlos o mostrar datos.",
+        "¿Qué diferencia hay entre componentes controlados y no controlados?":
+            "Controlados tienen su estado gestionado por React, no controlados por el DOM directamente."
+    },
+    "angular": {
+        "¿Qué es un módulo en Angular?":
+            "Un módulo agrupa componentes, servicios y otros módulos para organizar la aplicación.",
+        "¿Qué es un servicio en Angular?":
+            "Clase que proporciona funcionalidad reutilizable y es inyectable en componentes.",
+        "¿Qué es RxJS y cómo se usa?":
+            "Es una librería para programación reactiva con observables para manejar eventos asíncronos.",
+        "¿Qué es el data binding en Angular?":
+            "Sincronización automática de datos entre el modelo y la vista.",
+        "¿Qué son los decoradores en Angular?":
+            "Anotaciones que agregan metadatos a clases y propiedades para configurarlas.",
+        "¿Cómo funcionan los pipes en Angular?":
+            "Transforman datos en plantillas para mostrarlos en un formato adecuado.",
+        "¿Qué es la inyección de dependencias?":
+            "Patrón para suministrar dependencias a clases sin crearlas directamente.",
+        "¿Qué es un componente y cómo se comunica con otros?":
+            "Unidad básica de UI que puede recibir y emitir datos mediante inputs y outputs.",
+        "¿Cómo manejas el enrutamiento en Angular?":
+            "Con el RouterModule, definiendo rutas y navegando entre ellas."
+    },
+    "personal": {
+        "¿Dónde te ves en cinco años?":
+            "Me veo creciendo profesionalmente y aportando valor en proyectos desafiantes.",
+        "¿Cuál es tu mayor fortaleza y debilidad?":
+            "Mi fortaleza es la perseverancia y mi debilidad es que a veces soy muy perfeccionista.",
+        "¿Cómo manejas el estrés o la presión en el trabajo?":
+            "Organizo mis tareas y tomo pausas para mantenerme concentrado.",
+        "Descríbeme una situación en la que hayas tenido que resolver un conflicto.":
+            "Escuché a ambas partes, busqué un acuerdo y mantuve la comunicación abierta.",
+        "¿Por qué quieres trabajar con nosotros?":
+            "Porque admiro su cultura y quiero crecer junto a un equipo talentoso.",
+        "¿Qué te motiva a dar lo mejor de ti?":
+            "El deseo de aprender y superar retos constantemente.",
+        "¿Cómo te mantienes actualizado y mejorando profesionalmente?":
+            "Leo artículos, tomo cursos y participo en comunidades técnicas.",
+        "Cuéntame sobre un error que hayas cometido y cómo lo solucionaste.":
+            "Identifiqué el problema, pedí ayuda y aprendí para no repetirlo.",
+        "¿Prefieres trabajar en equipo o de forma independiente? ¿Por qué?":
+            "Prefiero el equipo porque las ideas se enriquecen colaborando."
+    }
+}
 
+RESOURCES = {
+    "frontend": [
+        "https://roadmap.sh/frontend",
+        "https://frontendmentor.io",
+        "https://cssbattle.dev",
+    ],
+    "backend": [
+        "https://roadmap.sh/backend",
+        "https://leetcode.com",
+        "https://sqlbolt.com",
+    ],
+    "react": [
+        "https://roadmap.sh/react",
+        "https://react.dev/learn",
+        "https://frontendmentor.io",
+    ],
+    "angular": [
+        "https://roadmap.sh/angular",
+        "https://angular.io/tutorial",
+        "https://rxjs.dev",
+    ],
+}
+MAX_QUESTIONS = 5
+sessions = {}
+
+
+def similarity(a, b):
+    return SequenceMatcher(None, a.lower(), b.lower()).ratio()
+
+def nivel_por_puntaje(avg_score):
+    if avg_score >= 0.75:
+        return "Senior"
+    elif avg_score >= 0.5:
+        return "Intermedio"
+    else:
+        return "Junior"
 
 def clean_company_name(line: str, max_length=50) -> str:
     line = re.sub(r"http\S+", "", line)
@@ -159,9 +312,232 @@ def clean_company_name(line: str, max_length=50) -> str:
     line = re.sub(r"[^\w\s.,-]", "", line)
     line = line.strip()
     return line[:max_length]
+  
+@api.route("/chat", methods=["POST"])
+@jwt_required()
+def chat():
+    try:
+        user_id = get_jwt_identity()
+        user_message = (request.json or {}).get("message", "").strip()
 
 
-def extract_postulation_fields(text):
+        if user_id not in sessions:
+            sessions[user_id] = {
+                "state": "SALUDO_INICIAL",
+                "role": None,
+                "question_index": 0,
+                "question_order": [],
+                "scores": []
+            }
+            return jsonify({
+                "response": "Hola, ¿cómo puedo ayudarte?"
+            })
+
+        session = sessions[user_id]
+
+
+        if session["state"] == "SALUDO_INICIAL":
+
+            session["state"] = "ESPERANDO_LISTO"
+            return jsonify({
+                "response": "¿Estás listo para una simulación de entrevista? (sí / no)"
+            })
+
+
+        if session["state"] == "ESPERANDO_LISTO":
+            if user_message.lower() in ["sí", "si", "s"]:
+                session["state"] = "ESPERANDO_ROL"
+                return jsonify({
+                    "response": (
+                        "Elige el tipo de entrevista:\n"
+                        "1) Frontend\n"
+                        "2) Backend\n"
+                        "3) React\n"
+                        "4) Angular\n"
+                        "5) Personal"
+                    )
+                })
+            elif user_message.lower() in ["no", "n"]:
+                return jsonify({"response": "Cuando estés listo, dime 'sí' para comenzar."})
+            else:
+                return jsonify({"response": "Por favor responde con 'sí' o 'no'."})
+
+
+        if session["state"] == "ESPERANDO_ROL":
+            roles = {
+                "1": "frontend",
+                "2": "backend",
+                "3": "react",
+                "4": "angular",
+                "5": "personal"
+            }
+
+            if user_message not in roles:
+                return jsonify({"response": "Por favor elige una opción válida (1–5)."})
+
+            role = roles[user_message]
+            session["role"] = role
+            session["state"] = "ENTREVISTA"
+            session["question_index"] = 0
+            session["scores"] = []
+
+            preguntas = QUESTIONS[role]
+            session["question_order"] = random.sample(
+                preguntas, min(MAX_QUESTIONS, len(preguntas))
+            )
+
+            return jsonify({
+                "response": f"Pregunta 1:\n{session['question_order'][0]}"
+            })
+
+
+        if session["state"] == "ENTREVISTA":
+            role = session["role"]
+            q_index = session["question_index"]
+            question_order = session["question_order"]
+
+            current_question = question_order[q_index]
+            ejemplo_respuesta = ANSWERS.get(role, {}).get(current_question)
+
+            score = 0.0
+
+            if ejemplo_respuesta:
+                score = similarity(user_message, ejemplo_respuesta)
+                session["scores"].append(score)
+
+                if score >= 0.75:
+                    feedback = "Buena respuesta."
+                elif score >= 0.5:
+                    feedback = "Necesitas estudiar un poco más esto."
+                else:
+                    feedback = "Respuesta insuficiente."
+            else:
+                session["scores"].append(0)
+                feedback = "Respuesta recibida."
+
+            session["question_index"] += 1
+
+            if session["question_index"] >= len(session["question_order"]):
+                session["state"] = "FINALIZADO"
+
+                avg_score = (
+                    sum(session["scores"]) / len(session["scores"])
+                    if session["scores"] else 0
+                )
+                nivel = nivel_por_puntaje(avg_score)
+                resources = RESOURCES.get(role, [])
+                recursos_texto = "\n".join(f"- {r}" for r in resources)
+
+                session["state"] = "ESPERANDO_LISTO"
+                session["question_index"] = 0
+                session["question_order"] = []
+                session["scores"] = []
+
+                return jsonify({
+                    "response": (
+                        f"{feedback}\n\n"
+                        "Has completado la entrevista.\n\n"
+                        f"Nivel: {nivel}\n"
+                        f"Puntaje promedio: {avg_score:.2f}\n\n"
+                        f"Recursos recomendados:\n{recursos_texto}\n\n"
+                        "¿Quieres iniciar otra entrevista? (sí / no)"
+                    )
+                })
+
+            session["state"] = "PREGUNTAR_SIGUIENTE"
+
+            return jsonify({
+                "response": (
+                    f"{feedback}\n\n"
+                    "¿Qué quieres hacer ahora?\n"
+                    "1) Siguiente pregunta\n"
+                    "2) Salir y ver recursos"
+                )
+            })
+
+
+        if session["state"] == "PREGUNTAR_SIGUIENTE":
+            if user_message == "1":
+                if session["question_index"] < len(session["question_order"]):
+                    siguiente_pregunta = session["question_order"][session["question_index"]]
+                    session["state"] = "ENTREVISTA"
+                    return jsonify({
+                        "response": f"Siguiente pregunta:\n{siguiente_pregunta}"
+                    })
+                else:
+                    session["state"] = "FINALIZADO"
+
+                    avg_score = (
+                        sum(session["scores"]) / len(session["scores"])
+                        if session["scores"] else 0
+                    )
+                    nivel = nivel_por_puntaje(avg_score)
+                    resources = RESOURCES.get(session["role"], [])
+                    recursos_texto = "\n".join(f"- {r}" for r in resources)
+
+                    session["state"] = "ESPERANDO_LISTO"
+                    session["question_index"] = 0
+                    session["question_order"] = []
+                    session["scores"] = []
+
+                    return jsonify({
+                        "response": (
+                            "Has completado la entrevista.\n\n"
+                            f"Nivel: {nivel}\n"
+                            f"Puntaje promedio: {avg_score:.2f}\n\n"
+                            f"Recursos recomendados:\n{recursos_texto}\n\n"
+                            "¿Quieres iniciar otra entrevista? (sí / no)"
+                        )
+                    })
+
+            elif user_message == "2":
+                session["state"] = "FINALIZADO"
+
+                avg_score = (
+                    sum(session["scores"]) / len(session["scores"])
+                    if session["scores"] else 0
+                )
+                nivel = nivel_por_puntaje(avg_score)
+                resources = RESOURCES.get(session["role"], [])
+                recursos_texto = "\n".join(f"- {r}" for r in resources)
+
+                session["state"] = "ESPERANDO_LISTO"
+                session["question_index"] = 0
+                session["question_order"] = []
+                session["scores"] = []
+
+                return jsonify({
+                    "response": (
+                        "Has finalizado la entrevista.\n\n"
+                        f"Nivel: {nivel}\n"
+                        f"Puntaje promedio: {avg_score:.2f}\n\n"
+                        f"Recursos recomendados:\n{recursos_texto}\n\n"
+                        "¿Quieres iniciar otra entrevista? (sí / no)"
+                    )
+                })
+
+            else:
+                return jsonify({
+                    "response": (
+                        "Por favor elige:\n"
+                        "1) Siguiente pregunta\n"
+                        "2) Salir y ver recursos"
+                    )
+                })
+
+
+        session["state"] = "ESPERANDO_LISTO"
+        return jsonify({
+            "response": "¿Quieres iniciar una entrevista? (sí / no)"
+        })
+
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({"response": f"Error del servidor: {str(e)}"}), 500
+
+
+
+def extract_postulation_fields(text: str) -> dict:
     clean_text = text.replace("€", " €").replace("$", " $")
     lines = [l.strip() for l in clean_text.split("\n") if len(l.strip()) > 3]
     full_text = " ".join(lines).lower()
@@ -180,6 +556,17 @@ def extract_postulation_fields(text):
         "job_description": clean_text[:800]
     }
 
+    # ---------------- PLATFORM DETECTION ----------------
+    if "linkedin" in full_text:
+        data["platform"] = "LinkedIn"
+    if "indeed" in full_text:
+        data["platform"] = "Indeed"
+    elif "sefcarm" in full_text or "sefoficinavirtual" in full_text:
+        data["platform"] = "Sefcarm"
+    else:
+        data["platform"] = "Unknown"
+
+    # ---------------- ROLE & COMPANY ----------------
     for line in lines:
         if " at " in line.lower():
             parts = re.split(r"\s+at\s+", line, flags=re.IGNORECASE)
@@ -188,11 +575,11 @@ def extract_postulation_fields(text):
                 data["company_name"] = clean_company_name(parts[1])
                 break
 
-    if not data["company_name"]:
-        for line in lines:
-            if "empresa" in line.lower():
-                data["company_name"] = clean_company_name(line)
-                break
+    if data["platform"] == "Indeed" and not data["company_name"]:
+        if lines:
+            data["company_name"] = clean_company_name(lines[0])
+        if len(lines) > 1:
+            data["role"] = lines[1].strip()
 
     if not data["company_name"] and lines:
         data["company_name"] = clean_company_name(lines[0])
@@ -209,13 +596,7 @@ def extract_postulation_fields(text):
     city_match = re.search(r"municipio:\s*([a-záéíóúñ]+)", full_text)
     if city_match:
         data["city"] = city_match.group(1).title()
-
-    if not data["city"]:
-        city_match2 = re.search(r"\(([^)]*murcia[^)]*)\)", full_text)
-        if city_match2:
-            data["city"] = "Murcia"
-
-    if not data["city"]:
+    else:
         for city in ["murcia", "barcelona", "madrid", "valencia", "sevilla", "santander"]:
             if city in full_text:
                 data["city"] = city.title()
@@ -227,24 +608,28 @@ def extract_postulation_fields(text):
         data["platform"] = "Sefcarm"
 
     if "presencial" in full_text or "on-site" in full_text:
+    # ---------------- WORK TYPE ----------------
+    if any(k in full_text for k in ["presencial", "on-site", "lunes a viernes"]):
         data["work_type"] = "Presencial"
-    elif "remoto" in full_text or "remote" in full_text:
+    elif any(k in full_text for k in ["remoto", "remote"]):
         data["work_type"] = "Remoto"
-    elif "híbrido" in full_text or "hybrid" in full_text:
+    elif any(k in full_text for k in ["híbrido", "hybrid"]):
         data["work_type"] = "Híbrido"
-
     if "lunes a viernes" in full_text:
         data["work_type"] = "Presencial"
 
+    # ---------------- EXPERIENCE ----------------
     exp_match = re.search(r"experiencia.*?(\d+)\s*(meses|años)", full_text)
     if exp_match:
         num = int(exp_match.group(1))
         data["experience"] = num if "meses" in exp_match.group(2) else num * 12
 
+    # ---------------- SALARY ----------------
     salary_match = re.search(r"(\d{3,5})\s*euros", full_text)
     if salary_match:
         data["salary"] = int(salary_match.group(1))
 
+    # ---------------- APPLICATIONS ----------------
     applied_match = re.search(r"más de (\d+)\s+solicitudes", full_text)
     if applied_match:
         data["candidates_applied"] = int(applied_match.group(1))
@@ -257,6 +642,15 @@ def extract_postulation_fields(text):
         if any(kw in line.lower() for kw in ["aptitudes", "habilidades"]):
             data["requirements"].append(line.strip())
 
+    # ---------------- REQUIREMENTS ----------------
+    for line in lines:
+        if any(k in line.lower() for k in [
+            "se requiere", "tener", "poseer",
+            "estar inscrito", "aptitudes", "habilidades"
+        ]):
+            data["requirements"].append(line)
+
+    # ---------------- URL ----------------
     url_match = re.search(r"(https?://[^\s]+)", text)
     if url_match:
         data["postulation_url"] = url_match.group(1)
@@ -426,6 +820,7 @@ def chat():
         return jsonify({"response": f"Error: {str(e)}"}), 500
 
 
+
 def save_uploaded_file(file, upload_folder=None):
     if not file:
         return None
@@ -513,100 +908,331 @@ def user_detail():
 
 @api.route("/cv", methods=["GET"])
 @jwt_required()
-def get_cv():
+def get_all_cvs():
     try:
         current_user_id = get_jwt_identity()
-        cv = CV.query.filter_by(user_id=current_user_id).first()
-
-        if not cv:
-            return jsonify({'success': False, 'message': 'CV no encontrado'}), 404
-
-        datos = json.loads(cv.datos)
+        cvs = CV.query.filter_by(user_id=current_user_id).all()
 
         return jsonify({
-            'success': True,
-            'datos': datos,
-            'fecha_creacion': cv.fecha_creacion.isoformat() if cv.fecha_creacion else None,
-            'fecha_modificacion': cv.fecha_modificacion.isoformat() if cv.fecha_modificacion else None
+            "success": True,
+            "cvs": [cv.serialize() for cv in cvs]
         }), 200
 
-    except json.JSONDecodeError as e:
-        return jsonify({'success': False, 'message': 'Error al leer los datos del CV'}), 500
+    except Exception as e:
+        print(f"ERROR: {e}")
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@api.route("/cv/<int:cv_id>", methods=["GET"])
+@jwt_required()
+def get_cv_by_id(cv_id):
+    try:
+        current_user_id = get_jwt_identity()
+        cv = CV.query.filter_by(id=cv_id, user_id=current_user_id).first()
+
+        if not cv:
+            return jsonify({"success": False, "message": "CV no encontrado"}), 404
+
+        return jsonify({"success": True, "cv": cv.serialize()}), 200
 
     except Exception as e:
-        print(f"Error: {e}")
-        import traceback
-        traceback.print_exc()
-        return jsonify({'success': False, 'message': str(e)}), 500
+        print(f"ERROR: {e}")
+        return jsonify({"success": False, "message": str(e)}), 500
 
 
 @api.route("/cv", methods=["POST"])
 @jwt_required()
-def save_cv():
+def create_cv():
     try:
         current_user_id = get_jwt_identity()
         data = request.get_json()
 
         if not data:
-            return jsonify({'success': False, 'message': 'No se enviaron datos'}), 400
+            return jsonify({"success": False, "message": "No se enviaron datos"}), 400
 
-        if not data.get('nombre'):
-            return jsonify({'success': False, 'message': 'El nombre es obligatorio'}), 400
+        nuevo_cv = CV(
+            user_id=current_user_id,
+            datos=json.dumps(data, ensure_ascii=False),
+            fecha_creacion=datetime.utcnow(),
+            fecha_modificacion=datetime.utcnow()
+        )
 
-        if not data.get('email'):
-            return jsonify({'success': False, 'message': 'El email es obligatorio'}), 400
-
-        if not data.get('telefono'):
-            return jsonify({'success': False, 'message': 'El teléfono es obligatorio'}), 400
-
-        json_data = json.dumps(data, ensure_ascii=False)
-        cv = CV.query.filter_by(user_id=current_user_id).first()
-
-        if cv:
-            cv.datos = json_data
-            cv.fecha_modificacion = datetime.utcnow()
-        else:
-            cv = CV(
-                user_id=current_user_id,
-                datos=json_data,
-                fecha_creacion=datetime.utcnow(),
-                fecha_modificacion=datetime.utcnow()
-            )
-            db.session.add(cv)
-
+        db.session.add(nuevo_cv)
         db.session.commit()
 
-        return jsonify({'success': True, 'message': 'CV guardado correctamente', 'cv_id': cv.id}), 200
+        return jsonify({
+            "success": True,
+            "cv": nuevo_cv.serialize()
+        }), 201
 
     except Exception as e:
         print(f"ERROR: {e}")
-        import traceback
-        traceback.print_exc()
         db.session.rollback()
-        return jsonify({'success': False, 'message': f'Error al guardar: {str(e)}'}), 500
+        return jsonify({"success": False, "message": str(e)}), 500
 
 
-@api.route("/cv", methods=["DELETE"])
+@api.route("/cv/<int:cv_id>", methods=["PUT"])
 @jwt_required()
-def delete_cv():
+def update_cv(cv_id):
     try:
         current_user_id = get_jwt_identity()
-        cv = CV.query.filter_by(user_id=current_user_id).first()
+        data = request.get_json()
+
+        cv = CV.query.filter_by(id=cv_id, user_id=current_user_id).first()
 
         if not cv:
-            return jsonify({'success': False, 'message': 'CV no encontrado'}), 404
+            return jsonify({"success": False, "message": "CV no encontrado"}), 404
+
+        cv.datos = json.dumps(data, ensure_ascii=False)
+        cv.fecha_modificacion = datetime.utcnow()
+
+        db.session.commit()
+
+        return jsonify({
+            "success": True,
+            "cv": cv.serialize()
+        }), 200
+
+    except Exception as e:
+        print(f"ERROR: {e}")
+        db.session.rollback()
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@api.route("/cv/<int:cv_id>", methods=["DELETE"])
+@jwt_required()
+def delete_cv(cv_id):
+    try:
+        current_user_id = get_jwt_identity()
+        cv = CV.query.filter_by(id=cv_id, user_id=current_user_id).first()
+
+        if not cv:
+            return jsonify({"success": False, "message": "CV no encontrado"}), 404
 
         db.session.delete(cv)
         db.session.commit()
 
-        return jsonify({'success': True, 'message': 'CV eliminado correctamente'}), 200
+        return jsonify({"success": True, "message": "CV eliminado correctamente"}), 200
 
     except Exception as e:
         print(f"ERROR: {e}")
-        import traceback
-        traceback.print_exc()
         db.session.rollback()
-        return jsonify({'success': False, 'message': f'Error al eliminar: {str(e)}'}), 500
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+
+@api.route("/cv/<int:cv_id>/pdf", methods=["GET"])
+@jwt_required()
+def generate_cv_pdf(cv_id):
+    try:
+        current_user_id = get_jwt_identity()
+        cv = CV.query.filter_by(id=cv_id, user_id=current_user_id).first()
+
+        if not cv:
+            return jsonify({"success": False, "message": "CV no encontrado"}), 404
+
+        datos = json.loads(cv.datos)
+
+        def normalizar_periodos(lista):
+            for item in lista:
+                periodo = item.get("periodo", "")
+                if periodo:
+                    partes = periodo.replace("–", "-").split("-")
+                    if len(partes) == 2:
+                        item["inicio"] = partes[0].strip()
+                        item["fin"] = partes[1].strip()
+                    else:
+                        item["inicio"] = periodo
+                        item["fin"] = ""
+                item.setdefault("inicio", "")
+                item.setdefault("fin", "")
+
+        datos.setdefault("perfil", datos.get("resumen", ""))
+        datos.setdefault("habilidades", [])
+        datos.setdefault("experiencia", [])
+        datos.setdefault("educacion", [])
+        datos.setdefault("ubicacion", "")
+        datos.setdefault("linkedin", "")
+        datos.setdefault("github", "")
+
+        normalizar_periodos(datos["experiencia"])
+        normalizar_periodos(datos["educacion"])
+
+        buffer = BytesIO()
+        p = canvas.Canvas(buffer, pagesize=A4)
+
+        width, height = A4
+        x_margin = 60
+        y = height - 80
+
+        title_color = HexColor("#005A9C")
+        text_color = HexColor("#2E2E2E")
+        muted_color = HexColor("#555555")
+        border_color = HexColor("#CCCCCC")
+
+        p.setStrokeColor(border_color)
+        p.setLineWidth(1)
+        p.rect(x_margin - 20, 50, width - (x_margin - 20)
+               * 2, height - 120, stroke=1, fill=0)
+
+        foto_base64 = datos.get("foto", "")
+        text_x = x_margin
+        text_y = y
+
+        if foto_base64:
+            try:
+                if foto_base64.startswith("data:image"):
+                    foto_base64 = foto_base64.split(",")[1]
+                foto_bytes = base64.b64decode(foto_base64)
+                foto_image = ImageReader(BytesIO(foto_bytes))
+                foto_width = 110
+                foto_height = 110
+                foto_x = x_margin
+                foto_y = y
+                p.drawImage(foto_image, foto_x, foto_y - foto_height, foto_width,
+                            foto_height, preserveAspectRatio=True, mask='auto')
+                text_x = foto_x + foto_width + 25
+                text_y = foto_y
+            except:
+                text_x = x_margin
+                text_y = y
+
+        nombre = datos.get("nombre", "")[:60]
+        font_size = 22
+        max_nombre_width = width - text_x - x_margin
+        while p.stringWidth(nombre, "Helvetica-Bold", font_size) > max_nombre_width and font_size > 12:
+            font_size -= 1
+
+        p.setFont("Helvetica-Bold", font_size)
+        p.setFillColor(title_color)
+        p.drawString(text_x, text_y, nombre)
+        text_y -= font_size + 4
+
+        p.setFont("Helvetica", 11)
+        p.setFillColor(muted_color)
+
+        if datos.get("email"):
+            p.drawString(text_x, text_y, f"Email: {datos['email']}")
+            text_y -= 16
+        if datos.get("telefono"):
+            p.drawString(text_x, text_y, f"Teléfono: {datos['telefono']}")
+            text_y -= 16
+        if datos.get("direccion"):
+            p.drawString(text_x, text_y, f"Dirección: {datos['direccion']}")
+            text_y -= 16
+        if datos.get("ubicacion"):
+            p.drawString(text_x, text_y, f"Ubicación: {datos['ubicacion']}")
+            text_y -= 16
+        if datos.get("linkedin"):
+            p.drawString(text_x, text_y, f"LinkedIn: {datos['linkedin']}")
+            text_y -= 16
+        if datos.get("github"):
+            p.drawString(text_x, text_y, f"GitHub: {datos['github']}")
+            text_y -= 16
+
+        y = min(y - 130, text_y - 40)
+
+        p.setStrokeColor(border_color)
+        p.setLineWidth(0.5)
+        p.line(x_margin - 10, y, width - x_margin + 10, y)
+        y -= 30
+
+        from reportlab.platypus import Paragraph
+        from reportlab.lib.styles import getSampleStyleSheet
+
+        styles = getSampleStyleSheet()
+        style = styles["Normal"]
+        style.fontName = "Helvetica"
+        style.fontSize = 11
+        style.textColor = text_color
+        style.leading = 14
+
+        def seccion(titulo):
+            nonlocal y
+            p.setFont("Helvetica-Bold", 13)
+            p.setFillColor(title_color)
+            p.drawString(x_margin, y, titulo.upper())
+            y -= 8
+            p.setStrokeColor(border_color)
+            p.setLineWidth(0.3)
+            p.line(x_margin, y, width - x_margin, y)
+            y -= 20
+
+        if datos["perfil"]:
+            seccion("Perfil profesional")
+            para = Paragraph(datos["perfil"], style)
+            w, h = para.wrap(width - 2 * x_margin, height)
+            para.drawOn(p, x_margin, y - h)
+            y -= h + 20
+
+        if datos["experiencia"]:
+            seccion("Experiencia")
+            for exp in datos["experiencia"]:
+                if exp.get("puesto"):
+                    p.setFont("Helvetica-Bold", 11)
+                    p.setFillColor(text_color)
+                    p.drawString(x_margin, y, exp["puesto"])
+                    y -= 14
+                if exp.get("empresa"):
+                    p.setFont("Helvetica", 11)
+                    p.setFillColor(muted_color)
+                    p.drawString(x_margin, y, exp["empresa"])
+                    y -= 14
+                periodo = f"{exp['inicio']} – {exp['fin']}".strip(" –")
+                if periodo:
+                    p.setFont("Helvetica-Oblique", 10)
+                    p.setFillColor(muted_color)
+                    p.drawString(x_margin, y, periodo)
+                    y -= 12
+                if exp.get("descripcion"):
+                    para = Paragraph(exp["descripcion"], style)
+                    w, h = para.wrap(width - 2 * x_margin, height)
+                    para.drawOn(p, x_margin, y - h)
+                    y -= h + 10
+                y -= 6
+            y -= 10
+
+        if datos["educacion"]:
+            seccion("Educación")
+            for edu in datos["educacion"]:
+                if edu.get("titulo"):
+                    p.setFont("Helvetica-Bold", 11)
+                    p.setFillColor(text_color)
+                    p.drawString(x_margin, y, edu["titulo"])
+                    y -= 14
+                if edu.get("institucion"):
+                    p.setFont("Helvetica", 11)
+                    p.setFillColor(muted_color)
+                    p.drawString(x_margin, y, edu["institucion"])
+                    y -= 14
+                periodo = f"{edu['inicio']} – {edu['fin']}".strip(" –")
+                if periodo:
+                    p.setFont("Helvetica-Oblique", 10)
+                    p.setFillColor(muted_color)
+                    p.drawString(x_margin, y, periodo)
+                    y -= 12
+                y -= 6
+            y -= 10
+
+        if datos["habilidades"]:
+            seccion("Habilidades")
+            skills = " · ".join(datos["habilidades"])
+            para = Paragraph(skills, style)
+            w, h = para.wrap(width - 2 * x_margin, height)
+            para.drawOn(p, x_margin, y - h)
+            y -= h + 10
+
+        p.showPage()
+        p.save()
+
+        buffer.seek(0)
+        pdf_content = buffer.getvalue()
+
+        return Response(pdf_content, mimetype="application/pdf", headers={"Content-Disposition": f"inline; filename=cv-{cv_id}.pdf"})
+
+    except Exception as e:
+        print(f"ERROR: {e}")
+        return jsonify({"success": False, "message": str(e)}), 500
 
 
 @api.route("/cv/export", methods=["GET"])
@@ -769,58 +1395,22 @@ def status_count():
     return jsonify({"postulation": postulacion})
 
 
-@api.route("/postulacion/abierta", methods=["GET"])
-@jwt_required()
-def status_abierta_get():
-    current_user = get_jwt_identity()
-    postulacion = Postulations.query.filter_by(
-        user_id=current_user, postulation_state="abierta").count()
-    return jsonify({"abierta": postulacion})
-
-
-@api.route("/postulacion/en_proceso", methods=["GET"])
-@jwt_required()
-def status_en_proceso_get():
-    current_user = get_jwt_identity()
-    postulacion = Postulations.query.filter_by(
-        user_id=current_user, postulation_state="en proceso").count()
-    return jsonify({"en_proceso": postulacion})
-
-
-@api.route("/postulacion/entrevista", methods=["GET"])
-@jwt_required()
+@api.route("/status", methods=["GET"])
 def status_entrevista_get():
-    current_user = get_jwt_identity()
-    postulacion = Postulations.query.filter_by(
-        user_id=current_user, postulation_state="entrevista").count()
-    return jsonify({"entrevista": postulacion})
+    entrevista = Stages.query.filter_by( stage_name="hr_interview").count()
+    offer = Stages.query.filter_by(stage_name="offer").count()
+    process_closure = Stages.query.filter_by( stage_name="process_closure").count()
+    aceptada = Postulations.query.filter_by( postulation_state="aceptada").count()
+    return jsonify({"entrevista": entrevista,
+                    "offer":offer,
+                    "descartado": process_closure,
+                    "aceptada": aceptada
+                    })
 
 
-@api.route("/postulacion/oferta", methods=["GET"])
-@jwt_required()
-def status_oferta_get():
-    current_user = get_jwt_identity()
-    postulacion = Postulations.query.filter_by(
-        user_id=current_user, postulation_state="oferta").count()
-    return jsonify({"oferta": postulacion})
 
 
-@api.route("/postulacion/descartado", methods=["GET"])
-@jwt_required()
-def status_descartado_get():
-    current_user = get_jwt_identity()
-    postulacion = Postulations.query.filter_by(
-        user_id=current_user, postulation_state="descartado").count()
-    return jsonify({"descartado": postulacion})
 
-
-@api.route("/postulacion/aceptada", methods=["GET"])
-@jwt_required()
-def status_aceptada_get():
-    current_user = get_jwt_identity()
-    postulacion = Postulations.query.filter_by(
-        user_id=current_user, postulation_state="aceptada").count()
-    return jsonify({"aceptada": postulacion})
 
 
 @api.route("/profile", methods=["GET"])

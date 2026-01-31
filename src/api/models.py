@@ -154,7 +154,8 @@ class Stages(db.Model):
             'id': self.id,
             'stage_name': self.stage_name,
             'date_completed_stage': self.date_completed_stage,
-            'stage_completed': self.stage_completed}
+            'stage_completed': self.stage_completed
+        }
 
 
 class TodoList(db.Model):
@@ -167,3 +168,4 @@ class TodoList(db.Model):
 
     user_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False)
     user: Mapped['User'] = relationship('User', back_populates='todo_list')
+

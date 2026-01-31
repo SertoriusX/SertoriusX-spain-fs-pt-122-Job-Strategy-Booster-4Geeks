@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import Sidebar from './SideBar';
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 import "../styles/app.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from "@fortawesome/free-solid-svg-icons";
@@ -13,7 +13,9 @@ export default function App() {
     const { token, user, theme, toggleTheme, profile } = useContext(UserContext);
     const [loading, setLoading] = useState(true);
     const [language, setLanguage] = useState("en");
+    const [isEditing, setIsEditing] = useState(false);
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const [open, setOpen] = useState(false);
 
     useEffect(() => {
         window.googleTranslateElementInit = () => {
@@ -38,6 +40,7 @@ export default function App() {
             delete window.googleTranslateElementInit;
         };
     }, []);
+    const navigate = useNavigate()
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -59,16 +62,49 @@ export default function App() {
     if (loading) {
         return <LoadingScreen />;
     }
-
+    const handleNavigation = (to) => {
+        setLoading(true);
+        setTimeout(() => {
+            setLoading(false);
+            navigate(to);
+        }, 1500);
+    };
     return (
         <div className="main_container" id="google_translate_element">
             <div className="display_component">
-                <Sidebar />
+                <Sidebar
+                    isEditing={isEditing}
+                    setIsEditing={setIsEditing}
+                />
+
                 <div className="main_content">
                     <div className="header_bar">
                         <div className="user_data">
-                            <FontAwesomeIcon className="notification_icon" icon={faBell} />
-                            <button className='btn btn-secondary' onClick={toggleTheme}>
+                            <FontAwesomeIcon
+                                className="notification_icon"
+                                icon={faBell}
+                                onClick={() => setOpen(!open)
+
+                                }
+
+                            />
+
+                            {open && (
+                                <div className="notification-dropdown">
+                                    <h5 onClick={() => {
+
+                                        handleNavigation("/status-entrevista");
+                                        setOpen(!open)
+
+
+
+                                    }
+
+                                    }>Entrevista</h5>
+                                    <h5>New message received</h5>
+                                    <h5>Profile updated</h5>
+                                </div>
+                            )}                            <button className='btn btn-secondary' onClick={toggleTheme}>
                                 {theme === "dark" ? "Modo claro" : "Modo oscuro"}
                             </button>
 
@@ -100,7 +136,8 @@ export default function App() {
                             </Link>
                         </div>
                     </div>
-                    <Outlet />
+                   <Outlet context={{ isEditing, setIsEditing }} />
+
                 </div>
             </div>
         </div>

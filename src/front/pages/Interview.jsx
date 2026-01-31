@@ -8,11 +8,45 @@ function Interview() {
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const backendUrl =
-        import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
-
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const chatEndRef = useRef(null);
     const { token } = useContext(UserContext);
+
+    function renderTextWithLineBreaks(text) {
+        return text.split("\n").map((line, i) => (
+            <React.Fragment key={i}>
+                {line}
+                {i !== text.split("\n").length - 1 && <br />}
+            </React.Fragment>
+        ));
+    }
+
+    function renderTextWithLineBreaksAndLinks(text) {
+        const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+        return text.split("\n").map((line, i) => {
+            const parts = line.split(urlRegex);
+            return (
+                <React.Fragment key={i}>
+                    {parts.map((part, idx) =>
+                        urlRegex.test(part) ? (
+                            <a
+                                key={idx}
+                                href={part}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                {part}
+                            </a>
+                        ) : (
+                            part
+                        )
+                    )}
+                    {i !== text.split("\n").length - 1 && <br />}
+                </React.Fragment>
+            );
+        });
+    }
 
     const sendMessage = async () => {
         if (!message.trim()) return;
@@ -24,6 +58,7 @@ function Interview() {
             ]);
             return;
         }
+
 
         setChat((prev) => [...prev, { sender: "user", text: message }]);
         setLoading(true);
@@ -40,8 +75,12 @@ function Interview() {
                 }
             );
 
-            const botReply = res.data.response;
-            setChat((prev) => [...prev, { sender: "bot", text: botReply }]);
+            const { response, options } = res.data;
+
+            setChat((prev) => [
+                ...prev,
+                { sender: "bot", text: response, options: options || [] },
+            ]);
             setMessage("");
         } catch (error) {
             console.error("Error sending message:", error);
@@ -66,6 +105,11 @@ function Interview() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleOptionClick = (value) => {
+        setMessage(value);
+        sendMessage();
     };
 
     useEffect(() => {
@@ -96,15 +140,38 @@ function Interview() {
                                 key={idx}
                                 className={`message-row ${isUser ? "user" : "bot"}`}
                             >
-                                <div
-                                    className={`message-bubble ${isUser ? "user" : "bot"
-                                        }`}
-                                >
-                                    {entry.text}
+                                <div className={`message-bubble ${isUser ? "user" : "bot"}`}>
+                                    <div className="message-text">
+                                        {isUser
+                                            ? renderTextWithLineBreaks(entry.text)
+                                            : renderTextWithLineBreaksAndLinks(entry.text)}
+                                    </div>
+
+                                    {!isUser && entry.options && entry.options.length > 0 && (
+                                        <div className="options-row">
+                                            {entry.options.map((option, i) => (
+                                                <button
+                                                    key={i}
+                                                    className="option-button"
+                                                    onClick={() => handleOptionClick(option.value)}
+                                                >
+                                                    {option.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    <div className="message-time">
+                                        {new Date().toLocaleTimeString([], {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                        })}
+                                    </div>
                                 </div>
                             </div>
                         );
                     })}
+
                     <div ref={chatEndRef} />
                 </div>
 

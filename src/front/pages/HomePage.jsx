@@ -20,7 +20,12 @@ function HomePage() {
 
 	const [postulation, setPostulation] = useState([])
 	const authorizationHeader = useGetAuthorizationHeader();
-	const [oferta, setOferta] = useState(0)
+	const [status, setStatus] = useState(0)
+
+
+
+
+
 	const [post, setPost] = useState(0)
 	const applicationStatistics = (state) => {
 		const totalInterview = postulation.filter((p) => p.postulation_state === state).length
@@ -35,16 +40,11 @@ function HomePage() {
 		{ name: "Descartado", value: applicationStatistics('descartado'), color: "#e44441ff" }
 	];
 	useEffect(() => {
-		axios.get(`${backendUrl}/postulacion/oferta`, {
-			headers: {
-				"Content-Type": "application/json",
-				'Authorization': `Bearer ${token}`
-			}
-
-		}).then((res) => { setOferta(res.data) }).catch((err) => {
+		axios.get(`${backendUrl}/status`).then((res) => { setStatus(res.data) }).catch((err) => {
 			console.error(err);
 		})
 	}, [])
+
 
 	useEffect(() => {
 		axios.get(`${backendUrl}/postulacion/count`, {
@@ -70,9 +70,9 @@ function HomePage() {
 		<div className="home_display">
 			<div className="statistics_container">
 				<HomeStatisticsCard title={'Postulaciones'} quantity={post.postulation} date={'12/01/2026'} icon={faSuitcase} />
-				<HomeStatisticsCard title={'Entrevistas'} quantity={applicationStatistics('Entrevista')} date={'12/01/2026'} icon={faUserTie} />
-				<HomeStatisticsCard title={'Ofertas'} quantity={oferta.oferta} date={'12/01/2026'} icon={faEnvelopesBulk} />
-				<HomeStatisticsCard title={'Descartado'} quantity={applicationStatistics('descartado')} date={'12/01/2026'} icon={faCircleXmark} />
+				<HomeStatisticsCard title={'Entrevistas'} quantity={status.entrevista} date={'12/01/2026'} icon={faUserTie} />
+				<HomeStatisticsCard title={'Ofertas'} quantity={status.offer} date={'12/01/2026'} icon={faEnvelopesBulk} />
+				<HomeStatisticsCard title={'Descartado'} quantity={status.descartado} date={'12/01/2026'} icon={faCircleXmark} />
 			</div>
 			<div className="grafica">
 				<div className="title">
