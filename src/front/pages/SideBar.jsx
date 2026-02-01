@@ -97,18 +97,7 @@ function Sidebar() {
                         to="/about"
                         onClick={() => handleNavigation("/about")}
                     />
-                    <NavBarButton
-                        icon={faGear}
-                        label={"Ajustes"}
-                        to="/settings"
-                        onClick={() => handleNavigation("/settings")}
-                    />
-                    <NavBarButton
-                        icon={faCircleQuestion}
-                        label={"Ayuda"}
-                        to="/help"
-                        onClick={() => handleNavigation("/help")}
-                    />
+
                     <button className="btn btn-secondary mt-2" onClick={handleLogout}>
                         Logout
                     </button>

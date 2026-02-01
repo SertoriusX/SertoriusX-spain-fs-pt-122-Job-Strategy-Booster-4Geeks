@@ -80,31 +80,30 @@ export default function App() {
                 <div className="main_content">
                     <div className="header_bar">
                         <div className="user_data">
-                            <FontAwesomeIcon
-                                className="notification_icon"
-                                icon={faBell}
-                                onClick={() => setOpen(!open)
+                            {/*
+                        <FontAwesomeIcon
+                            className="notification_icon"
+                            icon={faBell}
+                            onClick={() => setOpen(!open)}
+                        />
+                        */}
 
-                                }
+                            {/*
+{open && (
+    <div className="notification-dropdown">
+        <h5 onClick={() => {
+            handleNavigation("/status-entrevista");
+            setOpen(!open)
+        }}>
+            Entrevista
+        </h5>
+        <h5>New message received</h5>
+        <h5>Profile updated</h5>
+    </div>
+)}
+*/}
 
-                            />
-
-                            {open && (
-                                <div className="notification-dropdown">
-                                    <h5 onClick={() => {
-
-                                        handleNavigation("/status-entrevista");
-                                        setOpen(!open)
-
-
-
-                                    }
-
-                                    }>Entrevista</h5>
-                                    <h5>New message received</h5>
-                                    <h5>Profile updated</h5>
-                                </div>
-                            )}                            <button className='btn btn-secondary' onClick={toggleTheme}>
+                            <button className='btn btn-secondary' onClick={toggleTheme}>
                                 {theme === "dark" ? "Modo claro" : "Modo oscuro"}
                             </button>
 
@@ -136,7 +135,7 @@ export default function App() {
                             </Link>
                         </div>
                     </div>
-                   <Outlet context={{ isEditing, setIsEditing }} />
+                    <Outlet context={{ isEditing, setIsEditing }} />
 
                 </div>
             </div>
