@@ -1,81 +1,131 @@
-# WebApp boilerplate with React JS and Flask API
+# 🚀 Job Strategy Booster
 
-Build web applications using React.js for the front end and python/flask for your backend API.
+> Organiza, gestiona y optimiza tu proceso de búsqueda laboral desde un solo lugar.
 
-- Documentation can be found here: https://4geeks.com/docs/start/react-flask-template
-- Here is a video on [how to use this template](https://www.loom.com/share/f37c6838b3f1496c95111e515e83dd9b)
-- Integrated with Pipenv for package managing.
-- Fast deployment to Render [in just a few steps here](https://4geeks.com/docs/start/deploy-to-render-com).
-- Use of .env file.
-- SQLAlchemy integration for database abstraction.
+---
 
-### 1) Installation:
+## 🧩 Sobre el proyecto
 
-> If you use Github Codespaces (recommended) or Gitpod this template will already come with Python, Node and the Posgres Database installed. If you are working locally make sure to install Python 3.10, Node 
+Durante el proceso de búsqueda de empleo, la organización se vuelve un factor clave.  
+Con esto en mente, desarrollamos **Job Strategy Booster**, una aplicación diseñada para ayudar a los usuarios a **centralizar y gestionar todas sus postulaciones laborales** de forma clara y eficiente.
 
-It is recomended to install the backend first, make sure you have Python 3.10, Pipenv and a database engine (Posgress recomended)
+El objetivo principal del proyecto es permitir al usuario llevar un **control ordenado de sus postulaciones**, pero también acompañarlo durante todo el proceso de búsqueda con herramientas inteligentes que mejoren su preparación y toma de decisiones.
 
-1. Install the python packages: `$ pipenv install`
-2. Create a .env file based on the .env.example: `$ cp .env.example .env`
-3. Install your database engine and create your database, depending on your database you have to create a DATABASE_URL variable with one of the possible values, make sure you replace the valudes with your database information:
+---
 
-| Engine    | DATABASE_URL                                        |
-| --------- | --------------------------------------------------- |
-| SQLite    | sqlite:////test.db                                  |
-| MySQL     | mysql://username:password@localhost:port/example    |
-| Postgress | postgres://username:password@localhost:5432/example |
+## ✨ Funcionalidades principales
 
-4. Migrate the migrations: `$ pipenv run migrate` (skip if you have not made changes to the models on the `./src/api/models.py`)
-5. Run the migrations: `$ pipenv run upgrade`
-6. Run the application: `$ pipenv run start`
+### 📄 Gestión de CV
+Permite al usuario:
+- Almacenar la información de sus currículums en una base de datos  
+- Generar currículums en **formato PDF** de manera dinámica  
 
-> Note: Codespaces users can connect to psql by typing: `psql -h localhost -U gitpod example`
+---
 
-### Undo a migration
+### 📊 Seguimiento de postulaciones
+Facilita el registro y control de todas las postulaciones realizadas, permitiendo acceder rápidamente a información clave como:
 
-You are also able to undo a migration by running
+- 📝 Descripción del puesto  
+- 🔗 URL de la postulación  
+- 📋 Requisitos necesarios  
+- 🏠 Modalidad de empleo  
+- 📄 Tipo de contrato  
+- 👥 Número de candidatos  
+- 📌 Plazas disponibles  
+- 💰 Salario  
 
-```sh
-$ pipenv run downgrade
+---
+
+### 🤖 Simulador de entrevistas
+El desempeño en una entrevista suele ser decisivo.  
+Por este motivo, la aplicación integra un **simulador de entrevistas con inteligencia artificial** que ayuda al usuario a practicar y mejorar sus respuestas.
+
+El simulador permite:
+- Generar sesiones adaptadas al perfil del usuario  
+- Ajustar preguntas según el tipo de puesto  
+- Brindar retroalimentación automática  
+- Proponer variaciones de preguntas para mejorar la preparación  
+
+---
+
+### 🧠 Inteligencia Artificial utilizada
+El simulador está impulsado por un **modelo de OpenAI**, integrado en el backend, que permite:
+
+- Generar preguntas de entrevista dinámicas  
+- Adaptar preguntas según rol o sector  
+- Simular entrevistas  
+- Proveer sugerencias de mejora  
+
+---
+
+## 🔐 Autenticación con JWT
+La aplicación implementa autenticación mediante **JSON Web Tokens (JWT)** para proteger los endpoints del backend y garantizar el acceso seguro a la información del usuario.
+
+### Características
+- Login seguro  
+- Generación de token JWT al autenticarse  
+- Protección de rutas privadas  
+- Validación del token en cada solicitud  
+
+### Flujo de autenticación
+1. El usuario inicia sesión con sus credenciales  
+2. El backend valida los datos  
+3. Se genera un JWT  
+4. El token se envía al frontend  
+5. El frontend envía el token en los headers:
+
+## 🌐 Integración con Google Translate API
+
+El proyecto incluye integración con Google Cloud Translate API, permitiendo la traducción automática de:
+
+- CV
+- Descripciones de puestos
+- Respuestas de entrevistas
+- Textos ingresados por el usuario
+
+## 🛠 Tecnologías utilizadas
+
+### Frontend
+
+- ⚛️ React
+- 🧭 React Router
+
+### Backend
+
+- 🐍 Python
+- 🌶 Flask
+  
+### Base de datos
+
+- 🗄 SQLAlchemy (ORM)
+
+## ⚙️ Instalación y ejecución
+
+### Backend
+
+Si estás levantando el proyecto desde GitHub Codespaces, instala primero las dependencias:
+
+```bash
+$ pipenv install
 ```
 
-### Backend Populate Table Users
-
-To insert test users in the database execute the following command:
-
-```sh
-$ flask insert-test-users 5
+Luego inicia el servidor backend:
+```bash
+$ pipenv run start
 ```
 
-And you will see the following message:
+### Frontend
 
-```
-  Creating test users
-  test_user1@test.com created.
-  test_user2@test.com created.
-  test_user3@test.com created.
-  test_user4@test.com created.
-  test_user5@test.com created.
-  Users created successfully!
+Con el backend en ejecución, instala las dependencias del frontend:
+```bash
+npm install
 ```
 
-### **Important note for the database and the data inside it**
+Inicia el servidor de desarrollo:
+```bash
+npm run dev
+```
 
-Every Github codespace environment will have **its own database**, so if you're working with more people eveyone will have a different database and different records inside it. This data **will be lost**, so don't spend too much time manually creating records for testing, instead, you can automate adding records to your database by editing ```commands.py``` file inside ```/src/api``` folder. Edit line 32 function ```insert_test_data``` to insert the data according to your model (use the function ```insert_test_users``` above as an example). Then, all you need to do is run ```pipenv run insert-test-data```.
+## 📌 Nota
 
-### Front-End Manual Installation:
-
--   Make sure you are using node version 20 and that you have already successfully installed and runned the backend.
-
-1. Install the packages: `$ npm install`
-2. Start coding! start the webpack dev server `$ npm run start`
-
-## Publish your website!
-
-This boilerplate it's 100% read to deploy with Render.com and Heroku in a matter of minutes. Please read the [official documentation about it](https://4geeks.com/docs/start/deploy-to-render-com).
-
-### Contributors
-
-This template was built as part of the 4Geeks Academy [Coding Bootcamp](https://4geeksacademy.com/us/coding-bootcamp) by [Alejandro Sanchez](https://twitter.com/alesanchezr) and many other contributors. Find out more about our [Full Stack Developer Course](https://4geeksacademy.com/us/coding-bootcamps/part-time-full-stack-developer), and [Data Science Bootcamp](https://4geeksacademy.com/us/coding-bootcamps/datascience-machine-learning).
-
-You can find other templates and resources like this at the [school github page](https://github.com/4geeksacademy/).
+Si utilizas GitHub Codespaces, asegúrate de configurar los puertos del backend y frontend como públicos para poder acceder a la aplicación desde el navegador.
