@@ -33,10 +33,10 @@ function Registration() {
             <div className="log_in_page">
                 <div className="registration_form">
                     <div className="header">
-                        <div className="logo"></div>
+                        <div className="logo">  <img width="130" src="/img/JSB.png" alt="JSB logo" /></div>
                         <section className="details">
-                            <h1>Trackeando</h1>
-                            <p>Manten al dia tus candidaturas</p>
+                            <h1 style={{ textAlign: "center" }}>Job Strategy </h1>
+                            <h1 style={{ textAlign: "center" }}> Booster</h1>
                         </section>
                     </div>
 

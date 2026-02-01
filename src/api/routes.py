@@ -34,14 +34,11 @@ import random
 CORS(api)
 bcrypt = Bcrypt()
 
-bcrypt = Bcrypt()
 
 load_dotenv()
 api_key = ("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")
 bcrypt = Bcrypt()
-load_dotenv()
-api_key = ("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")
-bcrypt = Bcrypt()
+
 
 
 openai.api_key = api_key

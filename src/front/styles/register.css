@@ -39,11 +39,14 @@
   margin-bottom: 10px;
 
   .logo {
-    width: 80px;
+    width: 120px;
     height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-items: center;
+    justify-content: center;
     border-radius: 10px;
     margin-right: 20px;
-    background-color: var(--main-color);
   }
   .details {
     text-align: start;
