@@ -296,8 +296,6 @@ def delete_cv(cv_id):
         db.session.rollback()
         return jsonify({"success": False, "message": str(e)}), 500
 
-    from flask import Response, jsonify
-
 
 @api.route("/cv/<int:cv_id>/pdf", methods=["GET"])
 @jwt_required()
