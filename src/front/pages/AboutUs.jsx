@@ -1,17 +1,33 @@
 import '../styles/AboutUs.css';
 
-import trackerImage from '../components/assets/images/tracker-team.jpg';
+import trackerImage from '../components/assets/images/Team.png';
 import chico1 from '../components/assets/images/chico1.jpg';
 import chico2 from '../components/assets/images/chico2.jpg';
 import chica from '../components/assets/images/chica.jpg';
+import imgTsvetan from "../components/assets/images/tkgO.jpg"
+import imgYova from "../components/assets/images/Yova1.png"
+import imgSebas from "../components/assets/images/sebas.jpg"
 
 import {
   CodeBracketIcon,
   UserCircleIcon,
   ClipboardDocumentListIcon
 } from "@heroicons/react/24/outline";
+import ProfileCard from './ProfileCard.jsx';
 
 export default function AboutUs() {
+  const nameTsvetan = "Tsvetan Kirilov Georgiev"
+  const descripcionCeci = "He empezado mi camino como Full Stack Developer porque me apasiona la tecnología y crear soluciones completas, desde el frontend hasta el backend. Actualmente me formo en 4Geeks Academy, reforzando mis habilidades para crecer profesionalmente en desarrollo web."
+  const handleCeci = "tsvetan"
+
+  const nameYova = "Yovanna Alvarez"
+  const handleYova = "yovanna"
+  const descripcionYova = "Diseñar el tracker de empleo fue una oportunidad para crear con empatía, claridad y propósito. Cada decisión busca acompañar al usuario en su camino, con una interfaz que inspira confianza y acción."
+
+  const nameSebas = "Juan Sebastian Torres Arias"
+  const handleSebas = "sebas"
+
+
   return (
     <div className="about-container">
       <section className="intro-section">
@@ -28,44 +44,58 @@ export default function AboutUs() {
       </section>
 
       <section className="team-section">
-        <h2>Nuestro Equipo</h2>
+        <h2 style={{ textAlign: "center" }}>Nuestro Equipo</h2>
         <p> Somos tres developers que nos unimos para crear este proyecto con una misma visión: usar la tecnología para resolver problemas reales. </p>
 
         <div className="team-photos flex justify-center gap-12 mb-6">
 
-          {/* SOFTWARE */}
-          <div className="flex flex-col items-center gap-2">
-            <img src={chico1} className="profile-pic" />
-            <CodeBracketIcon className="w-5 h-5 text-indigo-600" />
-            <p className="text-sm font-medium text-gray-900 text-center">
-              Desarrollo de Software
-            </p>
-          </div>
+          <ProfileCard
+            avatarUrl={imgTsvetan}
+            name={nameTsvetan}
+            showIcon={false}
+            description={descripcionCeci}
+            handle={handleCeci}
+            showUserInfo
+            behindGlowEnabled={false}
+            behindGlowColor="hsla(228, 87%, 29%, 0.60)"
+            customInnerGradient="linear-gradient(145deg,hsla(298, 40%, 45%, 0.55) 0%,hsla(169, 60%, 70%, 0.27) 100%)"
+          />
 
-          {/* UX */}
-          <div className="flex flex-col items-center gap-2">
-            <img src={chico2} className="profile-pic" />
-            <UserCircleIcon className="w-5 h-5 text-purple-600" />
-            <p className="text-sm font-medium text-gray-900 text-center">
-              Experiencia de Usuario
-            </p>
-          </div>
+          <ProfileCard
+            avatarUrl={imgYova}
+            name={nameYova}
+            description={descripcionYova}
+            handle={handleYova}
+            showIcon={false}
+            showUserInfo
+            behindGlowEnabled={false}
 
-          {/* PRODUCTIVIDAD */}
-          <div className="flex flex-col items-center gap-2">
-            <img src={chica} className="profile-pic" />
-            <ClipboardDocumentListIcon className="w-5 h-5 text-pink-600" />
-            <p className="text-sm font-medium text-gray-900 text-center">
-              Productividad y Organización
-            </p>
-          </div>
+            behindGlowColor="hsla(298, 71%, 92%, 0.60)"
+            customInnerGradient="linear-gradient(145deg,hsla(298, 40%, 45%, 0.55) 0%,hsla(169, 60%, 70%, 0.27) 100%)"
+          />
+
+          <ProfileCard
+
+            avatarUrl={imgSebas}
+            name={nameSebas}
+            showIcon={false}
+            handle={handleSebas}
+
+            showUserInfo
+            behindGlowColor="hsla(298, 100%, 70%, 0.6)"
+            customInnerGradient="linear-gradient(145deg,hsla(298, 40%, 45%, 0.55) 0%,hsla(169, 60%, 70%, 0.27) 100%)"
+          />
 
         </div>
+
+
 
         <p className="closing-text">
           Trabajamos juntos para crear una herramienta que te acompañe en tu búsqueda laboral.
         </p>
       </section>
+
+
     </div>
   );
 }
