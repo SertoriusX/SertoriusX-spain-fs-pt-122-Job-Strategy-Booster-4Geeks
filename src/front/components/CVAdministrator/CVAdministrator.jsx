@@ -1,14 +1,13 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { UserContext } from "../../hooks/UserContextProvier.jsx";
+import { useOutletContext } from "react-router-dom";
 import CVPreview from "./CVPreview.jsx";
 import CVEditor from "./CVEditor.jsx";
-import { createEmptyCV } from "./utils/cvHelpers.js";
-import "../../styles/CVAdministrator.css";
 import ModalAgregarCV from "./ModalAgregarCV.jsx";
-import { Pencil, Trash2 } from "lucide-react";
-import { useOutletContext } from "react-router-dom";
-import { useRef } from "react";
 import ShareDropdown from "./ShareDropdown";
+import { createEmptyCV } from "./utils/cvHelpers.js";
+import { Pencil, Trash2 } from "lucide-react";
+import "../../styles/CVAdministrator.css";
 
 const CVAdministrator = () => {
     const { token } = useContext(UserContext);
@@ -36,8 +35,9 @@ const CVAdministrator = () => {
         setIsLoading(true);
         try {
             const res = await fetch(`${backendUrl}/cv`, {
-                headers: { Authorization: `Bearer ${token}` },
+                headers: { Authorization: `Bearer ${token}` }
             });
+
             const data = await res.json();
 
             if (data.success && Array.isArray(data.cvs)) {
@@ -67,7 +67,6 @@ const CVAdministrator = () => {
         return [];
     };
 
-
     useEffect(() => {
         if (token) loadCVList();
     }, [token]);
@@ -80,7 +79,6 @@ const CVAdministrator = () => {
             setIsEditing(false);
         }
     };
-
 
     const updateCurrentCV = (field, value) => {
         const updated = { ...formData, [field]: value };
@@ -106,9 +104,9 @@ const CVAdministrator = () => {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`
             },
-            body: JSON.stringify(nuevoCV),
+            body: JSON.stringify(nuevoCV)
         });
 
         const data = await res.json();
@@ -130,6 +128,7 @@ const CVAdministrator = () => {
 
     const handleSave = async (cvData) => {
         setSaving(true);
+
         if (!selectedCVId) {
             return handleSaveAs(cvData);
         }
@@ -138,9 +137,9 @@ const CVAdministrator = () => {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`
             },
-            body: JSON.stringify(cvData),
+            body: JSON.stringify(cvData)
         });
 
         const data = await res.json();
@@ -152,7 +151,9 @@ const CVAdministrator = () => {
             };
 
             setCvList((prev) =>
-                prev.map((cv) => (cv.id === actualizado.id ? actualizado : cv))
+                prev.map((cv) =>
+                    cv.id === actualizado.id ? actualizado : cv
+                )
             );
 
             setFormData(actualizado.datos);
@@ -195,12 +196,10 @@ const CVAdministrator = () => {
                 setSelectedCVId(null);
                 setFormData(null);
             }
-
         } catch (err) {
             console.error("Error al eliminar CV:", err);
         }
     };
-
 
     const handleView = (id) => {
         selectCV(id);
@@ -234,18 +233,20 @@ const CVAdministrator = () => {
         setIsEditing(false);
         setIsOpen(true);
 
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         window.print();
 
         setTimeout(() => setIsOpen(false), 1000);
     };
 
-    console.log("CV LIST ACTUALIZADA:", cvList);
     return (
         <div className="cv-admin-container">
             {showAgregarModal && (
-                <ModalAgregarCV cvList={cvList} onClose={() => setShowAgregarModal(false)} />
+                <ModalAgregarCV
+                    cvList={cvList}
+                    onClose={() => setShowAgregarModal(false)}
+                />
             )}
 
             <div className="cv-topbar">
@@ -310,7 +311,10 @@ const CVAdministrator = () => {
                         onSaveAs={handleSaveAs}
                     />
                 ) : formData ? (
-                    <div className="cv-pdf-container" style={{ display: isOpen ? "block" : "none" }}>
+                    <div
+                        className="cv-pdf-container"
+                        style={{ display: isOpen ? "block" : "none" }}
+                    >
                         <CVPreview formData={formData} />
                     </div>
                 ) : (

@@ -1,4 +1,6 @@
 :root {
+  --card-color: #ffffff;
+  --font-color: #0f172a;
   --blue: #1e3a8a;
   --blue-hover: #3749b3;
   --gray-light: #f1f5f9;
@@ -7,6 +9,7 @@
   --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.08);
   --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.12);
   --shadow-lg: 0 8px 20px rgba(0, 0, 0, 0.2);
+
   .cv-admin-container {
     min-height: 100vh;
     background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
@@ -1213,6 +1216,11 @@
   border-color: #cbd5e1;
 }
 
+[data-theme="dark"] {
+  --card-color: #1e1e1e;
+  --font-color: #f1f5f9;
+}
+
 [data-theme="dark"] .cv-admin-container,
 [data-theme="dark"] .cv-admin-header,
 [data-theme="dark"] .cv-main,
@@ -1237,6 +1245,7 @@
 [data-theme="dark"] .share-item,
 [data-theme="dark"] .cv-editor-title,
 [data-theme="dark"] .cv-input,
+[data-theme="dark"] .cv-title-input,
 [data-theme="dark"] .cv-textarea,
 [data-theme="dark"] .cv-profile-preview-circle,
 [data-theme="dark"] .cv-add-btn,
@@ -1247,6 +1256,19 @@
   background-color: var(--card-color);
   color: var(--font-color);
   border-color: #2a2d34;
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+  background-color: var(--card-color);
+  color: var(--font-color);
+  border-color: #3a3d45;
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: #94a3b8;
 }
 
 [data-theme="dark"] .cv-table tbody tr:hover {
@@ -1266,7 +1288,6 @@
   color: var(--font-color);
 }
 
-/* 🌙 MODO OSCURO — Iconos SVG */
 [data-theme="dark"] .cv-actions-row button svg,
 [data-theme="dark"] .btn-cv-action svg,
 [data-theme="dark"] .share-item svg,
@@ -1277,6 +1298,8 @@
 [data-theme="dark"] .btn-save-as svg,
 [data-theme="dark"] svg {
   color: var(--font-color) !important;
+  stroke: var(--font-color) !important;
+  fill: var(--font-color) !important;
 }
 
 [data-theme="dark"] .cv-actions-row button {
@@ -1285,12 +1308,66 @@
   color: var(--font-color) !important;
 }
 
-[data-theme="dark"] .cv-actions-row button svg {
-  color: var(--font-color) !important;
-  stroke: var(--font-color) !important;
-  fill: var(--font-color) !important;
-}
-
 [data-theme="dark"] .cv-actions-row button:hover {
   background-color: #3a3d45 !important;
+}
+/* ============================
+   MODO OSCURO — FIX DEFINITIVO
+   ============================ */
+
+[data-theme="dark"] {
+  --card-color: #1e1e1e;
+  --font-color: #f1f5f9;
+}
+
+/* TEXTOS GENERALES */
+[data-theme="dark"] * {
+  color: var(--font-color) !important;
+}
+
+/* INPUTS Y TEXTAREAS */
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select,
+[data-theme="dark"] .cv-input,
+[data-theme="dark"] .cv-title-input,
+[data-theme="dark"] .cv-textarea {
+  background-color: #1e1e1e !important;
+  color: #f1f5f9 !important;
+  border: 1px solid #3a3d45 !important;
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* BOTONES */
+[data-theme="dark"] button,
+[data-theme="dark"] .btn,
+[data-theme="dark"] .btn-primary,
+[data-theme="dark"] .btn-secondary,
+[data-theme="dark"] .btn-danger,
+[data-theme="dark"] .circle-btn,
+[data-theme="dark"] .btn-cv-action {
+  background-color: #2a2d34 !important;
+  color: #f1f5f9 !important;
+  border: 1px solid #3a3d45 !important;
+}
+
+[data-theme="dark"] button:hover,
+[data-theme="dark"] .btn:hover,
+[data-theme="dark"] .btn-primary:hover,
+[data-theme="dark"] .btn-secondary:hover,
+[data-theme="dark"] .btn-danger:hover,
+[data-theme="dark"] .circle-btn:hover,
+[data-theme="dark"] .btn-cv-action:hover {
+  background-color: #3a3d45 !important;
+}
+
+/* ICONOS — SIN DEFORMACIÓN */
+[data-theme="dark"] svg {
+  stroke: #f1f5f9 !important;
+  fill: none !important;
+  color: #f1f5f9 !important;
 }

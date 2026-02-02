@@ -1,3 +1,4 @@
+import random
 import re
 import traceback
 from werkzeug.utils import secure_filename
@@ -10,6 +11,7 @@ from dotenv import load_dotenv
 from flask_bcrypt import Bcrypt
 from api.models import db, User, CV
 from flask import Flask, request, jsonify, url_for, Blueprint, send_from_directory
+from flask import Response
 from api.models import db, User, Postulations, Profile, Stages, TodoList
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
@@ -22,15 +24,14 @@ from datetime import datetime, date
 import pytesseract
 from PIL import Image
 
+from io import BytesIO
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.utils import ImageReader
+from reportlab.lib.colors import HexColor
+
+
 api = Blueprint('api', __name__)
-from dotenv import load_dotenv
-import os
-import traceback
-import openai
-import requests
-from werkzeug.utils import secure_filename
-import re
-import random
 CORS(api)
 bcrypt = Bcrypt()
 
@@ -413,6 +414,7 @@ def normalize(text):
 def similarity(a, b):
     return SequenceMatcher(None, normalize(a), normalize(b)).ratio()
 
+
 def nivel_por_puntaje(avg_score):
     if avg_score >= 0.75:
         return "Senior"
@@ -429,7 +431,6 @@ def chat():
         user_id = get_jwt_identity()
         user_message = (request.json or {}).get("message", "").strip()
 
-
         if user_id not in sessions:
             sessions[user_id] = {
                 "state": "SALUDO_INICIAL",
@@ -444,14 +445,12 @@ def chat():
 
         session = sessions[user_id]
 
-
         if session["state"] == "SALUDO_INICIAL":
 
             session["state"] = "ESPERANDO_LISTO"
             return jsonify({
                 "response": "¿Estás listo para una simulación de entrevista? (sí / no)"
             })
-
 
         if session["state"] == "ESPERANDO_LISTO":
             if user_message.lower() in ["sí", "si", "s"]:
@@ -470,7 +469,6 @@ def chat():
                 return jsonify({"response": "Cuando estés listo, dime 'sí' para comenzar."})
             else:
                 return jsonify({"response": "Por favor responde con 'sí' o 'no'."})
-
 
         if session["state"] == "ESPERANDO_ROL":
             roles = {
@@ -498,7 +496,6 @@ def chat():
             return jsonify({
                 "response": f"Pregunta 1:\n{session['question_order'][0]}"
             })
-
 
         if session["state"] == "ENTREVISTA":
             role = session["role"]
@@ -563,7 +560,6 @@ def chat():
                     "2) Salir y ver recursos"
                 )
             })
-
 
         if session["state"] == "PREGUNTAR_SIGUIENTE":
             if user_message == "1":
@@ -634,7 +630,6 @@ def chat():
                     )
                 })
 
-
         session["state"] = "ESPERANDO_LISTO"
         return jsonify({
             "response": "¿Quieres iniciar una entrevista? (sí / no)"
@@ -649,15 +644,16 @@ def chat():
 
 
 def clean_company_name(line: str, max_length=50) -> str:
-    line = re.sub(r"http\S+", "", line)  
-    line = re.sub(r"\d+", "", line)      
-    line = re.sub(r"[^\w\s.,-]", "", line)  
+    line = re.sub(r"http\S+", "", line)
+    line = re.sub(r"\d+", "", line)
+    line = re.sub(r"[^\w\s.,-]", "", line)
     line = line.strip()
     words = line.split()
     filtered_words = [w for w in words if len(w) > 2]
     cleaned_line = " ".join(filtered_words)
 
     return cleaned_line[:max_length]
+
 
 def extract_postulation_fields(text: str, platform_hint="Unknown") -> dict:
     clean_text = text.replace("€", " €").replace("$", " $")
@@ -696,7 +692,7 @@ def extract_postulation_fields(text: str, platform_hint="Unknown") -> dict:
             "linkedin": "LinkedIn",
             "indeed": "Indeed",
             "sefcarm": "Sefcarm",
-            "infojobs": "InfoJobs",   
+            "infojobs": "InfoJobs",
 
             "unknown": "Unknown"
         }
@@ -705,9 +701,9 @@ def extract_postulation_fields(text: str, platform_hint="Unknown") -> dict:
     platform_lower = data["platform"].lower()
     if platform_lower == "indeed":
         if lines:
-           
+
             role_lines = [lines[0].strip()]
-            
+
             if len(lines) > 1 and not re.search(r"\d|http", lines[1]):
                 role_lines.append(lines[1].strip())
                 if len(lines) > 2:
@@ -719,11 +715,12 @@ def extract_postulation_fields(text: str, platform_hint="Unknown") -> dict:
                     data["company_name"] = clean_company_name(lines[1])
                 else:
                     data["company_name"] = "Unknown"
-            
+
             data["role"] = " ".join(role_lines)
 
     elif platform_lower == "linkedin":
-        cleaned_lines = [l for l in lines if len(l) > 3 and re.search(r"[a-zA-Z0-9]", l)]
+        cleaned_lines = [l for l in lines if len(
+            l) > 3 and re.search(r"[a-zA-Z0-9]", l)]
 
         found = False
         for line in cleaned_lines:
@@ -746,10 +743,11 @@ def extract_postulation_fields(text: str, platform_hint="Unknown") -> dict:
         if len(lines) > 1:
             data["company_name"] = clean_company_name(lines[1])
     elif platform_lower == "sefcarm":
-        offer_number_match = re.search(r"oferta[:\s]*([A-Za-z0-9-]+)", full_text, flags=re.IGNORECASE)
+        offer_number_match = re.search(
+            r"oferta[:\s]*([A-Za-z0-9-]+)", full_text, flags=re.IGNORECASE)
         if offer_number_match:
             offer_number = offer_number_match.group(1)
-            data["offer_number"] = offer_number 
+            data["offer_number"] = offer_number
 
             data["company_name"] = offer_number
 
@@ -758,7 +756,7 @@ def extract_postulation_fields(text: str, platform_hint="Unknown") -> dict:
                 if offer_number.lower() in line.lower():
                     offer_line_index = i
                     break
-            
+
             role_line = None
             if offer_line_index is not None:
                 for j in range(offer_line_index + 1, len(lines)):
@@ -766,7 +764,7 @@ def extract_postulation_fields(text: str, platform_hint="Unknown") -> dict:
                     if not re.search(r"fecha|inicio|finalización|municipio|\d{2}/\d{2}/\d{4}", next_line, re.IGNORECASE) and len(next_line) > 3:
                         role_line = next_line
                         break
-            
+
             if role_line:
                 data["role"] = role_line
             else:
@@ -857,7 +855,7 @@ def ocr_postulation():
     except Exception as e:
         return jsonify({"error": f"OCR or file handling failed: {str(e)}"}), 500
 
-    print("OCR Text:", repr(text))  
+    print("OCR Text:", repr(text))
 
     data = extract_postulation_fields(text, platform_hint=platform_hint)
 
@@ -1088,7 +1086,6 @@ def delete_cv(cv_id):
         return jsonify({"success": False, "message": str(e)}), 500
 
 
-
 @api.route("/cv/<int:cv_id>/pdf", methods=["GET"])
 @jwt_required()
 def generate_cv_pdf(cv_id):
@@ -1144,8 +1141,10 @@ def generate_cv_pdf(cv_id):
                * 2, height - 120, stroke=1, fill=0)
 
         foto_base64 = datos.get("foto", "")
-        text_x = x_margin
-        text_y = y
+
+        header_x = x_margin
+        header_y = height - 100
+        foto_size = 110
 
         if foto_base64:
             try:
@@ -1153,52 +1152,50 @@ def generate_cv_pdf(cv_id):
                     foto_base64 = foto_base64.split(",")[1]
                 foto_bytes = base64.b64decode(foto_base64)
                 foto_image = ImageReader(BytesIO(foto_bytes))
-                foto_width = 110
-                foto_height = 110
-                foto_x = x_margin
-                foto_y = y
-                p.drawImage(foto_image, foto_x, foto_y - foto_height, foto_width,
-                            foto_height, preserveAspectRatio=True, mask='auto')
-                text_x = foto_x + foto_width + 25
-                text_y = foto_y
+                p.drawImage(
+                    foto_image,
+                    header_x,
+                    header_y - foto_size,
+                    foto_size,
+                    foto_size,
+                    preserveAspectRatio=True,
+                    mask="auto",
+                )
             except:
-                text_x = x_margin
-                text_y = y
+                pass
+
+        text_x = header_x + foto_size + 30
+        text_y = header_y
 
         nombre = datos.get("nombre", "")[:60]
         font_size = 22
-        max_nombre_width = width - text_x - x_margin
-        while p.stringWidth(nombre, "Helvetica-Bold", font_size) > max_nombre_width and font_size > 12:
+        max_width = width - text_x - x_margin
+
+        while p.stringWidth(nombre, "Helvetica-Bold", font_size) > max_width and font_size > 12:
             font_size -= 1
 
         p.setFont("Helvetica-Bold", font_size)
         p.setFillColor(title_color)
         p.drawString(text_x, text_y, nombre)
-        text_y -= font_size + 4
+        text_y -= font_size + 10
 
         p.setFont("Helvetica", 11)
         p.setFillColor(muted_color)
 
-        if datos.get("email"):
-            p.drawString(text_x, text_y, f"Email: {datos['email']}")
-            text_y -= 16
-        if datos.get("telefono"):
-            p.drawString(text_x, text_y, f"Teléfono: {datos['telefono']}")
-            text_y -= 16
-        if datos.get("direccion"):
-            p.drawString(text_x, text_y, f"Dirección: {datos['direccion']}")
-            text_y -= 16
-        if datos.get("ubicacion"):
-            p.drawString(text_x, text_y, f"Ubicación: {datos['ubicacion']}")
-            text_y -= 16
-        if datos.get("linkedin"):
-            p.drawString(text_x, text_y, f"LinkedIn: {datos['linkedin']}")
-            text_y -= 16
-        if datos.get("github"):
-            p.drawString(text_x, text_y, f"GitHub: {datos['github']}")
-            text_y -= 16
+        def draw_contact(label, value):
+            nonlocal text_y
+            if value:
+                p.drawString(text_x, text_y, f"{label}: {value}")
+                text_y -= 16
 
-        y = min(y - 130, text_y - 40)
+        draw_contact("Email", datos.get("email"))
+        draw_contact("Teléfono", datos.get("telefono"))
+        draw_contact("Dirección", datos.get("direccion"))
+        draw_contact("Ubicación", datos.get("ubicacion"))
+        draw_contact("LinkedIn", datos.get("linkedin"))
+        draw_contact("GitHub", datos.get("github"))
+
+        y = text_y - 40
 
         p.setStrokeColor(border_color)
         p.setLineWidth(0.5)
@@ -1296,7 +1293,11 @@ def generate_cv_pdf(cv_id):
         buffer.seek(0)
         pdf_content = buffer.getvalue()
 
-        return Response(pdf_content, mimetype="application/pdf", headers={"Content-Disposition": f"inline; filename=cv-{cv_id}.pdf"})
+        return Response(
+            pdf_content,
+            mimetype="application/pdf",
+            headers={"Content-Disposition": f"inline; filename=cv-{cv_id}.pdf"},
+        )
 
     except Exception as e:
         print(f"ERROR: {e}")
@@ -1465,20 +1466,17 @@ def status_count():
 
 @api.route("/status", methods=["GET"])
 def status_entrevista_get():
-    entrevista = Stages.query.filter_by( stage_name="hr_interview").count()
+    entrevista = Stages.query.filter_by(stage_name="hr_interview").count()
     offer = Stages.query.filter_by(stage_name="offer").count()
-    process_closure = Stages.query.filter_by( stage_name="process_closure").count()
-    aceptada = Postulations.query.filter_by( postulation_state="aceptada").count()
+    process_closure = Stages.query.filter_by(
+        stage_name="process_closure").count()
+    aceptada = Postulations.query.filter_by(
+        postulation_state="aceptada").count()
     return jsonify({"entrevista": entrevista,
-                    "offer":offer,
+                    "offer": offer,
                     "descartado": process_closure,
                     "aceptada": aceptada
                     })
-
-
-
-
-
 
 
 @api.route("/profile", methods=["GET"])
