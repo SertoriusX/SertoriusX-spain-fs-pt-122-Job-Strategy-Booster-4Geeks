@@ -8,7 +8,6 @@
   --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.12);
   --shadow-lg: 0 8px 20px rgba(0, 0, 0, 0.2);
   .cv-admin-container {
-    margin-bottom: 2800px;
     min-height: 100vh;
     background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
     padding: 2.5rem 1.5rem;
