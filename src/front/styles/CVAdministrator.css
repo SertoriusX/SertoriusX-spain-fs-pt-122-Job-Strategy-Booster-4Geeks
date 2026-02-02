@@ -1213,3 +1213,85 @@
   color: #334155;
   border-color: #cbd5e1;
 }
+
+[data-theme="dark"] .cv-admin-container,
+[data-theme="dark"] .cv-admin-header,
+[data-theme="dark"] .cv-main,
+[data-theme="dark"] .cv-editor-container,
+[data-theme="dark"] .cv-section-block,
+[data-theme="dark"] .cv-preview-content,
+[data-theme="dark"] .card,
+[data-theme="dark"] .cv-item,
+[data-theme="dark"] .cv-table,
+[data-theme="dark"] .cv-table th,
+[data-theme="dark"] .cv-table td,
+[data-theme="dark"] .cv-editor-footer,
+[data-theme="dark"] .cv-form-group label,
+[data-theme="dark"] .cv-form-title,
+[data-theme="dark"] .cv-section-title,
+[data-theme="dark"] .cv-subtitle,
+[data-theme="dark"] .cv-preview-title,
+[data-theme="dark"] .cv-summary-title,
+[data-theme="dark"] .cv-summary-text,
+[data-theme="dark"] .cv-name,
+[data-theme="dark"] .modal-date,
+[data-theme="dark"] .share-item,
+[data-theme="dark"] .cv-editor-title,
+[data-theme="dark"] .cv-input,
+[data-theme="dark"] .cv-textarea,
+[data-theme="dark"] .cv-profile-preview-circle,
+[data-theme="dark"] .cv-add-btn,
+[data-theme="dark"] .cv-item-remove,
+[data-theme="dark"] .cv-tag-remove,
+[data-theme="dark"] .btn-save,
+[data-theme="dark"] .btn-save-as {
+  background-color: var(--card-color);
+  color: var(--font-color);
+  border-color: #2a2d34;
+}
+
+[data-theme="dark"] .cv-table tbody tr:hover {
+  background-color: #2a2d34;
+  color: var(--font-color);
+}
+
+[data-theme="dark"] .cv-actions-row button:hover,
+[data-theme="dark"] .btn-cv-action:hover,
+[data-theme="dark"] .share-item:hover,
+[data-theme="dark"] .cv-add-btn:hover,
+[data-theme="dark"] .cv-item-remove:hover,
+[data-theme="dark"] .cv-tag-remove:hover,
+[data-theme="dark"] .btn-save:hover,
+[data-theme="dark"] .btn-save-as:hover {
+  background-color: #3a3d45;
+  color: var(--font-color);
+}
+
+/* 🌙 MODO OSCURO — Iconos SVG */
+[data-theme="dark"] .cv-actions-row button svg,
+[data-theme="dark"] .btn-cv-action svg,
+[data-theme="dark"] .share-item svg,
+[data-theme="dark"] .cv-add-btn svg,
+[data-theme="dark"] .cv-item-remove svg,
+[data-theme="dark"] .cv-tag-remove svg,
+[data-theme="dark"] .btn-save svg,
+[data-theme="dark"] .btn-save-as svg,
+[data-theme="dark"] svg {
+  color: var(--font-color) !important;
+}
+
+[data-theme="dark"] .cv-actions-row button {
+  background-color: #2a2d34 !important;
+  border-color: #3a3d45 !important;
+  color: var(--font-color) !important;
+}
+
+[data-theme="dark"] .cv-actions-row button svg {
+  color: var(--font-color) !important;
+  stroke: var(--font-color) !important;
+  fill: var(--font-color) !important;
+}
+
+[data-theme="dark"] .cv-actions-row button:hover {
+  background-color: #3a3d45 !important;
+}

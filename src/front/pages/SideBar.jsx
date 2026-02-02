@@ -10,7 +10,8 @@ import {
     faGear,
     faCircleQuestion,
     faFileLines,
-    faInfoCircle
+    faInfoCircle,
+    faRightFromBracket
 } from "@fortawesome/free-solid-svg-icons";
 
 import { UserContext } from "../hooks/UserContextProvier.jsx";
@@ -49,7 +50,7 @@ function Sidebar() {
         <div className="side_bar">
             <div className="header">
                 <div onClick={() => handleNavigation('/')}>
-                    <img width={"220px"} src="/public/img/sycjob_transparent.png" alt="" />
+                    <img width="1000" src="/img/JSB.png" alt="JSB logo" />
                 </div>
                 <br />
             </div>
@@ -98,20 +99,13 @@ function Sidebar() {
                         onClick={() => handleNavigation("/about")}
                     />
                     <NavBarButton
-                        icon={faGear}
-                        label={"Ajustes"}
-                        to="/settings"
-                        onClick={() => handleNavigation("/settings")}
+                        icon={faRightFromBracket}
+                        label="Logout"
+                        to="#"
+                        onClick={handleLogout}
                     />
-                    <NavBarButton
-                        icon={faCircleQuestion}
-                        label={"Ayuda"}
-                        to="/help"
-                        onClick={() => handleNavigation("/help")}
-                    />
-                    <button className="btn btn-secondary mt-2" onClick={handleLogout}>
-                        Logout
-                    </button>
+
+
                 </div>
             </div>
         </div>

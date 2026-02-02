@@ -51,14 +51,22 @@ const CVAdministrator = () => {
                 if (normalizados.length > 0) {
                     setSelectedCVId(normalizados[0].id);
                     setFormData(normalizados[0].datos);
+                } else {
+                    setSelectedCVId(null);
+                    setFormData(null);
                 }
+
+                return normalizados;
             }
         } catch (err) {
             console.error("Error al cargar CVs:", err);
         } finally {
             setIsLoading(false);
         }
+
+        return [];
     };
+
 
     useEffect(() => {
         if (token) loadCVList();
@@ -72,6 +80,7 @@ const CVAdministrator = () => {
             setIsEditing(false);
         }
     };
+
 
     const updateCurrentCV = (field, value) => {
         const updated = { ...formData, [field]: value };
@@ -172,23 +181,21 @@ const CVAdministrator = () => {
                 }
             });
 
-            const data = await res.json();
-
-            if (!data.success) {
-                alert(data.message || "No se pudo eliminar el CV");
+            if (!res.ok) {
+                alert("No se pudo eliminar el CV");
                 return;
             }
 
-            const updatedList = cvList.filter((cv) => cv.id !== cvId);
-            setCvList(updatedList);
+            const actualizada = await loadCVList();
 
-            if (updatedList.length > 0) {
-                setSelectedCVId(updatedList[0].id);
-                setFormData(normalizeCV(updatedList[0].datos));
+            if (actualizada.length > 0) {
+                setSelectedCVId(actualizada[0].id);
+                setFormData(actualizada[0].datos);
             } else {
                 setSelectedCVId(null);
                 setFormData(null);
             }
+
         } catch (err) {
             console.error("Error al eliminar CV:", err);
         }
@@ -234,6 +241,7 @@ const CVAdministrator = () => {
         setTimeout(() => setIsOpen(false), 1000);
     };
 
+    console.log("CV LIST ACTUALIZADA:", cvList);
     return (
         <div className="cv-admin-container">
             {showAgregarModal && (

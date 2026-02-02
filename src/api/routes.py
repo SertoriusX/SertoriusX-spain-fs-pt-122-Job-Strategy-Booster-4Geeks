@@ -34,14 +34,11 @@ import random
 CORS(api)
 bcrypt = Bcrypt()
 
-bcrypt = Bcrypt()
 
 load_dotenv()
 api_key = ("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")
 bcrypt = Bcrypt()
-load_dotenv()
-api_key = ("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")
-bcrypt = Bcrypt()
+
 
 
 openai.api_key = api_key
@@ -162,141 +159,259 @@ RESOURCES = {
 }
 ANSWERS = {
     "frontend": {
-        "¿Qué es el Virtual DOM y por qué es importante?":
-            "El Virtual DOM es una representación ligera del DOM real que mejora el rendimiento " \
-            "de las actualizaciones en la interfaz de usuario.",
-        "¿Qué es CSS Flexbox y para qué sirve?":
-            "Flexbox es un modelo de diseño CSS que facilita la distribución y alineación de elementos " \
-            "en un contenedor, adaptándose a diferentes tamaños de pantalla.",
-        "¿Qué es un closure en JavaScript?":
-            "Un closure es una función que recuerda el entorno donde fue creada, permitiendo acceder " \
-            "a variables externas aun cuando la función se ejecute fuera de ese contexto.",
-        "¿Cuál es la diferencia entre 'var', 'let' y 'const' en JavaScript?":
-            "'var' tiene alcance global o de función, 'let' y 'const' tienen alcance de bloque; 'const' " \
-            "define variables inmutables.",
-        "¿Qué son las promesas en JavaScript y cómo funcionan?":
-            "Las promesas son objetos que representan la eventual finalización o fallo de una operación asíncrona.",
-        "¿Cómo manejas eventos en JavaScript?":
-            "Se usan listeners para capturar eventos y ejecutar funciones callback cuando ocurren.",
-        "¿Qué es el modelo de caja (box model) en CSS?":
-            "Es la forma en que CSS representa cada elemento como una caja compuesta por contenido, " \
-            "padding, border y margin.",
-        "¿Qué son las media queries y cómo se usan para responsive design?":
-            "Son reglas CSS que aplican estilos condicionales según las características del dispositivo, " \
-            "como ancho de pantalla.",
-        "¿Qué es la herencia en CSS y cómo funciona?":
-            "Es cuando ciertas propiedades CSS se transfieren de un elemento padre a sus hijos automáticamente."
+        "¿Qué es el Virtual DOM y por qué es importante?": [
+            "El Virtual DOM es una representación ligera del DOM real que mejora el rendimiento de las actualizaciones.",
+            "Es una copia virtual del DOM que permite comparar cambios antes de aplicarlos al DOM real.",
+            "Sirve para optimizar renderizados evitando manipulaciones directas costosas del DOM."
+        ],
+        "¿Qué es CSS Flexbox y para qué sirve?": [
+            "Flexbox es un modelo CSS para distribuir y alinear elementos fácilmente.",
+            "Permite crear layouts flexibles adaptados a distintos tamaños de pantalla.",
+            "Se usa para organizar elementos en filas o columnas de forma eficiente."
+        ],
+        "¿Qué es un closure en JavaScript?": [
+            "Un closure es una función que mantiene acceso a variables externas.",
+            "Es una función que recuerda su entorno léxico.",
+            "Permite usar datos de una función padre después de ejecutarse."
+        ],
+        "¿Cuál es la diferencia entre 'var', 'let' y 'const' en JavaScript?": [
+            "'var' tiene alcance de función; 'let' y 'const' de bloque.",
+            "'const' no permite reasignación, 'let' sí.",
+            "'var' se eleva (hoisting), 'let' y 'const' no igual."
+        ],
+        "¿Qué son las promesas en JavaScript y cómo funcionan?": [
+            "Representan resultados futuros de operaciones asíncronas.",
+            "Permiten manejar async con estados: pending, resolved, rejected.",
+            "Encapsulan operaciones que terminarán más tarde."
+        ],
+        "¿Cómo manejas eventos en JavaScript?": [
+            "Con addEventListener y callbacks.",
+            "Asignando handlers a eventos del DOM.",
+            "Usando listeners que reaccionan a acciones del usuario."
+        ],
+        "¿Qué es el modelo de caja (box model) en CSS?": [
+            "Define contenido, padding, borde y margen.",
+            "Cada elemento se representa como una caja.",
+            "Explica cómo se calcula el tamaño total de un elemento."
+        ],
+        "¿Qué son las media queries y cómo se usan para responsive design?": [
+            "Reglas CSS condicionales según tamaño de pantalla.",
+            "Permiten adaptar estilos por dispositivo.",
+            "Se usan para hacer diseño responsive."
+        ],
+        "¿Qué es la herencia en CSS y cómo funciona?": [
+            "Algunas propiedades pasan del padre al hijo.",
+            "Los elementos heredan ciertos estilos.",
+            "Reduce duplicación de reglas."
+        ]
     },
+
     "backend": {
-        "¿Qué es una API REST?":
-            "REST es un estilo arquitectónico para servicios web que usan HTTP para realizar operaciones CRUD.",
-        "¿Qué es una base de datos relacional?":
-            "Es un sistema que almacena datos en tablas con relaciones entre ellas.",
-        "¿Qué son los middlewares en backend?":
-            "Funciones que se ejecutan entre la solicitud y la respuesta para procesar o modificar datos.",
-        "¿Qué diferencias hay entre SQL y NoSQL?":
-            "SQL usa bases de datos estructuradas y NoSQL almacena datos no estructurados o flexibles.",
-        "¿Qué es la autenticación y autorización?":
-            "Autenticación verifica identidad, autorización controla acceso a recursos.",
-        "¿Qué es un token JWT y para qué se usa?":
-            "JWT es un token que permite autenticar y transmitir información segura entre cliente y servidor.",
-        "¿Cómo funciona el manejo de sesiones en aplicaciones web?":
-            "Se guarda información del usuario para mantener su estado entre peticiones.",
-        "¿Qué es un servidor web y cómo funciona?":
-            "Es un software que responde a peticiones HTTP enviando archivos o datos.",
-        "¿Qué es la escalabilidad en backend?":
-            "Capacidad del sistema para manejar mayor carga aumentando recursos."
+        "¿Qué es una API REST?": [
+            "Es un estilo para crear APIs usando HTTP.",
+            "Permite operaciones CRUD vía endpoints.",
+            "Define comunicación cliente-servidor sin estado."
+        ],
+        "¿Qué es una base de datos relacional?": [
+            "Organiza datos en tablas relacionadas.",
+            "Usa filas y columnas con claves.",
+            "Permite relaciones entre entidades."
+        ],
+        "¿Qué son los middlewares en backend?": [
+            "Funciones intermedias entre request y response.",
+            "Procesan peticiones antes del controlador.",
+            "Sirven para auth, logs o validación."
+        ],
+        "¿Qué diferencias hay entre SQL y NoSQL?": [
+            "SQL es estructurado; NoSQL flexible.",
+            "SQL usa tablas; NoSQL documentos o claves.",
+            "NoSQL escala horizontal más fácil."
+        ],
+        "¿Qué es la autenticación y autorización?": [
+            "Auth verifica identidad; autorización permisos.",
+            "Una valida usuario; otra acceso.",
+            "Son capas de seguridad distintas."
+        ],
+        "¿Qué es un token JWT y para qué se usa?": [
+            "Token firmado para autenticar usuarios.",
+            "Permite sesiones sin estado.",
+            "Transporta datos seguros entre partes."
+        ],
+        "¿Cómo funciona el manejo de sesiones en aplicaciones web?": [
+            "Guarda estado entre requests.",
+            "Asocia usuario con ID de sesión.",
+            "Mantiene login activo."
+        ],
+        "¿Qué es un servidor web y cómo funciona?": [
+            "Responde peticiones HTTP.",
+            "Entrega recursos al cliente.",
+            "Sirve contenido y APIs."
+        ],
+        "¿Qué es la escalabilidad en backend?": [
+            "Capacidad de soportar más carga.",
+            "Crecer sin perder rendimiento.",
+            "Escalar vertical u horizontalmente."
+        ]
     },
+
     "react": {
-        "¿Qué es el estado (state) en React?":
-            "El estado es un objeto que almacena datos que pueden cambiar y afectar el renderizado.",
-        "¿Qué es un Hook?":
-            "Funciones que permiten usar estado y otras características de React en componentes funcionales.",
-        "¿Cómo funcionan los componentes funcionales?":
-            "Son funciones que retornan JSX para representar UI y pueden usar hooks para manejar estado.",
-        "¿Qué es el ciclo de vida de un componente en React?":
-            "Son fases por las que pasa un componente desde su creación hasta destrucción.",
-        "¿Qué es Redux y para qué se utiliza?":
-            "Es una librería para manejar el estado global de la aplicación de forma predecible.",
-        "¿Qué es el Context API en React?":
-            "Permite compartir datos entre componentes sin pasar props manualmente.",
-        "¿Cómo optimizas el rendimiento en una aplicación React?":
-            "Usando memoización, evitando renders innecesarios y dividiendo componentes.",
-        "¿Qué son las props y cómo se usan?":
-            "Son propiedades que se pasan a componentes para configurarlos o mostrar datos.",
-        "¿Qué diferencia hay entre componentes controlados y no controlados?":
-            "Controlados tienen su estado gestionado por React, no controlados por el DOM directamente."
+        "¿Qué es el estado (state) en React?": [
+            "Datos que controlan renderizado.",
+            "Información mutable del componente.",
+            "Valores que al cambiar re-renderizan."
+        ],
+        "¿Qué es un Hook?": [
+            "Funciones especiales de React.",
+            "Permiten usar estado en funciones.",
+            "Extienden componentes funcionales."
+        ],
+        "¿Cómo funcionan los componentes funcionales?": [
+            "Son funciones que retornan JSX.",
+            "Renderizan UI sin clases.",
+            "Usan hooks para lógica."
+        ],
+        "¿Qué es el ciclo de vida de un componente en React?": [
+            "Fases de montaje y desmontaje.",
+            "Momentos de render y actualización.",
+            "Controlado con hooks."
+        ],
+        "¿Qué es Redux y para qué se utiliza?": [
+            "Gestor de estado global.",
+            "Centraliza datos de app.",
+            "Hace estado predecible."
+        ],
+        "¿Qué es el Context API en React?": [
+            "Comparte datos sin props drilling.",
+            "Estado global simple.",
+            "Comunicación entre componentes."
+        ],
+        "¿Cómo optimizas el rendimiento en una aplicación React?": [
+            "Memoización y lazy loading.",
+            "Evitar renders innecesarios.",
+            "Dividir componentes."
+        ],
+        "¿Qué son las props y cómo se usan?": [
+            "Datos que recibe un componente.",
+            "Configuran comportamiento.",
+            "Se pasan desde el padre."
+        ],
+        "¿Qué diferencia hay entre componentes controlados y no controlados?": [
+            "Controlados usan state.",
+            "No controlados usan DOM.",
+            "Controlados son más predecibles."
+        ]
     },
+
     "angular": {
-        "¿Qué es un módulo en Angular?":
-            "Un módulo agrupa componentes, servicios y otros módulos para organizar la aplicación.",
-        "¿Qué es un servicio en Angular?":
-            "Clase que proporciona funcionalidad reutilizable y es inyectable en componentes.",
-        "¿Qué es RxJS y cómo se usa?":
-            "Es una librería para programación reactiva con observables para manejar eventos asíncronos.",
-        "¿Qué es el data binding en Angular?":
-            "Sincronización automática de datos entre el modelo y la vista.",
-        "¿Qué son los decoradores en Angular?":
-            "Anotaciones que agregan metadatos a clases y propiedades para configurarlas.",
-        "¿Cómo funcionan los pipes en Angular?":
-            "Transforman datos en plantillas para mostrarlos en un formato adecuado.",
-        "¿Qué es la inyección de dependencias?":
-            "Patrón para suministrar dependencias a clases sin crearlas directamente.",
-        "¿Qué es un componente y cómo se comunica con otros?":
-            "Unidad básica de UI que puede recibir y emitir datos mediante inputs y outputs.",
-        "¿Cómo manejas el enrutamiento en Angular?":
-            "Con el RouterModule, definiendo rutas y navegando entre ellas."
+        "¿Qué es un módulo en Angular?": [
+            "Agrupa partes de la app.",
+            "Organiza componentes y servicios.",
+            "Define bloques funcionales."
+        ],
+        "¿Qué es un servicio en Angular?": [
+            "Clase reutilizable inyectable.",
+            "Contiene lógica compartida.",
+            "Se usa vía DI."
+        ],
+        "¿Qué es RxJS y cómo se usa?": [
+            "Programación reactiva.",
+            "Trabaja con observables.",
+            "Maneja async streams."
+        ],
+        "¿Qué es el data binding en Angular?": [
+            "Sincroniza vista y datos.",
+            "Conecta modelo y template.",
+            "Actualización automática."
+        ],
+        "¿Qué son los decoradores en Angular?": [
+            "Añaden metadatos.",
+            "Configuran clases.",
+            "Definen comportamiento."
+        ],
+        "¿Cómo funcionan los pipes en Angular?": [
+            "Transforman datos en templates.",
+            "Formatean salida.",
+            "Aplican filtros."
+        ],
+        "¿Qué es la inyección de dependencias?": [
+            "Provee dependencias externas.",
+            "Evita instanciación manual.",
+            "Facilita testing."
+        ],
+        "¿Qué es un componente y cómo se comunica con otros?": [
+            "Bloque UI básico.",
+            "Usa inputs y outputs.",
+            "Intercambia datos."
+        ],
+        "¿Cómo manejas el enrutamiento en Angular?": [
+            "Con RouterModule.",
+            "Definiendo rutas.",
+            "Navegando por path."
+        ]
     },
+
     "personal": {
-        "¿Dónde te ves en cinco años?":
-            "Me veo creciendo profesionalmente y aportando valor en proyectos desafiantes.",
-        "¿Cuál es tu mayor fortaleza y debilidad?":
-            "Mi fortaleza es la perseverancia y mi debilidad es que a veces soy muy perfeccionista.",
-        "¿Cómo manejas el estrés o la presión en el trabajo?":
-            "Organizo mis tareas y tomo pausas para mantenerme concentrado.",
-        "Descríbeme una situación en la que hayas tenido que resolver un conflicto.":
-            "Escuché a ambas partes, busqué un acuerdo y mantuve la comunicación abierta.",
-        "¿Por qué quieres trabajar con nosotros?":
-            "Porque admiro su cultura y quiero crecer junto a un equipo talentoso.",
-        "¿Qué te motiva a dar lo mejor de ti?":
-            "El deseo de aprender y superar retos constantemente.",
-        "¿Cómo te mantienes actualizado y mejorando profesionalmente?":
-            "Leo artículos, tomo cursos y participo en comunidades técnicas.",
-        "Cuéntame sobre un error que hayas cometido y cómo lo solucionaste.":
-            "Identifiqué el problema, pedí ayuda y aprendí para no repetirlo.",
-        "¿Prefieres trabajar en equipo o de forma independiente? ¿Por qué?":
-            "Prefiero el equipo porque las ideas se enriquecen colaborando."
+        "¿Dónde te ves en cinco años?": [
+            "Creciendo profesionalmente.",
+            "Con más responsabilidad técnica.",
+            "Aportando valor en proyectos grandes."
+        ],
+        "¿Cuál es tu mayor fortaleza y debilidad?": [
+            "Fortaleza: constancia. Debilidad: perfeccionismo.",
+            "Soy perseverante pero a veces muy detallista.",
+            "Aprendo rápido pero me exijo mucho."
+        ],
+        "¿Cómo manejas el estrés o la presión en el trabajo?": [
+            "Priorizo tareas.",
+            "Organizo tiempos.",
+            "Trabajo por bloques."
+        ],
+        "Descríbeme una situación en la que hayas tenido que resolver un conflicto.": [
+            "Escuché ambas partes.",
+            "Busqué solución común.",
+            "Medié con comunicación."
+        ],
+        "¿Por qué quieres trabajar con nosotros?": [
+            "Por su cultura.",
+            "Por sus proyectos.",
+            "Por oportunidad de crecimiento."
+        ],
+        "¿Qué te motiva a dar lo mejor de ti?": [
+            "Aprender.",
+            "Superar retos.",
+            "Mejorar constantemente."
+        ],
+        "¿Cómo te mantienes actualizado y mejorando profesionalmente?": [
+            "Cursos y lectura.",
+            "Práctica constante.",
+            "Comunidades tech."
+        ],
+        "Cuéntame sobre un error que hayas cometido y cómo lo solucionaste.": [
+            "Analicé causa y corregí.",
+            "Pedí ayuda y aprendí.",
+            "Documenté la solución."
+        ],
+        "¿Prefieres trabajar en equipo o de forma independiente? ¿Por qué?": [
+            "Equipo por sinergia.",
+            "Ambos según tarea.",
+            "Equipo por intercambio de ideas."
+        ]
     }
 }
 
-RESOURCES = {
-    "frontend": [
-        "https://roadmap.sh/frontend",
-        "https://frontendmentor.io",
-        "https://cssbattle.dev",
-    ],
-    "backend": [
-        "https://roadmap.sh/backend",
-        "https://leetcode.com",
-        "https://sqlbolt.com",
-    ],
-    "react": [
-        "https://roadmap.sh/react",
-        "https://react.dev/learn",
-        "https://frontendmentor.io",
-    ],
-    "angular": [
-        "https://roadmap.sh/angular",
-        "https://angular.io/tutorial",
-        "https://rxjs.dev",
-    ],
-}
 MAX_QUESTIONS = 5
 sessions = {}
 
 
+def normalize(text):
+    if isinstance(text, list):
+        text = " ".join(text)
+    text = text.lower()
+    text = re.sub(r"\s+", " ", text)
+    return text.strip()
+
 def similarity(a, b):
-    return SequenceMatcher(None, a.lower(), b.lower()).ratio()
+    return SequenceMatcher(None, normalize(a), normalize(b)).ratio()
 
 def nivel_por_puntaje(avg_score):
     if avg_score >= 0.75:
@@ -306,12 +421,6 @@ def nivel_por_puntaje(avg_score):
     else:
         return "Junior"
 
-def clean_company_name(line: str, max_length=50) -> str:
-    line = re.sub(r"http\S+", "", line)
-    line = re.sub(r"\d+", "", line)
-    line = re.sub(r"[^\w\s.,-]", "", line)
-    line = line.strip()
-    return line[:max_length]
   
 @api.route("/chat", methods=["POST"])
 @jwt_required()
@@ -534,128 +643,196 @@ def chat():
     except Exception as e:
         traceback.print_exc()
         return jsonify({"response": f"Error del servidor: {str(e)}"}), 500
+    
 
 
 
-def extract_postulation_fields(text: str) -> dict:
+
+def clean_company_name(line: str, max_length=50) -> str:
+    line = re.sub(r"http\S+", "", line)  
+    line = re.sub(r"\d+", "", line)      
+    line = re.sub(r"[^\w\s.,-]", "", line)  
+    line = line.strip()
+    words = line.split()
+    filtered_words = [w for w in words if len(w) > 2]
+    cleaned_line = " ".join(filtered_words)
+
+    return cleaned_line[:max_length]
+
+def extract_postulation_fields(text: str, platform_hint="Unknown") -> dict:
     clean_text = text.replace("€", " €").replace("$", " $")
     lines = [l.strip() for l in clean_text.split("\n") if len(l.strip()) > 3]
     full_text = " ".join(lines).lower()
+
+    platform_hint_norm = platform_hint.lower() if platform_hint else "unknown"
 
     data = {
         "company_name": None,
         "role": None,
         "city": None,
-        "platform": None,
-        "work_type": "Unknown",
+        "platform": platform_hint if platform_hint != "Unknown" else "Unknown",
+        "work_type":None ,
         "experience": 0,
         "salary": 0,
         "candidates_applied": 0,
         "postulation_url": None,
         "requirements": [],
-        "job_description": clean_text[:800]
+        "job_description": clean_text[:800],
     }
 
-    # ---------------- PLATFORM DETECTION ----------------
-    if "linkedin" in full_text:
-        data["platform"] = "LinkedIn"
-    if "indeed" in full_text:
-        data["platform"] = "Indeed"
-    elif "sefcarm" in full_text or "sefoficinavirtual" in full_text:
-        data["platform"] = "Sefcarm"
+    if platform_hint_norm == "unknown":
+        if "linkedin" in full_text:
+            data["platform"] = "LinkedIn"
+        elif "indeed" in full_text:
+            data["platform"] = "Indeed"
+        elif "sefcarm" in full_text or "sefoficinavirtual" in full_text:
+            data["platform"] = "Sefcarm"
+        elif "infojobs" in full_text:
+            data["platform"] = "InfoJobs"
+        else:
+            data["platform"] = "Unknown"
     else:
-        data["platform"] = "Unknown"
+        platform_map = {
+            "linkedin": "LinkedIn",
+            "indeed": "Indeed",
+            "sefcarm": "Sefcarm",
+            "infojobs": "InfoJobs",   
 
-    # ---------------- ROLE & COMPANY ----------------
-    for line in lines:
-        if " at " in line.lower():
-            parts = re.split(r"\s+at\s+", line, flags=re.IGNORECASE)
-            if len(parts) == 2:
-                data["role"] = parts[0].strip()
-                data["company_name"] = clean_company_name(parts[1])
-                break
+            "unknown": "Unknown"
+        }
+        data["platform"] = platform_map.get(platform_hint_norm, platform_hint)
 
-    if data["platform"] == "Indeed" and not data["company_name"]:
+    platform_lower = data["platform"].lower()
+    if platform_lower == "indeed":
         if lines:
-            data["company_name"] = clean_company_name(lines[0])
+           
+            role_lines = [lines[0].strip()]
+            
+            if len(lines) > 1 and not re.search(r"\d|http", lines[1]):
+                role_lines.append(lines[1].strip())
+                if len(lines) > 2:
+                    data["company_name"] = clean_company_name(lines[2])
+                else:
+                    data["company_name"] = "Unknown"
+            else:
+                if len(lines) > 1:
+                    data["company_name"] = clean_company_name(lines[1])
+                else:
+                    data["company_name"] = "Unknown"
+            
+            data["role"] = " ".join(role_lines)
+
+    elif platform_lower == "linkedin":
+        cleaned_lines = [l for l in lines if len(l) > 3 and re.search(r"[a-zA-Z0-9]", l)]
+
+        found = False
+        for line in cleaned_lines:
+            if " at " in line.lower():
+                parts = re.split(r"\s+at\s+", line, flags=re.IGNORECASE)
+                if len(parts) == 2:
+                    data["company_name"] = clean_company_name(parts[0].strip())
+                    data["role"] = parts[1].strip()
+                    found = True
+                    break
+
+        if not found:
+            if len(cleaned_lines) > 0:
+                data["company_name"] = clean_company_name(cleaned_lines[0])
+            if len(cleaned_lines) > 1:
+                data["role"] = cleaned_lines[1].strip()
+    elif platform_lower == "infojobs":
+        if lines:
+            data["role"] = lines[0].strip()
         if len(lines) > 1:
-            data["role"] = lines[1].strip()
+            data["company_name"] = clean_company_name(lines[1])
+    elif platform_lower == "sefcarm":
+        offer_number_match = re.search(r"oferta[:\s]*([A-Za-z0-9-]+)", full_text, flags=re.IGNORECASE)
+        if offer_number_match:
+            offer_number = offer_number_match.group(1)
+            data["offer_number"] = offer_number 
 
-    if not data["company_name"] and lines:
-        data["company_name"] = clean_company_name(lines[0])
+            data["company_name"] = offer_number
 
-    if not data["role"]:
-        for line in lines:
-            if any(k in line.lower() for k in ["limpieza", "personal", "operario"]):
-                data["role"] = line.strip()
-                break
+            offer_line_index = None
+            for i, line in enumerate(lines):
+                if offer_number.lower() in line.lower():
+                    offer_line_index = i
+                    break
+            
+            role_line = None
+            if offer_line_index is not None:
+                for j in range(offer_line_index + 1, len(lines)):
+                    next_line = lines[j].strip()
+                    if not re.search(r"fecha|inicio|finalización|municipio|\d{2}/\d{2}/\d{4}", next_line, re.IGNORECASE) and len(next_line) > 3:
+                        role_line = next_line
+                        break
+            
+            if role_line:
+                data["role"] = role_line
+            else:
+                if offer_line_index is not None and offer_line_index + 1 < len(lines):
+                    data["role"] = lines[offer_line_index + 1].strip()
+                elif lines:
+                    data["role"] = lines[0].strip()
+        else:
+            if lines:
+                data["role"] = lines[0].strip()
+            if len(lines) > 1:
+                data["company_name"] = clean_company_name(lines[1])
 
-    if not data["role"] and len(lines) > 1:
-        data["role"] = lines[1]
+    exp_patterns = [
+        r"(experiencia mínima|experiencia requerida|se requiere experiencia).*?(\d+)\s*(meses|años)",
+        r"(mínimo de experiencia).*?(\d+)\s*(meses|años)"
+    ]
 
-    city_match = re.search(r"municipio:\s*([a-záéíóúñ]+)", full_text)
-    if city_match:
-        data["city"] = city_match.group(1).title()
-    else:
-        for city in ["murcia", "barcelona", "madrid", "valencia", "sevilla", "santander"]:
-            if city in full_text:
-                data["city"] = city.title()
-                break
+    for pattern in exp_patterns:
+        exp_match = re.search(pattern, full_text, re.IGNORECASE)
+        if exp_match:
+            num = int(exp_match.group(2))
+            data["experience"] = num if "meses" in exp_match.group(3).lower() else num * 12
+            break
 
-    if "linkedin" in full_text:
-        data["platform"] = "Linkedin"
-    elif "sefcarm" in full_text or "sefoficinavirtual" in full_text:
-        data["platform"] = "Sefcarm"
-
-    if "presencial" in full_text or "on-site" in full_text:
-    # ---------------- WORK TYPE ----------------
-    if any(k in full_text for k in ["presencial", "on-site", "lunes a viernes"]):
-        data["work_type"] = "Presencial"
-    elif any(k in full_text for k in ["remoto", "remote"]):
-        data["work_type"] = "Remoto"
-    elif any(k in full_text for k in ["híbrido", "hybrid"]):
-        data["work_type"] = "Híbrido"
-    if "lunes a viernes" in full_text:
-        data["work_type"] = "Presencial"
-
-    # ---------------- EXPERIENCE ----------------
-    exp_match = re.search(r"experiencia.*?(\d+)\s*(meses|años)", full_text)
-    if exp_match:
-        num = int(exp_match.group(1))
-        data["experience"] = num if "meses" in exp_match.group(2) else num * 12
-
-    # ---------------- SALARY ----------------
     salary_match = re.search(r"(\d{3,5})\s*euros", full_text)
     if salary_match:
         data["salary"] = int(salary_match.group(1))
+    work_type_match = re.search(
+        r"\b(jornada completa|tiempo completo|full[- ]?time|medio tiempo|part[- ]?time|parcial|presencial|remoto|teletrabajo|home office)\b", 
+        full_text, 
+        re.IGNORECASE
+    )
+    if work_type_match:
+        data["work_type"] = work_type_match.group(1).lower()
+    else:
+        data["work_type"] = "Unknown"
+    candidates_patterns = [
+    r"más de (\d+)\s+solicitudes",
+    r"(\d+)\s+candidatos?",
+    r"(\d+)\s+aplicantes?",
+    r"(\d+)\s+postulantes?",
+    r"(\d+)\s+personas interesadas"
+]
 
-    # ---------------- APPLICATIONS ----------------
-    applied_match = re.search(r"más de (\d+)\s+solicitudes", full_text)
-    if applied_match:
-        data["candidates_applied"] = int(applied_match.group(1))
+    for pattern in candidates_patterns:
+        applied_match = re.search(pattern, full_text, re.IGNORECASE)
+        if applied_match:
+            data["candidates_applied"] = int(applied_match.group(1))
+            break
 
-    for line in lines:
-        if any(kw in line.lower() for kw in ["se requiere", "tener", "poseer", "estar inscrito"]):
-            data["requirements"].append(line.strip())
 
-    for line in lines:
-        if any(kw in line.lower() for kw in ["aptitudes", "habilidades"]):
-            data["requirements"].append(line.strip())
-
-    # ---------------- REQUIREMENTS ----------------
-    for line in lines:
-        if any(k in line.lower() for k in [
+        requirement_keywords = [
             "se requiere", "tener", "poseer",
             "estar inscrito", "aptitudes", "habilidades"
-        ]):
-            data["requirements"].append(line)
+        ]
+        for line in lines:
+            if any(k in line.lower() for k in requirement_keywords):
+                data["requirements"].append(line)
 
-    # ---------------- URL ----------------
     url_match = re.search(r"(https?://[^\s]+)", text)
     if url_match:
         data["postulation_url"] = url_match.group(1)
 
     return data
+
 
 
 @api.route("/ocr-postulation", methods=["POST"])
@@ -665,6 +842,7 @@ def ocr_postulation():
     if not file:
         return jsonify({"error": "No image file provided"}), 400
 
+    platform_hint = request.form.get("platform", "Unknown")
     current_user = get_jwt_identity()
 
     upload_dir = "uploads"
@@ -672,12 +850,16 @@ def ocr_postulation():
         os.makedirs(upload_dir)
 
     path = os.path.join(upload_dir, file.filename)
-    file.save(path)
+    try:
+        file.save(path)
+        img = Image.open(path)
+        text = pytesseract.image_to_string(img)
+    except Exception as e:
+        return jsonify({"error": f"OCR or file handling failed: {str(e)}"}), 500
 
-    img = Image.open(path)
-    text = pytesseract.image_to_string(img)
+    print("OCR Text:", repr(text))  
 
-    data = extract_postulation_fields(text)
+    data = extract_postulation_fields(text, platform_hint=platform_hint)
 
     requirements = data.get("requirements")
     if not isinstance(requirements, list):
@@ -692,7 +874,7 @@ def ocr_postulation():
         city=data.get("city") or "Unknown",
         salary=data.get("salary", 0),
         platform=data.get("platform") or "Unknown",
-        postulation_url="",
+        postulation_url=data.get("postulation_url") or "",
         work_type=data.get("work_type") or "Unknown",
         requirements=requirements,
         candidates_applied=data.get("candidates_applied") or 0,
@@ -705,120 +887,6 @@ def ocr_postulation():
     db.session.commit()
 
     return jsonify(postulation.serialize()), 201
-
-
-@api.route('/chat', methods=["POST"])
-@jwt_required()
-def chat():
-    try:
-        user_id = get_jwt_identity()
-        data = request.json or {}
-        user_message = data.get("message", "").lower().strip()
-
-        if user_id not in sessions:
-            sessions[user_id] = {
-                "state": "WAIT_READY",
-                "role": None,
-                "question_index": 0
-            }
-            return jsonify({
-                "response": "👋 ¿Estás listo para una simulación de entrevista? (sí / no)"
-            })
-
-        session = sessions[user_id]
-
-        if session["state"] == "WAIT_READY":
-            if user_message in ["si", "sí", "yes"]:
-                session["state"] = "WAIT_ROLE"
-                return jsonify({
-                    "response": (
-                        "Perfecto 🚀\n"
-                        "Elige el tipo de entrevista:\n"
-                        "1) Frontend (FE)\n"
-                        "2) Backend (BE)\n"
-                        "3) React\n"
-                        "4) Angular\n"
-                        "5) Preguntas personales"
-                    )
-                })
-
-            if user_message in ["no", "nop", "nope"]:
-                return jsonify({
-                    "response": "👌 Cuando estés listo escribe 'sí'."
-                })
-
-            return jsonify({
-                "response": "Por favor responde únicamente: sí o no."
-            })
-
-        if session["state"] == "WAIT_ROLE":
-            roles = {
-                "1": "frontend",
-                "2": "backend",
-                "3": "react",
-                "4": "angular",
-                "5": "personal"
-            }
-
-            if user_message not in roles:
-                return jsonify({
-                    "response": "Selecciona una opción válida (1-5)."
-                })
-
-            role = roles[user_message]
-            session["role"] = role
-            session["state"] = "INTERVIEW"
-            session["question_index"] = 0
-
-            first_question = QUESTIONS[role][0]
-            return jsonify({
-                "response": (
-                    f"🎯 Entrevista {role.upper()} iniciada.\n\n"
-                    f"Pregunta 1:\n{first_question}"
-                )
-            })
-
-        if session["state"] == "INTERVIEW":
-            role = session["role"]
-            q_index = session.get("question_index", 0)
-
-            q_index += 1
-
-            if q_index < len(QUESTIONS[role]):
-                session["question_index"] = q_index
-                next_question = QUESTIONS[role][q_index]
-                return jsonify({
-                    "response": f"Pregunta {q_index + 1}:\n{next_question}"
-                })
-            else:
-                session["state"] = "FINISHED"
-                resources = "\n".join(
-                    f"- {url}" for url in RESOURCES.get(role, []))
-                return jsonify({
-                    "response": (
-                        "✅ ¡Buen trabajo!\n\n"
-                        "📚 Recursos recomendados para seguir entrenando:\n"
-                        f"{resources}\n\n"
-                        "¿Quieres otra simulación? (sí / no)"
-                    )
-                })
-
-        if session["state"] == "FINISHED":
-            if user_message in ["si", "sí", "yes"]:
-                session["state"] = "WAIT_ROLE"
-                session["question_index"] = 0
-                return jsonify({
-                    "response": "Perfecto 👍 Elige nuevamente una opción (1-5)."
-                })
-
-            return jsonify({
-                "response": "👋 Gracias por practicar. ¡Éxitos!"
-            })
-
-    except Exception as e:
-        traceback.print_exc()
-        return jsonify({"response": f"Error: {str(e)}"}), 500
-
 
 
 def save_uploaded_file(file, upload_folder=None):

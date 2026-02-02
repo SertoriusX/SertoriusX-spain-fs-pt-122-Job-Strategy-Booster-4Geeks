@@ -16,11 +16,21 @@ El objetivo principal del proyecto es permitir al usuario llevar un **control or
 ## ✨ Funcionalidades principales
 
 ### 📄 Gestión de CV
-Permite al usuario:
-- Almacenar la información de sus currículums en una base de datos  
-- Generar currículums en **formato PDF** de manera dinámica  
+La gestión de CV ofrece al usuario un espacio flexible para crear, actualizar y organizar distintas versiones de su currículum según cada oportunidad.
+Cada documento queda registrado en un historial que muestra dónde fue utilizado, ayudando a tomar decisiones más estratégicas en la búsqueda laboral.
+Esta herramienta convierte el proceso de postulación en algo ágil, claro y totalmente bajo control del usuario.
 
----
+✏️ Edición ilimitada de CVs  
+Crea y modifica tus currículums tantas veces como necesites, adaptándolos a cada oportunidad.
+
+📂 Historial de postulaciones  
+Visualiza qué versión de tu CV fue utilizada en cada postulación, para mejorar tu estrategia laboral.
+
+📄 Exportación en PDF  
+Descarga tus CVs en formato profesional, listos para enviar.
+
+📤 Compartir fácilmente  
+Envía tus CVs por correo electrónico o WhatsApp directamente desde la plataforma.
 
 ### 📊 Seguimiento de postulaciones
 Facilita el registro y control de todas las postulaciones realizadas, permitiendo acceder rápidamente a información clave como:

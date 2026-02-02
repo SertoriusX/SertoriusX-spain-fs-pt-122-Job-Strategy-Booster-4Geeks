@@ -3,12 +3,15 @@ import axios from "axios";
 import { UserContext } from "../../hooks/UserContextProvier";
 import { useNavigate } from "react-router-dom";
 
+const PLATFORMS = ["Unknown", "LinkedIn", "Indeed", "InfoJobs", "Sefcarm"];
+
 export default function UploadImageOnly() {
     const { token } = useContext(UserContext);
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
     const [image, setImage] = useState(null);
     const [preview, setPreview] = useState(null);
+    const [platform, setPlatform] = useState("Unknown");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
@@ -18,19 +21,16 @@ export default function UploadImageOnly() {
         const file = e.target.files[0];
         if (!file) return;
 
-        // Revoke old preview to avoid memory leaks
         if (preview) URL.revokeObjectURL(preview);
 
         setImage(file);
         setPreview(URL.createObjectURL(file));
 
-        // Clear previous messages on new image selection
         setError("");
         setSuccess("");
     };
 
     useEffect(() => {
-        // Cleanup on unmount
         return () => {
             if (preview) URL.revokeObjectURL(preview);
         };
@@ -49,6 +49,7 @@ export default function UploadImageOnly() {
         try {
             const fd = new FormData();
             fd.append("image", image);
+            fd.append("platform", platform); // send platform info too
 
             const res = await axios.post(`${backendUrl}/ocr-postulation`, fd, {
                 headers: { Authorization: `Bearer ${token}` },
@@ -57,7 +58,6 @@ export default function UploadImageOnly() {
             setSuccess("Image uploaded and data extracted successfully!");
             console.log("Response data:", res.data);
 
-            // Navigate after success
             navigate("/postulations");
         } catch (err) {
             console.error(err);
@@ -71,7 +71,19 @@ export default function UploadImageOnly() {
         <div style={{ maxWidth: 400, margin: "auto", padding: 20 }}>
             <h2>Subir imagen</h2>
 
-            <input type="file" accept="image/*" onChange={handleImage} />
+            <label>
+                Plataforma:
+                <select value={platform} onChange={(e) => setPlatform(e.target.value)} style={{ marginLeft: 10 }}>
+                    {PLATFORMS.map((p) => (
+                        <option key={p} value={p}>
+                            {p}
+                        </option>
+                    ))}
+                </select>
+            </label>
+
+            <input type="file" accept="image/*" onChange={handleImage} style={{ display: "block", marginTop: 10 }} />
+
             {preview && (
                 <div style={{ marginTop: 10 }}>
                     <img src={preview} alt="preview" width="250" />

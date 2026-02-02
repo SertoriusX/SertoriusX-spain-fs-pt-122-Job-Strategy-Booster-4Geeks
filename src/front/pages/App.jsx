@@ -8,7 +8,11 @@ import { UserContext } from "../hooks/UserContextProvier.jsx";
 import Registration from './RegisterPage.jsx';
 import LoadingScreen from "../components/LoadingScreen";
 import { translatePage as translatePageFunc } from "../hooks/usePageTranslate.js";
-
+import NavBarButton from '../components/navbar/NavBarButton.jsx';
+import "../styles/navbar.css";
+import {
+    faSun, faMoon
+} from "@fortawesome/free-solid-svg-icons";
 export default function App() {
     const { token, user, theme, toggleTheme, profile } = useContext(UserContext);
     const [loading, setLoading] = useState(true);
@@ -80,34 +84,33 @@ export default function App() {
                 <div className="main_content">
                     <div className="header_bar">
                         <div className="user_data">
-                            <FontAwesomeIcon
-                                className="notification_icon"
-                                icon={faBell}
-                                onClick={() => setOpen(!open)
+                            {/*
+                        <FontAwesomeIcon
+                            className="notification_icon"
+                            icon={faBell}
+                            onClick={() => setOpen(!open)}
+                        />
+                        */}
 
-                                }
-
+                            {/*
+{open && (
+    <div className="notification-dropdown">
+        <h5 onClick={() => {
+            handleNavigation("/status-entrevista");
+            setOpen(!open)
+        }}>
+            Entrevista
+        </h5>
+        <h5>New message received</h5>
+        <h5>Profile updated</h5>
+    </div>
+)}
+*/}
+                            <NavBarButton
+                                icon={theme === "dark" ? faSun : faMoon}
+                                className="theme_btn"
+                                onClick={toggleTheme}
                             />
-
-                            {open && (
-                                <div className="notification-dropdown">
-                                    <h5 onClick={() => {
-
-                                        handleNavigation("/status-entrevista");
-                                        setOpen(!open)
-
-
-
-                                    }
-
-                                    }>Entrevista</h5>
-                                    <h5>New message received</h5>
-                                    <h5>Profile updated</h5>
-                                </div>
-                            )}                            <button className='btn btn-secondary' onClick={toggleTheme}>
-                                {theme === "dark" ? "Modo claro" : "Modo oscuro"}
-                            </button>
-
                             <select
                                 value={language}
                                 onChange={(e) => handleLanguageChange(e.target.value)}
@@ -136,7 +139,7 @@ export default function App() {
                             </Link>
                         </div>
                     </div>
-                   <Outlet context={{ isEditing, setIsEditing }} />
+                    <Outlet context={{ isEditing, setIsEditing }} />
 
                 </div>
             </div>
