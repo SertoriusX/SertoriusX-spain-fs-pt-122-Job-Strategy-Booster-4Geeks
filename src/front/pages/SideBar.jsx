@@ -19,8 +19,6 @@ import { useNavigate } from "react-router-dom";
 import LoadingScreen from "../components/LoadingScreen";
 
 function Sidebar() {
-
-
     const [loading, setLoading] = useState(false);
     const { logOut } = useContext(UserContext);
     const navigate = useNavigate();
@@ -48,10 +46,8 @@ function Sidebar() {
 
     return (
         <div className="side_bar">
-            <div className="header">
-                <div onClick={() => handleNavigation('/')}>
-                    <img width="1000" src="/img/JSB.png" alt="JSB logo" />
-                </div>
+            <div className="header" onClick={() => handleNavigation('/')}>
+                <img width="1000" src="/img/JSB.png" alt="JSB logo" />
                 <br />
             </div>
 

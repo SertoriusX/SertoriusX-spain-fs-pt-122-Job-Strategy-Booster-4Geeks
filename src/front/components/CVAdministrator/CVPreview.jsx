@@ -6,7 +6,9 @@ const CVPreview = ({ formData }) => {
         <div className="cv-pdf-card">
             <div className="cv-pdf-header">
                 <div className="cv-pdf-header-left">
-                    <h1 className="cv-name">{formData.nombre || "Nombre completo"}</h1>
+                    <h1 className="cv-name">
+                        {formData.nombre || "Nombre completo"}
+                    </h1>
 
                     <div className="cv-contact-line">
                         <Mail size={18} className="cv-contact-icon" />
@@ -32,15 +34,17 @@ const CVPreview = ({ formData }) => {
                         ))}
                 </div>
 
-                {formData.foto && (
-                    <div className="cv-pdf-header-right">
+                <div className="cv-pdf-header-right">
+                    {formData.foto ? (
                         <img
                             src={formData.foto}
                             alt="Foto de perfil"
                             className="cv-photo-card"
                         />
-                    </div>
-                )}
+                    ) : (
+                        <div className="cv-photo-placeholder">Foto</div>
+                    )}
+                </div>
             </div>
 
             {formData.resumen && (
