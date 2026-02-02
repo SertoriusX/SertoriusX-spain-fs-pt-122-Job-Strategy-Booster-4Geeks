@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../styles/jobs.css';
-import JobCard2 from '../components/JobCard2';
-import MenuButttons from '../components/MenuButtons';
+import JobCard2 from '../components/JobComponent/JobCard2';
+import MenuButttons from '../components/home/MenuButtons';
 import '../styles/JobCard2.css';
-import { useGetAuthorizationHeader } from '../hooks/useGetAuthorizationHeader';
 import { Link } from 'react-router-dom';
+import useGetAuthorizationHeader from '../hooks/useGetAuthorizationHeader';
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -39,7 +39,7 @@ export default function Jobs() {
       .catch(err => {
         console.error(err);
       });
-  }, [selectedFilter, backendUrl]);
+  }, []);
 
   function handleFilterChange(filter) {
     setSelectedFilter(filter);
@@ -53,7 +53,8 @@ export default function Jobs() {
           <button className='advance_filter'>Filtros Avanzados</button>
         </div>
 
-        <Link to='/formulario'><button className="add_new_postulation" onClick={() => { console.log(postulaciones) }}>Add</button></Link>
+        <Link to='/img-post'><button className="add_new_postulation" onClick={() => { console.log(postulaciones) }}>Agregar img</button></Link>
+        <Link to='/formulario'><button className="add_new_postulation" onClick={() => { console.log(postulaciones) }}>Agregar</button></Link>
       </div>
       <div className="cards-grid">
         {postulaciones.length > 0 ? (

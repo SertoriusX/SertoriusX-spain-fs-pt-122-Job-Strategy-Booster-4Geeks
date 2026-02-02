@@ -1,0 +1,137 @@
+:root {
+  --back-color: #ffffff;
+  --card-color: #d9d9d9;
+  --font-color: #1b1b1b;
+  --ligther-font-color: #6f6f6f;
+  --main-color: #2b4eeb;
+  --main-color-hover: #6b82ec;
+}
+[data-theme="dark"]  {
+  --back-color: #0f1115;
+  --card-color: #1c1f26;
+  --font-color: #e6e6e6;
+  --ligther-font-color: #a1a1aa;
+  --main-color: #4c6fff;
+  --main-color-hover: #6e8bff;
+}
+
+
+.about-container {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--back-color);
+  color: var(--back-color);;
+  padding: 40px;
+  max-width: 1100px;
+  margin: auto;
+  line-height: 1.6;
+}
+
+h2 {
+  font-size: 36px;
+  color: var(--font-color);
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.intro-section {
+  margin-bottom: 60px;
+}
+
+.intro-layout {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.group-photo {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.intro-text {
+  flex: 1;
+  min-width: 300px;
+  color:var(--font-color);
+}
+
+.team-section {
+  background-color: var(--back-color);
+  border-radius: 12px;
+  padding: 40px;
+  color: var(--font-color);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.team-section .intro-paragraph {
+  font-size: 18px;
+  line-height: 1.7;
+  text-align: left;
+  max-width: 900px;
+  width: 100%;
+  margin: 0 0 30px 0;
+}
+
+.team-photos {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin: 50px 0;
+}
+
+.team-photos > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  min-height: 260px;
+}
+
+.profile-pic {
+  width: 160px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.team-photos svg {
+  width: 40px;
+  height: 40px;
+  stroke-width: 1.6;
+}
+
+.team-photos p {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.skills {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 30px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.skill {
+  text-align: center;
+  width: 160px;
+}
+
+.skill-icon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 12px;
+}
+
+.closing-text {
+  margin-top: 40px;
+  font-style: italic;
+  text-align: center;
+  font-size: 16px;
+}

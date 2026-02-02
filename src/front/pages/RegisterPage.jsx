@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "../styles/register.css";
-import LoginForm from "../components/LoginForm";
-import SignupForm from "../components/SignupForm";
-import LoadingScreen from "../components/LoadingScreen";
 
+import LoadingScreen from "../components/LoadingScreen";
+import LoginForm from "../components/user/LoginForm";
+import SignupForm from "../components/user/SignupForm"
 function Registration() {
     const [loading, setLoading] = useState(true);
     const [formType, setFormType] = useState("login");
@@ -33,10 +33,10 @@ function Registration() {
             <div className="log_in_page">
                 <div className="registration_form">
                     <div className="header">
-                        <div className="logo"></div>
+                        <div className="logo">  <img width="130" src="/img/JSB.png" alt="JSB logo" /></div>
                         <section className="details">
-                            <h1>Trackeando</h1>
-                            <p>Manten al dia tus candidaturas</p>
+                            <h1 style={{ textAlign: "center" }}>Job Strategy </h1>
+                            <h1 style={{ textAlign: "center" }}> Booster</h1>
                         </section>
                     </div>
 

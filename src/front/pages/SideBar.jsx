@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import NavBarButton from "../components/NavBarButton";
+import NavBarButton from "../components/navbar/NavBarButton.jsx";
 import "../styles/navbar.css";
 
 import {
@@ -10,6 +10,8 @@ import {
     faGear,
     faCircleQuestion,
     faFileLines,
+    faInfoCircle,
+    faRightFromBracket
 } from "@fortawesome/free-solid-svg-icons";
 
 import { UserContext } from "../hooks/UserContextProvier.jsx";
@@ -44,9 +46,9 @@ function Sidebar() {
 
     return (
         <div className="side_bar">
-            <div className="header">
-                <div className="logo"></div>
-                <p>Trakeando</p>
+            <div className="header" onClick={() => handleNavigation('/')}>
+                <img width="1000" src="/img/JSB.png" alt="JSB logo" />
+                <br />
             </div>
 
             <div className="nav_bar">
@@ -54,10 +56,13 @@ function Sidebar() {
                 <div className="nav_bar_buttons">
                     <NavBarButton
                         icon={faHouse}
-                        label="Home"
+                        label="Inicio"
                         to="/"
                         onClick={() => handleNavigation("/")}
                     />
+
+
+
                     <NavBarButton
                         icon={faClipboardList}
                         label="postulations"
@@ -67,8 +72,8 @@ function Sidebar() {
                     <NavBarButton
                         icon={faBookBookmark}
                         label="Curriculums"
-                        to="/Curriculum"
-                        onClick={() => handleNavigation("/Curriculum")}
+                        to="/admin-cv"
+                        onClick={() => handleNavigation("/admin-cv")}
                     />
                     <NavBarButton
                         icon={faHandshake}
@@ -84,20 +89,19 @@ function Sidebar() {
                 <h4>General</h4>
                 <div className="tools_buttons">
                     <NavBarButton
-                        icon={faGear}
-                        label={"Ajustes"}
-                        to="/settings"
-                        onClick={() => handleNavigation("/settings")}
+                        icon={faInfoCircle}
+                        label="Sobre nosotras"
+                        to="/about"
+                        onClick={() => handleNavigation("/about")}
                     />
                     <NavBarButton
-                        icon={faCircleQuestion}
-                        label={"Ayuda"}
-                        to="/help"
-                        onClick={() => handleNavigation("/help")}
+                        icon={faRightFromBracket}
+                        label="Logout"
+                        to="#"
+                        onClick={handleLogout}
                     />
-                    <button className="btn btn-secondary mt-2" onClick={handleLogout}>
-                        Logout
-                    </button>
+
+
                 </div>
             </div>
         </div>
