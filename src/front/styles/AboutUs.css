@@ -55,10 +55,12 @@ h2 {
   flex: 1;
   min-width: 300px;
   color:var(--font-color);
+  
 }
 
 .team-section {
   background-color: var(--back-color);
+  text-align: center;
   border-radius: 12px;
   padding: 40px;
   color: var(--font-color);
@@ -70,6 +72,7 @@ h2 {
   line-height: 1.7;
   text-align: left;
   max-width: 900px;
+  
   width: 100%;
   margin: 0 0 30px 0;
 }
@@ -77,7 +80,7 @@ h2 {
 .team-photos {
   display: flex;
   justify-content: center;
-  gap: 40px;
+  gap: 20px;
   margin: 50px 0;
 }
 
