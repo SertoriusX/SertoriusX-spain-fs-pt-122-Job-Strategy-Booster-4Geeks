@@ -864,7 +864,7 @@ def ocr_postulation():
         requirements = []
 
     postulation = Postulations(
-        postulation_state="pending",
+        postulation_state="Open",
         company_name=data.get("company_name") or "Unknown",
         role=data.get("role") or "Unknown",
         experience=data.get("experience", 0),

@@ -11,12 +11,11 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 export default function Jobs() {
   const authorizationHeader = useGetAuthorizationHeader();
-  const options = ['All', 'Closet', 'Open']; // Filter options
+  const options = ['All', 'Closet', 'Open'];
 
   const [postulaciones, setPostulaciones] = useState([]);
   const [selectedFilter, setSelectedFilter] = useState('All');
 
-  // Fetch all postulations once
   useEffect(() => {
     axios.get(`${backendUrl}/postulations`, authorizationHeader)
       .then(res => {
@@ -25,7 +24,6 @@ export default function Jobs() {
       .catch(err => console.error(err));
   }, []);
 
-  // Filter front-end only
   const filteredPostulations = selectedFilter === 'All'
     ? postulaciones
     : postulaciones.filter(p => p.postulation_state === selectedFilter);
@@ -35,7 +33,6 @@ export default function Jobs() {
       <div className="filters">
         <div className="filter">
           <MenuButttons options={options} onFilterChange={setSelectedFilter} />
-          <button className='advance_filter'>Filtros Avanzados</button>
         </div>
 
         <Link to='/img-post'>
