@@ -39,7 +39,7 @@ export const router = createBrowserRouter(
       <Route path="interview" element={<Interview />} />
       <Route path="register" element={<Registration />} />
 
-      <Route path="login" element={<LoginForm />} />
+      <Route path="/login" element={<LoginForm />} />
       <Route path="about" element={<AboutUs />} />
       {/* <Route path="timeline" element={<ListadoAplicaciones />} /> */}
       <Route path="admin-cv" element={<AdminCV />} />
