@@ -1,64 +1,54 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import '../styles/jobs.css';
 import JobCard2 from '../components/JobComponent/JobCard2';
 import MenuButttons from '../components/home/MenuButtons';
-import '../styles/JobCard2.css';
 import { Link } from 'react-router-dom';
 import useGetAuthorizationHeader from '../hooks/useGetAuthorizationHeader';
+import '../styles/jobs.css';
+import '../styles/JobCard2.css';
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 export default function Jobs() {
   const authorizationHeader = useGetAuthorizationHeader();
-  const options = ['Todos', 'Abierto', 'Cerrado', 'Espera'];
+  const options = ['All', 'Closet', 'Open']; // Filter options
 
   const [postulaciones, setPostulaciones] = useState([]);
-  const [selectedFilter, setSelectedFilter] = useState('Todos');
+  const [selectedFilter, setSelectedFilter] = useState('All');
 
-  const statusMap = {
-    'Abierto': 'open',
-    'Cerrado': 'closed',
-    'Espera': 'pending',
-  };
-
+  // Fetch all postulations once
   useEffect(() => {
-    let url = `${backendUrl}/postulations`;
-
-    if (selectedFilter === 'Todos') {
-      url = `${backendUrl}/postulations`;
-    } else {
-      const status = statusMap[selectedFilter];
-      url = `${backendUrl}/postulations/filter?status=${status}`;
-    }
-
-    axios.get(url, authorizationHeader)
+    axios.get(`${backendUrl}/postulations`, authorizationHeader)
       .then(res => {
         setPostulaciones(res.data.postulations);
       })
-      .catch(err => {
-        console.error(err);
-      });
+      .catch(err => console.error(err));
   }, []);
 
-  function handleFilterChange(filter) {
-    setSelectedFilter(filter);
-  }
+  // Filter front-end only
+  const filteredPostulations = selectedFilter === 'All'
+    ? postulaciones
+    : postulaciones.filter(p => p.postulation_state === selectedFilter);
 
   return (
     <div className="app-container">
       <div className="filters">
         <div className="filter">
-          <MenuButttons options={options} onFilterChange={handleFilterChange} selected={selectedFilter} />
+          <MenuButttons options={options} onFilterChange={setSelectedFilter} />
           <button className='advance_filter'>Filtros Avanzados</button>
         </div>
 
-        <Link to='/img-post'><button className="add_new_postulation" onClick={() => { console.log(postulaciones) }}>Agregar img</button></Link>
-        <Link to='/formulario'><button className="add_new_postulation" onClick={() => { console.log(postulaciones) }}>Agregar</button></Link>
+        <Link to='/img-post'>
+          <button className="add_new_postulation">Agregar img</button>
+        </Link>
+        <Link to='/formulario'>
+          <button className="add_new_postulation">Agregar</button>
+        </Link>
       </div>
+
       <div className="cards-grid">
-        {postulaciones.length > 0 ? (
-          postulaciones.map(post => (
+        {filteredPostulations.length > 0 ? (
+          filteredPostulations.map(post => (
             <JobCard2 post={post} key={post.id} />
           ))
         ) : (

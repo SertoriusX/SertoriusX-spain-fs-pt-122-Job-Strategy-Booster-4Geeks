@@ -1,11 +1,28 @@
 import React from 'react'
-
-export default function CreateProfile({ form, handleKeyDown, handleSend, handleChange, removeTag, inputValue, setInputValue }) {
+import '../../styles/formDesing.css'
+export default function CreateProfile({
+    form,
+    handleKeyDown,
+    handleSend,
+    handleChange,
+    removeTag,
+    inputValue,
+    setInputValue,
+    setShowCreateProfile
+}) {
     return (
-        <div>
-            <>
-                <h1 className="page-title">Create / Edit Profile</h1>
-                <form onSubmit={handleSend} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+        <div className="profile-modal-overlay">
+
+            <div className="profile-modal-card">
+
+                <button className="profile-close-btn" onClick={() => setShowCreateProfile(false)}>
+                    ✕
+                </button>
+
+                <h1 className="page-title">Create Profile</h1>
+
+                <form onSubmit={handleSend} className="profile-form">
+
                     <input
                         type="text"
                         name="first_name"
@@ -35,37 +52,29 @@ export default function CreateProfile({ form, handleKeyDown, handleSend, handleC
                         rows={4}
                     />
 
-                    <label className="section-title" htmlFor="img_profile">
+                    <label className="section-title">
                         Profile Image
                     </label>
+
                     <input
                         type="file"
                         name="img_profile"
-                        id="img_profile"
                         accept="image/*"
                         onChange={handleChange}
                         className="input-field"
                     />
 
                     <label className="section-title">Skills</label>
-                    <div className="skills-grid" style={{ flexWrap: "wrap", alignItems: "center" }}>
+
+                    <div className="skills-grid">
+
                         {form.skill.map((tag, i) => (
-                            <span key={i} className="skill-badge" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                            <span key={i} className="skill-badge">
                                 {tag}
                                 <button
                                     type="button"
                                     onClick={() => removeTag(i)}
-                                    style={{
-                                        background: "transparent",
-                                        border: "none",
-                                        color: "#8b5cf6",
-                                        cursor: "pointer",
-                                        fontWeight: "700",
-                                        fontSize: "18px",
-                                        lineHeight: "1",
-                                        padding: "0 4px",
-                                    }}
-                                    aria-label={`Remove ${tag}`}
+                                    className="remove-skill-btn"
                                 >
                                     ×
                                 </button>
@@ -77,22 +86,17 @@ export default function CreateProfile({ form, handleKeyDown, handleSend, handleC
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
                             onKeyDown={handleKeyDown}
-                            placeholder="Type a skill and press Enter"
-                            className="input-field"
-                            style={{ flex: "1 0 150px", minWidth: "150px" }}
+                            placeholder="Type skill + Enter"
+                            className="input-field skill-input"
                         />
                     </div>
 
-                    <button
-                        type="submit"
-                        className="confirm-button"
-                        style={{ marginTop: "20px", alignSelf: "flex-start" }}
-                    >
+                    <button type="submit" className="confirm-button">
                         Save Profile
                     </button>
-                </form>
-            </>
 
+                </form>
+            </div>
         </div>
     )
 }

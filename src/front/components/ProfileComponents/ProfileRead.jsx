@@ -1,50 +1,80 @@
-import React from 'react'
+import React from "react";
+import '../../styles/profileRead.css';
 
-export default function ProfileRead({ profile, backendUrl, parseSkills, navigate }) {
+export default function ProfileRead({ profile, parseSkills, navigate, setOpen }) {
+    const skills = parseSkills(profile.skill);
+    const previewSkills = skills.slice(0, 4);
+
+    const initials =
+        (profile.first_name?.[0] || "") +
+        (profile.last_name?.[0] || "");
+
     return (
         <>
-            <aside className="perfil-sidebar">
-                <div className="profile-card">
-                    <div className="avatar-wrapper">
-                        <div className="avatar">
-                            <img
-                                src={`${backendUrl}/uploads/${profile.img_profile}`}
-                                alt={`${profile.first_name} avatar`}
-                                className="avatar-image"
-                                onError={(e) => (e.target.src = "/default-profile.png")}
-                            />
-                        </div>
-                        <h2 className="name">
-                            {profile.first_name} {profile.last_name}
-                        </h2>
-                    </div>
+            {/* Dark overlay */}
+            <div
+                className="profile-modal-overlay"
+                onClick={() => setOpen(false)}
+                aria-label="Close profile modal overlay"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') setOpen(false);
+                }}
+            />
 
-                    <div className="profile-edit-card">
-                        <div className="section-title">Habilidades</div>
-                        <div className="skills-grid">
-                            {parseSkills(profile.skill).length === 0 ? (
-                                <span className="skill-badge" style={{ opacity: 0.5 }}>
-                                    None
-                                </span>
-                            ) : (
-                                parseSkills(profile.skill).map((skill, i) => (
-                                    <span className="skill-badge" key={i}>
-                                        {skill}
-                                    </span>
-                                ))
-                            )}
-                        </div>
-                        <button
-                            className="edit-profile-button"
-                            onClick={() => navigate(`/perfil/${profile.id}/edit`)}
-                        >
-                            Editar perfil
+            {/* Modal container */}
+            <aside
+                className="profile-modal-container"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="profile-modal-title"
+            >
+                <button
+                    className="profile-modal-close-btn"
+                    onClick={() => setOpen(false)}
+                    aria-label="Close profile modal"
+                >
+                    &times;
+                </button>
 
-                        </button>
-                    </div>
+                {/* Initials avatar */}
+                <div className="initials-avatar">
+                    {initials.toUpperCase()}
                 </div>
-            </aside>
 
+                {/* Name */}
+                <h2 id="profile-modal-title" className="home-profile-name">
+                    {profile.first_name} {profile.last_name}
+                </h2>
+
+                {/* Skills */}
+                <div className="home-profile-skills">
+                    {previewSkills.length === 0 ? (
+                        <span className="skill-badge empty">No skills</span>
+                    ) : (
+                        previewSkills.map((skill, i) => (
+                            <span className="skill-badge" key={i}>
+                                {skill}
+                            </span>
+                        ))
+                    )}
+
+                    {skills.length > 4 && (
+                        <span className="skill-more">+{skills.length - 4}</span>
+                    )}
+                </div>
+
+                <button
+                    className="home-profile-btn"
+                    onClick={() => {
+                        navigate(`/perfil/${profile.id}/edit`);
+                        setOpen(false);
+                    }}
+                >
+                    Edit profile
+                </button>
+            </aside>
         </>
-    )
+    );
 }

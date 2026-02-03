@@ -379,7 +379,6 @@ const ProfileCardComponent = ({
                   color: '#fff',
                   paddingRight: '10px',
                   borderRadius: '10px',
-                  textAlign: 'center',
                   zIndex: 10
                 }}
               >

@@ -13,6 +13,9 @@ import "../styles/navbar.css";
 import {
     faSun, faMoon
 } from "@fortawesome/free-solid-svg-icons";
+import CreateProfile from '../components/ProfileComponents/CreateProfile.jsx';
+import { ProfileHook } from '../hooks/ProfileHook.jsx';
+import ProfileRead from '../components/ProfileComponents/ProfileRead.jsx';
 export default function App() {
     const { token, user, theme, toggleTheme, profile } = useContext(UserContext);
     const [loading, setLoading] = useState(true);
@@ -20,6 +23,7 @@ export default function App() {
     const [isEditing, setIsEditing] = useState(false);
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const [open, setOpen] = useState(false);
+    const { profile: prof, handleChange, inputValue, setInputValue, handleKeyDown, removeTag, handleSend, parseSkills, form } = ProfileHook()
 
     useEffect(() => {
         window.googleTranslateElementInit = () => {
@@ -123,20 +127,32 @@ export default function App() {
                             </select>
 
                             <div className="user_personal_information" style={{ marginLeft: "10px" }}>
-                                <h3>Hello, {user?.username}</h3>
+                                <h3>Hello, {profile ? (<>{profile?.first_name} {profile?.last_name}</>) : (<><h1>You dont have yet profile</h1></>)}</h3>
                                 <p>{user?.email}</p>
                             </div>
-                            <Link to="/perfil">
-                                <div className="">
-                                    {profile ? (<img className='user_picture '
-                                        src={profile?.img_profile ? `${backendUrl}/uploads/${profile.img_profile}` : '/img/default-profile.png'}
-                                        alt={profile?.first_name || "profile"}
-                                        onError={e => { e.target.onerror = null; e.target.src = '/img/default-profile.png'; }}
-                                    />) : (<Link to="/perfil">
-                                        <div className="user_picture"></div>
-                                    </Link>)}
-                                </div>
-                            </Link>
+                            {!open ? (<div className="" onClick={() => setOpen(true)}>
+                                {profile ? (<img className='user_picture '
+                                    src={profile?.img_profile ? `${backendUrl}/uploads/${profile.img_profile}` : '/img/default-profile.png'}
+                                    alt={profile?.first_name || "profile"}
+                                    onError={e => { e.target.onerror = null; e.target.src = '/img/default-profile.png'; }}
+                                />) : (<Link to="/perfil">
+                                    <div className="user_picture"></div>
+                                </Link>)}
+                            </div>) : (<div className="" onClick={() => setOpen(true)}>
+                                {profile ? (<img className='user_picture '
+                                    src={profile?.img_profile ? `${backendUrl}/uploads/${profile.img_profile}` : '/img/default-profile.png'}
+                                    alt={profile?.first_name || "profile"}
+                                    onError={e => { e.target.onerror = null; e.target.src = '/img/default-profile.png'; }}
+                                />) : (<Link to="/perfil">
+                                    <div className="user_picture"></div>
+                                </Link>)}
+                            </div>)}
+
+                            {open ? (<><ProfileRead
+                                profile={prof} parseSkills={parseSkills} navigate={navigate}
+
+                                setOpen={setOpen}
+                            /></>) : (<></>)}
                         </div>
                     </div>
                     <Outlet context={{ isEditing, setIsEditing }} />

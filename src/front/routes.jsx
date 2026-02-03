@@ -10,7 +10,6 @@ import Registration from "./pages/RegisterPage";
 import App from "./pages/App";
 import Curriculums from "./pages/Curriculum";
 import Interview from "./pages/Interview";
-import PerfilUsuario from "./pages/PerfilUsuario";
 import AboutUs from "./pages/AboutUs";
 import AdminCV from "./pages/AdminCV";
 
@@ -41,7 +40,6 @@ export const router = createBrowserRouter(
       <Route path="register" element={<Registration />} />
 
       <Route path="login" element={<LoginForm />} />
-      <Route path="perfil" element={<PerfilUsuario />} />
       <Route path="about" element={<AboutUs />} />
       {/* <Route path="timeline" element={<ListadoAplicaciones />} /> */}
       <Route path="admin-cv" element={<AdminCV />} />
