@@ -109,7 +109,7 @@ function SignupForm({ changeForm }) {
                         checked={form.isAccepted}
                         onChange={handleChange}
                     />{" "}
-                    Accept terms and conditions
+                    <p>Accept terms and conditions</p>
                 </label>
 
                 <input className="create_account" type="submit" value="Register" />
