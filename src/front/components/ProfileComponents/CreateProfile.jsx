@@ -91,7 +91,7 @@ export default function CreateProfile({
                         />
                     </div>
 
-                    <button type="submit" className="confirm-button">
+                    <button type="submit" className="btn-primary">
                         Save Profile
                     </button>
 

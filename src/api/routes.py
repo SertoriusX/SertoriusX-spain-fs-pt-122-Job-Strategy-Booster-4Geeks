@@ -1553,18 +1553,35 @@ def status_count():
 
 
 @api.route("/status", methods=["GET"])
+@jwt_required()
 def status_entrevista_get():
-    entrevista = Stages.query.filter_by(stage_name="hr_interview").count()
-    offer = Stages.query.filter_by(stage_name="offer").count()
+    current_user=get_jwt_identity()
+    entrevista = Stages.query.filter_by(
+        stage_name="hr_interview",
+        user_id=current_user
+    ).count()
+
+    offer = Stages.query.filter_by(
+        stage_name="offer",
+        user_id=current_user
+    ).count()
+
     process_closure = Stages.query.filter_by(
-        stage_name="process_closure").count()
+        stage_name="process_closure",
+        user_id=current_user
+    ).count()
+
     aceptada = Postulations.query.filter_by(
-        postulation_state="aceptada").count()
-    return jsonify({"entrevista": entrevista,
-                    "offer": offer,
-                    "descartado": process_closure,
-                    "aceptada": aceptada
-                    })
+        postulation_state="aceptada",
+        user_id=current_user
+    ).count()
+
+    return jsonify({
+        "entrevista": entrevista,
+        "offer": offer,
+        "descartado": process_closure,
+        "aceptada": aceptada
+    })
 
 
 @api.route("/profile", methods=["GET"])
@@ -1664,7 +1681,7 @@ def get_route_map(id):
 @jwt_required()
 def create_or_replace_route_map(id):
     stage_list = request.get_json()
-
+    current_user=get_jwt_identity()
     if not stage_list or not isinstance(stage_list, list):
         return jsonify({'error': 'Data must be a list of stage objects'}), 400
 
@@ -1698,7 +1715,8 @@ def create_or_replace_route_map(id):
             stage_name=stage_name.strip(),
             stage_completed=bool(stage_data.get('stage_completed', False)),
             date_completed_stage=date_completed_stage,
-            postulation_id=id
+            postulation_id=id,
+            user_id=current_user
         )
 
         db.session.add(stage)

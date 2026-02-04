@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 335f9e770da1
+Revision ID: 95062ea67ffc
 Revises: 
-Create Date: 2026-02-03 12:08:31.962650
+Create Date: 2026-02-04 13:29:33.060459
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '335f9e770da1'
+revision = '95062ea67ffc'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -38,20 +38,20 @@ def upgrade():
     )
     op.create_table('postulations',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('postulation_state', sa.String(length=50), nullable=False),
     sa.Column('company_name', sa.String(length=50), nullable=False),
-    sa.Column('role', sa.String(length=100), nullable=False),
-    sa.Column('experience', sa.Integer(), nullable=False),
-    sa.Column('inscription_date', sa.Date(), nullable=False),
-    sa.Column('city', sa.String(length=50), nullable=False),
-    sa.Column('salary', sa.Integer(), nullable=False),
-    sa.Column('platform', sa.String(length=100), nullable=False),
-    sa.Column('postulation_url', sa.String(length=2000), nullable=False),
-    sa.Column('work_type', sa.String(length=50), nullable=False),
-    sa.Column('requirements', sa.JSON(), nullable=False),
-    sa.Column('candidates_applied', sa.Integer(), nullable=False),
-    sa.Column('available_positions', sa.Integer(), nullable=False),
-    sa.Column('job_description', sa.Text(), nullable=False),
+    sa.Column('postulation_state', sa.String(length=50), nullable=True),
+    sa.Column('role', sa.String(length=100), nullable=True),
+    sa.Column('experience', sa.Integer(), nullable=True),
+    sa.Column('inscription_date', sa.Date(), nullable=True),
+    sa.Column('city', sa.String(length=50), nullable=True),
+    sa.Column('salary', sa.Integer(), nullable=True),
+    sa.Column('platform', sa.String(length=100), nullable=True),
+    sa.Column('postulation_url', sa.String(length=2000), nullable=True),
+    sa.Column('work_type', sa.String(length=50), nullable=True),
+    sa.Column('requirements', sa.JSON(), nullable=True),
+    sa.Column('candidates_applied', sa.Integer(), nullable=True),
+    sa.Column('available_positions', sa.Integer(), nullable=True),
+    sa.Column('job_description', sa.Text(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -81,7 +81,9 @@ def upgrade():
     sa.Column('date_completed_stage', sa.Date(), nullable=True),
     sa.Column('stage_completed', sa.Boolean(), nullable=False),
     sa.Column('postulation_id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['postulation_id'], ['postulations.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###

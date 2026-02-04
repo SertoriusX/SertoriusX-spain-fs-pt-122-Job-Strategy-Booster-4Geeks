@@ -91,6 +91,7 @@ export default function UploadImageOnly() {
             )}
 
             <button
+                className="btn-primary"
                 onClick={upload}
                 disabled={loading || !image}
                 style={{ marginTop: 10 }}

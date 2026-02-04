@@ -26,6 +26,7 @@ class User(db.Model):
 
     todo_list: Mapped[List['TodoList']] = relationship(
         'TodoList', back_populates='user', cascade="all, delete-orphan")
+    stages: Mapped[List["Stages"]] = relationship('Stages', back_populates='user', cascade="all, delete-orphan")
 
     def serialize(self):
         return {
@@ -162,7 +163,9 @@ class Stages(db.Model):
         ForeignKey('postulations.id'), nullable=False)
     postulation: Mapped['Postulations'] = relationship(
         'Postulations', back_populates='stages')
-
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    user: Mapped["User"] = relationship(
+        "User", back_populates="stages", uselist=False)
     def serialize(self):
         return {
             'id': self.id,

@@ -90,7 +90,13 @@ function HomePage() {
 		{ name: "Descartado", value: applicationStatistics('descartado'), color: "#e44441ff" }
 	];
 	useEffect(() => {
-		axios.get(`${backendUrl}/status`).then((res) => { setStatus(res.data) }).catch((err) => {
+		axios.get(`${backendUrl}/status`, {
+			headers: {
+				"Content-Type": "application/json",
+				'Authorization': `Bearer ${token}`
+			}
+
+		}).then((res) => { setStatus(res.data) }).catch((err) => {
 			console.error(err);
 		})
 	}, [backendUrl])
@@ -192,7 +198,7 @@ function HomePage() {
 
 				{!profile && !showCreateProfile && (
 					<button
-						className="open-create-profile-btn"
+						className="btn-primary"
 						onClick={() => setShowCreateProfile(true)}
 					>
 						Create Profile
