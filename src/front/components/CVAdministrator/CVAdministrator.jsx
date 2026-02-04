@@ -268,9 +268,7 @@ const CVAdministrator = () => {
             <div className="cv-topbar">
                 <div className="cv-topbar-title">Administrador de CVs</div>
 
-                <div className="cv-topbar-actions">
-                    <button onClick={createNewCV}>+ Nuevo CV</button>
-                </div>
+                <button className="cv-topbar-actions-btns" onClick={createNewCV}>+ Nuevo CV</button>
             </div>
 
             {!isEditing && !isOpen && (
@@ -287,7 +285,7 @@ const CVAdministrator = () => {
                                 <td>{cv.datos.titulo || "Sin título"}</td>
 
                                 <td>
-                                    <div className="cv-actions-row">
+                                    <div className="cv-actions-row-btns">
 
                                         <button
                                             type="button"

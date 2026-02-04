@@ -10,6 +10,8 @@ import Stepper from '../CreateRouteMap';
 import RouteMapPreview from '../RouteMapPreview';
 import { getRoutes } from '../../Fetch/routeMapFecth';
 import JobDetailsEdit from './JobDetailsEdit';
+import { UserContext } from '../../hooks/UserContextProvier';
+import axios from 'axios';
 
 export default function JobsDetail() {
     const status = ['Closet', 'Open']
@@ -86,10 +88,11 @@ export default function JobsDetail() {
 
     return (
         <>
-            {isEdit ? <JobDetailsEdit postulation={postulation} setPostulation={setPostulation} isEdit={isEdit} setIsEdit={setIsEdit} stages={stages}/> :
+            {isEdit ? <JobDetailsEdit postulation={postulation} setPostulation={setPostulation} isEdit={isEdit} setIsEdit={setIsEdit} stages={stages} /> :
                 <div className="job_details">
                     <div className="header">
                         <div className="left_side">
+
                             <Link to='/postulations'><span><FontAwesomeIcon icon={faArrowLeft} />Volver a lista de postulaciones</span></Link>
                             <h1>{postulation.company_name}</h1>
                             <section>
@@ -111,7 +114,18 @@ export default function JobsDetail() {
                             )}
                         </div>
                     </div>
-
+                    <form className="status_form" onSubmit={handleStatusUpdate}>
+                        <select
+                            value={editStatus || postulation.postulation_state || ""}
+                            onChange={(e) => setEditStatus(e.target.value)}
+                        >
+                            <option value="">Select status</option>
+                            {status.map(s => (
+                                <option key={s} value={s}>{s}</option>
+                            ))}
+                        </select>
+                        <button type="submit" className="update">Actualizar</button>
+                    </form>
                     <div className="rode_map_details">
                         {isRouteMap
                             ? <Stepper stages={stages} id={id} setStages={setStages} />

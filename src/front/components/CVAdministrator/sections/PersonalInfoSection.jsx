@@ -69,7 +69,7 @@ const PersonalInfoSection = ({ formData, updateCurrentCV }) => {
                         />
                     )}
 
-                    <button className="photo-upload-btn" onClick={handleUploadClick}>
+                    <button className="btn-primary" onClick={handleUploadClick}>
                         <Camera size={18} />
                     </button>
 

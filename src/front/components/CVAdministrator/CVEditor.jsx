@@ -82,7 +82,7 @@ const CVEditor = ({ formData, updateCurrentCV, setIsEditing, saving, onSave, onS
         <div className="cv-editor-container">
             <div className="cv-editor-header">
                 <button
-                    className="cv-close-button"
+                    className="cv-close-btns"
                     onClick={closeEditor}
                     disabled={saving}
                 >
@@ -104,7 +104,7 @@ const CVEditor = ({ formData, updateCurrentCV, setIsEditing, saving, onSave, onS
             <div className="save-wrapper">
                 <div className="cv-editor-footer">
                     <button
-                        className="btn-cancel-icon"
+                        className="btn btn-primary"
                         type="button"
                         onClick={closeEditor}
                         disabled={saving}
@@ -154,7 +154,7 @@ const CVEditor = ({ formData, updateCurrentCV, setIsEditing, saving, onSave, onS
             </div>
         </div>
     );
-    
+
 };
 
 export default CVEditor;

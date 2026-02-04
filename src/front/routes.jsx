@@ -22,6 +22,7 @@ import Stepper from './components/CreateRouteMap.jsx'
 import CreatePostImg from "./components/JobComponent/CreatePostImg.jsx";
 import Entrevista from "./components/status/Entrevista.jsx";
 import JobDetailsEdit from "./components/JobComponent/JobDetailsEdit.jsx";
+import PerfilUsuario from "./pages/PerfilUsuario.jsx";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -33,6 +34,9 @@ export const router = createBrowserRouter(
         <Route index element={<Jobs />} />
         <Route path=":id" element={<JobsDetail />} />
         <Route path="formulario" element={<Formulario />} />
+        <Route path="profile" element={<PerfilUsuario />} />
+
+
         <Route path="/postulations/:id/route-map" element={<JobsDetail />} />
       </Route>
       <Route path="postulations/:id/create-stepper" element={<Stepper />} />
