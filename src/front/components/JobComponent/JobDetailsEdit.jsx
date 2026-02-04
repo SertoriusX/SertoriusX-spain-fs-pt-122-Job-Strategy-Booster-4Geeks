@@ -15,6 +15,28 @@ export default function JobDetailsEdit({ postulation, setPostulation, isEdit, se
     const authorizationHeader = useGetAuthorizationHeader();
     const [originalPostulation, setOriginalPostulation] = useState(postulation);
 
+    const addRequirement = () => {
+        setPostulation(prev => ({
+            ...prev,
+            requirements: [...prev.requirements, ""]
+        }));
+    };
+
+    const removeRequirement = (index) => {
+        setPostulation(prev => ({
+            ...prev,
+            requirements: prev.requirements.filter((_, id) => id !== index)
+        }));
+    };
+
+    const updateRequirement = (index, value) => {
+        setPostulation(prev => {
+            const newRequirements = [...prev.requirements];
+            newRequirements[index] = value;
+            return { ...prev, requirements: newRequirements };
+        });
+    };
+
     const handleChange = (e) => {
         const { name, value, type } = e.target;
 
@@ -28,8 +50,14 @@ export default function JobDetailsEdit({ postulation, setPostulation, isEdit, se
     };
 
     const handleSave = async () => {
-        await updatePostulation(postulation, id, authorizationHeader);
-        setOriginalPostulation(postulation);
+        const filteredPostulation = {
+            ...postulation,
+            requirements: postulation.requirements.filter(req => req.trim() !== "")
+        };
+
+        await updatePostulation(filteredPostulation, id, authorizationHeader);
+        setPostulation(filteredPostulation);
+        setOriginalPostulation(filteredPostulation);
         setIsEdit(false);
     };
 
@@ -38,7 +66,6 @@ export default function JobDetailsEdit({ postulation, setPostulation, isEdit, se
         setIsEdit(false);
     };
 
-    console.log(stages)
 
     if (!postulation) return <p>Postulation not found</p>;
 
@@ -93,24 +120,37 @@ export default function JobDetailsEdit({ postulation, setPostulation, isEdit, se
                         <div className="requirement">
                             <p>Requisitos</p>
                             <ul>
+
                                 {postulation.requirements.map((requirement, index) => (
-                                    <li key={index}>
-                                        <input
-                                            type="text"
-                                            value={requirement}
-                                            onChange={(e) => {
-                                                const newRequirements = [...postulation.requirements];
-                                                newRequirements[index] = e.target.value;
-                                                setPostulation(prev => ({
-                                                    ...prev,
-                                                    requirements: newRequirements
-                                                }));
-                                            }}
-                                        />
+                                    <li key={index} className="requirement-item">
+                                        <div className="requirement_container">
+                                            <input
+                                                type="text"
+                                                value={requirement}
+                                                onChange={(e) => updateRequirement(index, e.target.value)}
+                                                placeholder="Escribe un requisito"
+                                                className="requirement_input"
+                                            />
+                                            <button
+                                                type="button"
+                                                className="remove_requirement"
+                                                onClick={() => removeRequirement(index)}
+                                            >
+                                                ❌
+                                            </button>
+                                        </div>
                                     </li>
+
                                 ))}
                             </ul>
 
+                            <button
+                                type="button"
+                                className="add_requirement"
+                                onClick={addRequirement}
+                            >
+                                ➕ Añadir requisito
+                            </button>
                         </div>
                         <div className="postulation_platform_de">
                             <div className="platform_detail">
