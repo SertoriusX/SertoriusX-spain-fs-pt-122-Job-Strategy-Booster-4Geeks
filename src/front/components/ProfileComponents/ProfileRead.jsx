@@ -11,7 +11,6 @@ export default function ProfileRead({ profile, parseSkills, navigate, setOpen })
 
     return (
         <>
-            {/* Dark overlay */}
             <div
                 className="profile-modal-overlay"
                 onClick={() => setOpen(false)}
@@ -23,7 +22,6 @@ export default function ProfileRead({ profile, parseSkills, navigate, setOpen })
                 }}
             />
 
-            {/* Modal container */}
             <aside
                 className="profile-modal-container"
                 role="dialog"
@@ -38,17 +36,15 @@ export default function ProfileRead({ profile, parseSkills, navigate, setOpen })
                     &times;
                 </button>
 
-                {/* Initials avatar */}
                 <div className="initials-avatar">
                     {initials.toUpperCase()}
                 </div>
 
-                {/* Name */}
-                <h2 id="profile-modal-title" className="home-profile-name">
+                <h2 id="profile-modal-title " className="home-profile-name">
                     {profile.first_name} {profile.last_name}
                 </h2>
+                <p className=" mb-3 mt-3">{profile.bio}</p>
 
-                {/* Skills */}
                 <div className="home-profile-skills">
                     {previewSkills.length === 0 ? (
                         <span className="skill-badge empty">No skills</span>
