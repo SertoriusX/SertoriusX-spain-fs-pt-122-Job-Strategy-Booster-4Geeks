@@ -41,7 +41,6 @@ api_key = ("sk-proj-Zuwga-fAZaNZ8JTI_nRcnFXOO6eguKRwnWCSx3S0zO676BSlwmeu_jty12or
 bcrypt = Bcrypt()
 
 
-
 openai.api_key = api_key
 GOOGLE_API_KEY = "AIzaSyC-8znGPyiPtg52au8Qm8m1NQehlPLS_uI"
 
@@ -411,6 +410,7 @@ def normalize(text):
     text = re.sub(r"\s+", " ", text)
     return text.strip()
 
+
 def similarity(a, b):
     return SequenceMatcher(None, normalize(a), normalize(b)).ratio()
 
@@ -423,7 +423,7 @@ def nivel_por_puntaje(avg_score):
     else:
         return "Junior"
 
-  
+
 @api.route("/chat", methods=["POST"])
 @jwt_required()
 def chat():
@@ -638,9 +638,6 @@ def chat():
     except Exception as e:
         traceback.print_exc()
         return jsonify({"response": f"Error del servidor: {str(e)}"}), 500
-    
-
-
 
 
 def clean_company_name(line: str, max_length=50) -> str:
@@ -667,7 +664,7 @@ def extract_postulation_fields(text: str, platform_hint="Unknown") -> dict:
         "role": None,
         "city": None,
         "platform": platform_hint if platform_hint != "Unknown" else "Unknown",
-        "work_type":None ,
+        "work_type": None,
         "experience": 0,
         "salary": 0,
         "candidates_applied": 0,
@@ -787,15 +784,16 @@ def extract_postulation_fields(text: str, platform_hint="Unknown") -> dict:
         exp_match = re.search(pattern, full_text, re.IGNORECASE)
         if exp_match:
             num = int(exp_match.group(2))
-            data["experience"] = num if "meses" in exp_match.group(3).lower() else num * 12
+            data["experience"] = num if "meses" in exp_match.group(
+                3).lower() else num * 12
             break
 
     salary_match = re.search(r"(\d{3,5})\s*euros", full_text)
     if salary_match:
         data["salary"] = int(salary_match.group(1))
     work_type_match = re.search(
-        r"\b(jornada completa|tiempo completo|full[- ]?time|medio tiempo|part[- ]?time|parcial|presencial|remoto|teletrabajo|home office)\b", 
-        full_text, 
+        r"\b(jornada completa|tiempo completo|full[- ]?time|medio tiempo|part[- ]?time|parcial|presencial|remoto|teletrabajo|home office)\b",
+        full_text,
         re.IGNORECASE
     )
     if work_type_match:
@@ -803,19 +801,18 @@ def extract_postulation_fields(text: str, platform_hint="Unknown") -> dict:
     else:
         data["work_type"] = "Unknown"
     candidates_patterns = [
-    r"más de (\d+)\s+solicitudes",
-    r"(\d+)\s+candidatos?",
-    r"(\d+)\s+aplicantes?",
-    r"(\d+)\s+postulantes?",
-    r"(\d+)\s+personas interesadas"
-]
+        r"más de (\d+)\s+solicitudes",
+        r"(\d+)\s+candidatos?",
+        r"(\d+)\s+aplicantes?",
+        r"(\d+)\s+postulantes?",
+        r"(\d+)\s+personas interesadas"
+    ]
 
     for pattern in candidates_patterns:
         applied_match = re.search(pattern, full_text, re.IGNORECASE)
         if applied_match:
             data["candidates_applied"] = int(applied_match.group(1))
             break
-
 
         requirement_keywords = [
             "se requiere", "tener", "poseer",
@@ -830,7 +827,6 @@ def extract_postulation_fields(text: str, platform_hint="Unknown") -> dict:
         data["postulation_url"] = url_match.group(1)
 
     return data
-
 
 
 @api.route("/ocr-postulation", methods=["POST"])
@@ -1384,28 +1380,11 @@ def postulaciones_post():
 
     current_user_id = get_jwt_identity()
 
-    REQUIRED_FIELDS = [
-        "postulation_state",
-        "company_name",
-        "role",
-        "experience",
-        "inscription_date",
-        "city",
-        "salary",
-        "platform",
-        "postulation_url",
-        "work_type",
-        "requirements",
-        "candidates_applied",
-        "available_positions",
-        "job_description",
-    ]
-
-    missing_field = [
-        field for field in REQUIRED_FIELDS if field not in data or data[field] is None]
-
-    if missing_field:
-        return {"error": "Missing required fields", "fields": missing_field}, 400
+    if not data.get("company_name"):
+        return {
+            "error": "Missing required field",
+            "fields": ["company_name"]
+        }, 400
 
     def safe_int(value, field_name, min_value=0):
         try:
@@ -1417,42 +1396,139 @@ def postulaciones_post():
             raise ValueError(f"{field_name} must be an integer")
 
     try:
-        experience = safe_int(data["experience"], "experience", 0)
-        salary = safe_int(data["salary"], "salary", 0)
+        experience = safe_int(data.get("experience"), "experience", 0) if data.get(
+            "experience") is not None else None
+        salary = safe_int(data.get("salary"), "salary", 0) if data.get(
+            "salary") is not None else None
         candidates_applied = safe_int(
-            data["candidates_applied"], "candidates_applied", 0)
+            data.get("candidates_applied"), "candidates_applied", 0
+        ) if data.get("candidates_applied") is not None else None
         available_positions = safe_int(
-            data["available_positions"], "available_positions", 1)
+            data.get("available_positions"), "available_positions", 1
+        ) if data.get("available_positions") is not None else None
     except ValueError as e:
         return {"error": str(e)}, 400
 
-    try:
-        inscription_date = datetime.strptime(
-            data["inscription_date"], "%Y-%m-%d").date()
-    except (ValueError, TypeError):
-        return {"error": "inscription_date must be in yyyy-mm-dd format"}, 400
+    inscription_date = None
+    if data.get("inscription_date"):
+        try:
+            inscription_date = datetime.strptime(
+                data["inscription_date"], "%Y-%m-%d"
+            ).date()
+        except ValueError:
+            return {"error": "inscription_date must be in yyyy-mm-dd format"}, 400
 
     new_postulacion = Postulations(
         user_id=current_user_id,
-        postulation_state=data["postulation_state"],
+        postulation_state=data.get("postulation_state"),
         company_name=data["company_name"],
-        role=data["role"],
+        role=data.get("role"),
         experience=experience,
         inscription_date=inscription_date,
-        city=data["city"],
+        city=data.get("city"),
         salary=salary,
-        platform=data["platform"],
-        postulation_url=data["postulation_url"],
-        work_type=data["work_type"],
-        requirements=data["requirements"],
+        platform=data.get("platform"),
+        postulation_url=data.get("postulation_url"),
+        work_type=data.get("work_type"),
+        requirements=data.get("requirements"),
         candidates_applied=candidates_applied,
         available_positions=available_positions,
-        job_description=data["job_description"]
+        job_description=data.get("job_description")
     )
 
     db.session.add(new_postulacion)
     db.session.commit()
+
     return jsonify(new_postulacion.serialize()), 201
+
+
+@api.route("/postulations/<int:id>", methods=["PUT"])
+@jwt_required()
+def postulaciones_put(id):
+    data = request.get_json()
+
+    if not data:
+        return {"error": "Request body must be JSON"}, 400
+
+    current_user_id = get_jwt_identity()
+
+    postulation = Postulations.query.filter_by(
+        id=id,
+        user_id=current_user_id
+    ).first()
+
+    if not postulation:
+        return {"error": "Postulation not found"}, 404
+
+    def safe_int(value, field_name, min_value=0):
+        try:
+            value = int(value)
+            if value < min_value:
+                raise ValueError
+            return value
+        except (ValueError, TypeError):
+            raise ValueError(f"{field_name} must be an integer")
+
+    try:
+        if "experience" in data:
+            postulation.experience = (
+                safe_int(data["experience"], "experience", 0)
+                if data["experience"] is not None else None
+            )
+
+        if "salary" in data:
+            postulation.salary = (
+                safe_int(data["salary"], "salary", 0)
+                if data["salary"] is not None else None
+            )
+
+        if "candidates_applied" in data:
+            postulation.candidates_applied = (
+                safe_int(data["candidates_applied"], "candidates_applied", 0)
+                if data["candidates_applied"] is not None else None
+            )
+
+        if "available_positions" in data:
+            postulation.available_positions = (
+                safe_int(data["available_positions"], "available_positions", 1)
+                if data["available_positions"] is not None else None
+            )
+
+    except ValueError as e:
+        return {"error": str(e)}, 400
+
+    if "inscription_date" in data:
+        if data["inscription_date"] is None:
+            postulation.inscription_date = None
+        else:
+            try:
+                postulation.inscription_date = datetime.strptime(
+                    data["inscription_date"], "%Y-%m-%d"
+                ).date()
+            except ValueError:
+                return {
+                    "error": "inscription_date must be in yyyy-mm-dd format"
+                }, 400
+
+    updatable_fields = [
+        "company_name",
+        "postulation_state",
+        "role",
+        "city",
+        "platform",
+        "postulation_url",
+        "work_type",
+        "requirements",
+        "job_description",
+    ]
+
+    for field in updatable_fields:
+        if field in data:
+            setattr(postulation, field, data[field])
+
+    db.session.commit()
+
+    return jsonify(postulation.serialize()), 200
 
 
 @api.route('/postulations/<int:id>', methods=['DELETE'])

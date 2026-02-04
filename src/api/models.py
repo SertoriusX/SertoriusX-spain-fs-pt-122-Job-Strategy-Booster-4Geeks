@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import String, Boolean, ForeignKey, Integer, Float, JSON, DateTime, Date,Text
+from sqlalchemy import String, Boolean, ForeignKey, Integer, Float, JSON, DateTime, Date, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 from datetime import datetime, date
@@ -66,47 +66,61 @@ class Postulations(db.Model):
     __tablename__ = "postulations"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    postulation_state: Mapped[str] = mapped_column(String(50), nullable=False)
-    company_name: Mapped[str] = mapped_column(String(50), nullable=False)
-    role: Mapped[str] = mapped_column(String(100), nullable=False)
-    experience: Mapped[int] = mapped_column(Integer, nullable=False)
-    inscription_date: Mapped[date] = mapped_column(Date, nullable=False)
-    city: Mapped[str] = mapped_column(String(50), nullable=False)
-    salary: Mapped[int] = mapped_column(Integer, nullable=False)
-    platform: Mapped[str] = mapped_column(String(100), nullable=False)
-    postulation_url: Mapped[str] = mapped_column(String(2000), nullable=False)
-    work_type: Mapped[str] = mapped_column(String(50), nullable=False)
-    requirements: Mapped[List[str]] = mapped_column(JSON, nullable=False)
-    candidates_applied: Mapped[int] = mapped_column(Integer, nullable=False)
-    available_positions: Mapped[int] = mapped_column(Integer, nullable=False)
-    job_description: Mapped[str] = mapped_column(Text, nullable=False)
 
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    company_name: Mapped[str] = mapped_column(String(50), nullable=False)
+
+    postulation_state: Mapped[str | None] = mapped_column(
+        String(50), nullable=True)
+    role: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    experience: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    inscription_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    city: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    salary: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    platform: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    postulation_url: Mapped[str | None] = mapped_column(
+        String(2000), nullable=True)
+    work_type: Mapped[str | None] = mapped_column(String(50), nullable=True)
+
+    requirements: Mapped[list | None] = mapped_column(JSON, nullable=True)
+
+    candidates_applied: Mapped[int | None] = mapped_column(
+        Integer, nullable=True)
+    available_positions: Mapped[int | None] = mapped_column(
+        Integer, nullable=True)
+    job_description: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
+
     user: Mapped["User"] = relationship("User", back_populates="postulations")
-    stages: Mapped[List['Stages']] = relationship(
-        'Stages', back_populates='postulation', cascade="all, delete-orphan")
+    stages: Mapped[list["Stages"]] = relationship(
+        "Stages",
+        back_populates="postulation",
+        cascade="all, delete-orphan"
+    )
 
     def serialize(self):
         return {
-        "id": self.id,
-        "postulation_state": self.postulation_state,
-        "company_name": self.company_name,
-        "role": self.role,
-        "experience": self.experience,
-        "inscription_date": self.inscription_date.isoformat() if self.inscription_date else None,
-        "city": self.city,
-        "salary": self.salary,
-        "platform": self.platform,
-        "postulation_url": self.postulation_url,
-        "work_type": self.work_type,
-        "requirements": self.requirements,
-        "candidates_applied": self.candidates_applied,
-        "available_positions": self.available_positions,
-        "job_description": self.job_description,
-        "stages": [stage.serialize() for stage in self.stages]
-    }
+            "id": self.id,
+            "postulation_state": self.postulation_state,
+            "company_name": self.company_name,
+            "role": self.role,
+            "experience": self.experience,
+            "inscription_date": self.inscription_date.isoformat() if self.inscription_date else None,
+            "city": self.city,
+            "salary": self.salary,
+            "platform": self.platform,
+            "postulation_url": self.postulation_url,
+            "work_type": self.work_type,
+            "requirements": self.requirements,
+            "candidates_applied": self.candidates_applied,
+            "available_positions": self.available_positions,
+            "job_description": self.job_description,
+            "stages": [stage.serialize() for stage in self.stages]
+        }
+
     def __str__(self):
         return self.user.username if self.user else f"User ID {self.user_id}"
+
 
 class Profile(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -168,4 +182,3 @@ class TodoList(db.Model):
 
     user_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False)
     user: Mapped['User'] = relationship('User', back_populates='todo_list')
-

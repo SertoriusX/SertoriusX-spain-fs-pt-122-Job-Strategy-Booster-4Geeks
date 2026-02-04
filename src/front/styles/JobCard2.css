@@ -134,6 +134,7 @@
 .application_card_title {
   display: flex;
   align-items: center;
+  min-height: 50px;
   justify-content: space-between;
   color: var(--font-color);
   margin: 13.5px 0;

@@ -4,7 +4,7 @@ import { faAnglesLeft, faAnglesRight } from "@fortawesome/free-solid-svg-icons";
 import { updateStage } from '../Fetch/routeMapFecth';
 import useGetAuthorizationHeader from '../hooks/useGetAuthorizationHeader';
 
-const RouteMapPreview = ({ stages, id, setStages }) => {
+const RouteMapPreview = ({ stages, id, setStages, isEdit }) => {
     const authorizationHeader = useGetAuthorizationHeader();
 
     const handleStageUpdate = async (action) => {
@@ -24,14 +24,14 @@ const RouteMapPreview = ({ stages, id, setStages }) => {
         <div className="stages_container">
             <div className="stages_header">
                 <h3>Tu proceso</h3>
-                <div className="action_buttons">
+                {!isEdit && (<div className="action_buttons">
                     <button onClick={() => handleStageUpdate('prev')}>
                         <FontAwesomeIcon icon={faAnglesLeft} />
                     </button>
                     <button onClick={() => handleStageUpdate('next')}>
                         <FontAwesomeIcon icon={faAnglesRight} />
                     </button>
-                </div>
+                </div>)}
             </div>
 
             <div className="stepper">

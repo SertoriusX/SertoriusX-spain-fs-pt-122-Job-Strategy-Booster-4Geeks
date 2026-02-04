@@ -21,8 +21,8 @@ export default function Formulario() {
         postulation_url: "",
         work_type: "",
         requirements: [],
-        candidates_applied: "",
-        available_positions: "",
+        candidates_applied: 0,
+        available_positions: 1,
         job_description: ""
     });
 

@@ -107,7 +107,7 @@
 .notification-dropdown {
   position: absolute;
   top: 50px;
-  right:360px;
+  right: 360px;
   width: 200px;
   background: white;
   border: 1px solid #ddd;
@@ -126,4 +126,10 @@
 
 .notification-dropdown h5:hover {
   background: #f5f5f5;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }

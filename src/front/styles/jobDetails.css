@@ -37,6 +37,11 @@
   justify-content: space-between;
   align-items: flex-start;
 }
+.job_details .header h1 input {
+  font-size: 38px;
+  font-weight: 700;
+  color: var(--main-color);
+}
 
 .left_side a {
   text-decoration: none;
@@ -181,9 +186,18 @@
 
 .job_description {
   padding: 18px;
+  width: 100%;
+  min-height: 150px;
+  overflow: scroll;
   border-radius: var(--border-radius);
   background-color: var(--back-color);
   line-height: 1.6;
+}
+
+textarea {
+  width: 100%;
+  min-height: 150px;
+  resize: none;
 }
 
 .requirement_details {
@@ -214,9 +228,49 @@
   margin-bottom: 6px;
 }
 
-.postulation_platform_de {
+.requirement-item {
+  margin-bottom: 0.5rem;
+}
+
+.requirement_container {
   display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.requirement_input {
+  flex: 1;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+.remove_requirement {
+  background-color: var(--card-color);
+  padding: 3px 6px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.add_requirement {
+  background-color: var(--card-color);
+  border: none;
+  border-radius: 10px;
+  color: var(--font-color);
+  padding: 5px 10px;
+  margin-top: 5px;
+  transition: 0.2s ease;
+}
+
+.remove-requirement:hover,
+.add_requirement:hover {
+  opacity: 0.8;
+}
+
+.postulation_platform_de {
   width: 50%;
+  display: flex;
   flex-direction: column;
   gap: 14px;
   padding: 16px;
@@ -224,10 +278,15 @@
   background-color: var(--back-color);
 }
 
+.postulation_platform_de .platform_detail .platform_value input {
+  text-align: end;
+  padding: 10px 10px;
+}
+
 .platform_detail {
   display: flex;
   justify-content: space-between;
-  align-items: start;
+  align-items: center;
 }
 
 .platform_detail p {
@@ -235,6 +294,10 @@
   font-size: 13px;
   font-weight: 700;
   color: var(--ligther-font-color);
+}
+
+.platform_detail .platform_value select {
+  width: 175px;
 }
 
 .platform_value {
@@ -270,6 +333,15 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
+}
+
+.general_details_rigth .postulation_detail input {
+  text-align: end;
+  padding: 5px 10px;
+  background-color: var(--card-color);
+  border: none;
+  outline: none;
+  width: 120px;
 }
 
 .postulation_detail {

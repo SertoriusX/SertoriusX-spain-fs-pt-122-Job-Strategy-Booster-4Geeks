@@ -33,10 +33,8 @@ function JobCard2({ post }) {
                         <h4><FontAwesomeIcon icon={faCalendarDays} />{formatDate(post.inscription_date)}</h4>
                     </div>
                     <div className="progres_chart">
-
                     </div>
                 </div>
-                <span>Chart</span>
             </div>
 
             <div className="application_body">

@@ -35,12 +35,8 @@ export default function Jobs() {
           <MenuButttons options={options} onFilterChange={setSelectedFilter} />
         </div>
 
-        <Link to='/img-post'>
-          <button className="add_new_postulation">Agregar img</button>
-        </Link>
-        <Link to='/formulario'>
-          <button className="add_new_postulation">Agregar</button>
-        </Link>
+        <Link to='/img-post'><button className="add_new_postulation" onClick={() => { console.log(postulaciones) }}>Agregar img</button></Link>
+        <Link to='formulario'><button className="add_new_postulation" onClick={() => { console.log(postulaciones) }}>Agregar</button></Link>
       </div>
 
       <div className="cards-grid">
