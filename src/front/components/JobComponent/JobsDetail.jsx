@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Link, useMatch, useNavigate, useParams } from 'react-router-dom';
 import useGetAuthorizationHeader from '../../hooks/useGetAuthorizationHeader';
 import { getPostulationById, removePostulation } from '../../Fetch/postulationFecth';
@@ -9,14 +9,20 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Stepper from '../CreateRouteMap';
 import RouteMapPreview from '../RouteMapPreview';
 import { getRoutes } from '../../Fetch/routeMapFecth';
+import { UserContext } from '../../hooks/UserContextProvier';
+import axios from 'axios';
 
 export default function JobsDetail() {
+    const status = ['Closet', 'Open']
     const { id } = useParams();
     const navigate = useNavigate();
     const isRouteMap = useMatch('/postulations/:id/route-map');
     const authorizationHeader = useGetAuthorizationHeader();
     const [postulation, setPostulation] = useState(null);
     const [stages, setStages] = useState([])
+    const { token } = useContext(UserContext);
+    const [editStatus, setEditStatus] = useState("");
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
     const handleDelete = async () => {
         if (!postulation) return;
@@ -46,6 +52,35 @@ export default function JobsDetail() {
         fetchPostulation();
         getRouteMap()
     }, [id]);
+    const handleStatusUpdate = async (e) => {
+        e.preventDefault();
+
+        if (!editStatus) {
+            alert("Please select a status");
+            return;
+        }
+
+        try {
+            await axios.put(
+                `${backendUrl}/postulations/status/${id}`,
+                { postulation_state: editStatus },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+            navigate('/postulations');
+
+            setPostulation(prev => ({ ...prev, postulation_state: editStatus }));
+
+            alert("Status updated successfully!");
+        } catch (err) {
+            console.error(err);
+            alert("Failed to update status");
+        }
+    };
 
     if (!postulation) return <p>Postulation not found</p>;
 
@@ -71,6 +106,18 @@ export default function JobsDetail() {
                     )}
                 </div>
             </div>
+            <form className="status_form" onSubmit={handleStatusUpdate}>
+                <select
+                    value={editStatus || postulation.postulation_state || ""}
+                    onChange={(e) => setEditStatus(e.target.value)}
+                >
+                    <option value="">Select status</option>
+                    {status.map(s => (
+                        <option key={s} value={s}>{s}</option>
+                    ))}
+                </select>
+                <button type="submit" className="update">Actualizar</button>
+            </form>
 
             <div className="rode_map_details">
                 {isRouteMap

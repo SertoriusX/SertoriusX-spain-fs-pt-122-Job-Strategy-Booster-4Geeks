@@ -1,0 +1,84 @@
+/* Overlay background */
+.profile-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 20px;
+}
+
+/* Card */
+.profile-modal-card {
+  background: var(--card-color, #111);
+  color: var(--font-color, #fff);
+  width: 100%;
+  max-width: 720px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 18px;
+  padding: 32px;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+/* Form layout */
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Close button */
+.profile-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  border: none;
+  background: rgba(255,255,255,0.1);
+  color: white;
+  font-size: 18px;
+  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.profile-close-btn:hover {
+  background: rgba(255,255,255,0.25);
+  transform: scale(1.1);
+}
+
+/* Skills */
+.skills-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skill-input {
+  min-width: 160px;
+  flex: 1;
+}
+
+/* Remove skill button */
+.remove-skill-btn {
+  background: none;
+  border: none;
+  color: #a78bfa;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .profile-modal-card {
+    padding: 20px;
+    border-radius: 14px;
+  }
+}

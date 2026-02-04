@@ -139,7 +139,7 @@ export default function EditProfile() {
                 updateProfile(res.data)
             }
 
-            navigate("/perfil")
+            navigate("/")
         } catch (err) {
             console.error("Save failed:", err)
         }

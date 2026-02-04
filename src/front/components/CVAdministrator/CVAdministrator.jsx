@@ -6,7 +6,7 @@ import CVEditor from "./CVEditor.jsx";
 import ModalAgregarCV from "./ModalAgregarCV.jsx";
 import ShareDropdown from "./ShareDropdown";
 import { createEmptyCV } from "./utils/cvHelpers.js";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Copy } from "lucide-react";
 import "../../styles/CVAdministrator.css";
 
 const CVAdministrator = () => {
@@ -75,7 +75,10 @@ const CVAdministrator = () => {
         const cv = cvList.find((c) => c.id === id);
         if (cv) {
             setSelectedCVId(id);
-            setFormData(normalizeCV(cv.datos));
+            setFormData({
+                ...normalizeCV(cv.datos),
+                id: cv.id
+            });
             setIsEditing(false);
         }
     };
@@ -240,6 +243,19 @@ const CVAdministrator = () => {
         setTimeout(() => setIsOpen(false), 1000);
     };
 
+    const handleClone = (id) => {
+        const cv = cvList.find((c) => c.id === id);
+        if (!cv) return;
+
+        setFormData({
+            ...normalizeCV(cv.datos),
+            id: null,
+            titulo: ""
+        });
+
+        setIsEditing(true);
+    };
+
     return (
         <div className="cv-admin-container">
             {showAgregarModal && (
@@ -265,7 +281,6 @@ const CVAdministrator = () => {
                             <th style={{ width: "160px" }}>Acciones</th>
                         </tr>
                     </thead>
-
                     <tbody>
                         {cvList.map((cv) => (
                             <tr key={cv.id}>
@@ -273,6 +288,7 @@ const CVAdministrator = () => {
 
                                 <td>
                                     <div className="cv-actions-row">
+
                                         <button
                                             type="button"
                                             className="btn-cv-action btn-secondary"
@@ -283,18 +299,29 @@ const CVAdministrator = () => {
 
                                         <button
                                             type="button"
+                                            className="btn-cv-action btn-secondary"
+                                            onClick={() => handleClone(cv.id)}
+                                        >
+                                            <Copy size={18} />
+                                        </button>
+
+                                        <ShareDropdown cv={cv} />
+
+                                        <button
+                                            type="button"
                                             className="btn-cv-action btn-danger"
                                             onClick={() => deleteCV(cv.id)}
                                         >
                                             <Trash2 size={18} />
                                         </button>
 
-                                        <ShareDropdown cv={cv} />
                                     </div>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
+
+
                 </table>
             )}
 

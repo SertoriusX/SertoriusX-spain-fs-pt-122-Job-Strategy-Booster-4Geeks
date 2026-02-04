@@ -1,12 +1,9 @@
-import React, { useEffect, useState, useContext } from "react";
-import "../styles/PerfilUsuario.css";
-import { UserContext } from "../hooks/UserContextProvier";
-import axios from "axios";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import CreateProfile from "../components/ProfileComponents/CreateProfile";
-import ProfileRead from "../components/ProfileComponents/ProfileRead";
+import { UserContext } from "./UserContextProvier";
+import axios from "axios";
 
-export default function PerfilUsuario() {
+export const ProfileHook = () => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const { token, updateProfile } = useContext(UserContext);
     const navigate = useNavigate();
@@ -89,41 +86,7 @@ export default function PerfilUsuario() {
         }
     };
 
-    return (
-        <div className="perfil-container">
-            <div className={profile ? "perfil-have" : "perfil-layout"}>
 
+    return { setInputValue, navigate, profile, form, inputValue, handleChange, handleKeyDown, removeTag, handleSend, parseSkills }
 
-                <main className="perfil-main-content">
-                    {profile && (
-                        <div className="bio-section">
-                            <h2>Sobre Mi</h2>
-                            <p>{profile.bio}</p>
-                        </div>
-                    )}
-
-                    {!profile && (
-                        <CreateProfile
-                            handleKeyDown={handleKeyDown}
-                            form={form}
-                            handleSend={handleSend}
-                            handleChange={handleChange}
-                            removeTag={removeTag}
-                            inputValue={inputValue}
-                            setInputValue={setInputValue}
-                        />
-                    )}
-                </main>
-
-            </div>
-
-            <div className="profile-header-banner">
-                <div className="banner-circle banner-circle-1"></div>
-                <div className="banner-circle banner-circle-2"></div>
-                <div className="banner-circle banner-circle-3"></div>
-                <div className="banner-circle banner-circle-4"></div>
-            </div>
-        </div>
-
-    );
 }

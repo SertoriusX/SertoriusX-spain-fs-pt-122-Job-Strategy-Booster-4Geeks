@@ -318,3 +318,64 @@
     flex-direction: row;
   }
 }
+/* Status form container */
+.status_form {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* space between select and button */
+    margin-top: 15px;
+}
+
+/* Style the select dropdown */
+.status_form select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: #fff;
+    color: #333;
+    transition: border 0.2s, box-shadow 0.2s;
+    min-width: 150px;
+}
+
+/* Hover and focus effect for select */
+.status_form select:hover,
+.status_form select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+    outline: none;
+}
+
+/* Style the update button */
+.status_form button.update {
+    padding: 8px 16px;
+    font-size: 14px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+/* Hover and active effects for button */
+.status_form button.update:hover {
+    background-color: #0056b3;
+}
+
+.status_form button.update:active {
+    transform: scale(0.98);
+}
+
+/* Optional: responsive design for smaller screens */
+@media (max-width: 500px) {
+    .status_form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .status_form select,
+    .status_form button.update {
+        width: 100%;
+    }
+}

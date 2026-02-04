@@ -1,0 +1,166 @@
+/* =========================
+   THEME VARIABLES
+========================= */
+
+:root {
+  --back-color: #ffffff;
+  --card-color: #d9d9d9;
+  --font-color: #1b1b1b;
+  --lighter-font-color: #6f6f6f;
+  --main-color: #2b4eeb;
+  --main-color-hover: #6b82ec;
+  --overlay-color: rgba(0, 0, 0, 0.5);
+}
+
+:root[data-theme="dark"] {
+  --back-color: #0f1115;
+  --card-color: #1c1f26;
+  --font-color: #e6e6e6;
+  --lighter-font-color: #a1a1aa;
+  --main-color: #4c6fff;
+  --main-color-hover: #6e8bff;
+  --overlay-color: rgba(0, 0, 0, 0.7);
+}
+
+/* =========================
+   OVERLAY
+========================= */
+
+.profile-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: var(--overlay-color);
+  z-index: 999;
+}
+
+/* =========================
+   MODAL CONTAINER
+========================= */
+
+.profile-modal-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--card-color);
+  padding: 2rem 2.5rem;
+  border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  max-width: 420px;
+  width: 90%;
+  z-index: 1000;
+  text-align: center;
+  color: var(--font-color);
+  box-sizing: border-box;
+}
+
+/* =========================
+   CLOSE BUTTON
+========================= */
+
+.profile-modal-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  font-size: 22px;
+  line-height: 32px;
+  text-align: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--lighter-font-color);
+  padding: 0;
+  user-select: none;
+  transition: color 0.2s ease;
+}
+
+.profile-modal-close-btn:hover,
+.profile-modal-close-btn:focus {
+  color: var(--font-color);
+  outline: none;
+}
+
+/* =========================
+   AVATAR
+========================= */
+
+.initials-avatar {
+  background-color: var(--main-color);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.8rem;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+/* =========================
+   PROFILE NAME
+========================= */
+
+.home-profile-name {
+  margin-bottom: 1rem;
+  font-weight: 600;
+  font-size: 1.4rem;
+  color: var(--font-color);
+}
+
+/* =========================
+   SKILLS
+========================= */
+
+.home-profile-skills {
+  margin-bottom: 1.5rem;
+}
+
+.skill-badge {
+  background-color: var(--back-color);
+  padding: 0.35rem 0.85rem;
+  margin: 0 0.25rem 0.5rem;
+  border-radius: 16px;
+  display: inline-block;
+  font-size: 0.85rem;
+  color: var(--font-color);
+  user-select: none;
+}
+
+.skill-badge.empty {
+  color: var(--lighter-font-color);
+  font-style: italic;
+}
+
+.skill-more {
+  font-weight: 600;
+  margin-left: 6px;
+  color: var(--main-color);
+}
+
+/* =========================
+   ACTION BUTTON
+========================= */
+
+.home-profile-btn {
+  padding: 0.65rem 1.4rem;
+  font-size: 1rem;
+  background-color: var(--main-color);
+  border: none;
+  color: #fff;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  user-select: none;
+}
+
+.home-profile-btn:hover,
+.home-profile-btn:focus {
+  background-color: var(--main-color-hover);
+  outline: none;
+  transform: translateY(-1px);
+}

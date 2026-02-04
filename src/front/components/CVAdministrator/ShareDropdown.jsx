@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import { Share2, Mail, Link2, FileDown } from "lucide-react";
-import { FaWhatsapp } from "react-icons/fa";
+import { Share2, Mail, FileDown } from "lucide-react";
 import PortalDropdown from "./PortalDropdown";
+import { pdf } from "@react-pdf/renderer";
+import CVPDFDocument from "./CVPDFDocument";
 
 const ShareDropdown = ({ cv }) => {
     const [open, setOpen] = useState(false);
     const [pos, setPos] = useState({ top: 0, left: 0 });
-
-    const cvUrl = `${window.location.origin}/cv/${cv.id}`;
+    const [isGenerating, setIsGenerating] = useState(false);
 
     const toggle = (e) => {
         const rect = e.currentTarget.getBoundingClientRect();
@@ -19,35 +19,53 @@ const ShareDropdown = ({ cv }) => {
     };
 
     const handleEmail = () => {
-        const subject = encodeURIComponent(`Te comparto mi CV: ${cv.nombre}`);
-        const body = encodeURIComponent(`Hola,\n\nTe comparto mi CV:\n${cvUrl}\n\nUn saludo.`);
-        window.location.href = `mailto:?subject=${subject}&body=${body}`;
+        const subject = encodeURIComponent(`CV - ${cv?.datos?.nombre || 'Curriculum Vitae'}`);
+        const body = encodeURIComponent(`Hola,\n\nTe comparto mi CV.\n\nSaludos,\n${cv?.datos?.nombre || ''}`);
+        const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=&su=${subject}&body=${body}`;
+        window.open(gmailUrl, "_blank");
         setOpen(false);
     };
 
-    const handleWhatsApp = () => {
-        const text = encodeURIComponent(`Te comparto mi CV: ${cvUrl}`);
-        window.open(`https://wa.me/?text=${text}`, "_blank");
-        setOpen(false);
-    };
     const handleDownloadPDF = async () => {
-        const backendUrl = import.meta.env.VITE_BACKEND_URL;
-        const pdfurl = `${backendUrl}/cv/${cv.id}/pdf`;
-        const token = localStorage.getItem("token");
+        if (isGenerating) return;
 
-        const response = await fetch(pdfurl, {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
+        setIsGenerating(true);
 
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        window.open(url, "_blank");
-        setOpen(false);
+        try {
+            console.log("=== DEBUG PDF ===");
+            console.log("CV completo:", cv);
+            console.log("CV.datos:", cv.datos);
+            console.log("Tiene foto?", cv?.datos?.foto ? "SÍ" : "NO");
+            if (cv?.datos?.foto) {
+                console.log("Foto inicia con:", cv.datos.foto.substring(0, 50));
+                console.log("Longitud foto:", cv.datos.foto.length);
+            }
+
+            const blob = await pdf(<CVPDFDocument formData={cv.datos} />).toBlob();
+
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+
+            const fileName = cv?.datos?.nombre
+                ? `CV_${cv.datos.nombre.replace(/\s+/g, '_')}.pdf`
+                : `${cv?.datos?.titulo || "CV"}.pdf`;
+
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            setTimeout(() => URL.revokeObjectURL(url), 100);
+
+            setOpen(false);
+        } catch (error) {
+            console.error("Error generando PDF:", error);
+            alert(`Error al generar el PDF: ${error.message}`);
+        } finally {
+            setIsGenerating(false);
+        }
     };
-
 
     return (
         <div className="share-dropdown">
@@ -55,6 +73,7 @@ const ShareDropdown = ({ cv }) => {
                 type="button"
                 className="btn-cv-action btn-secondary share-trigger"
                 onClick={toggle}
+                title="Compartir CV"
             >
                 <Share2 size={18} />
             </button>
@@ -63,15 +82,16 @@ const ShareDropdown = ({ cv }) => {
                 <div className="share-menu open">
                     <button className="share-item" onClick={handleEmail}>
                         <Mail size={16} />
-                        <span>Correo electrónico</span>
+                        <span>Enviar por correo</span>
                     </button>
-                    <button className="share-item" onClick={handleWhatsApp}>
-                        <FaWhatsapp size={16} />
-                        <span>WhatsApp</span>
-                    </button>
-                    <button className="share-item" onClick={handleDownloadPDF}>
+
+                    <button
+                        className="share-item"
+                        onClick={handleDownloadPDF}
+                        disabled={isGenerating}
+                    >
                         <FileDown size={16} />
-                        <span>Descargar PDF</span>
+                        <span>{isGenerating ? "Generando PDF..." : "Descargar PDF"}</span>
                     </button>
                 </div>
             </PortalDropdown>

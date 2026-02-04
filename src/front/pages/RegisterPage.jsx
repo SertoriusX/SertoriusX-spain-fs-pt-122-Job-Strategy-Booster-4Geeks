@@ -47,7 +47,9 @@ function Registration() {
                     )}
                 </div>
 
-                <div className="img"></div>
+                <div className="img">
+                    <img style={{ borderRadius: "50px" }} width={"800px"} height={"650px"} src="/img/teamss.jpg" alt="" />
+                </div>
             </div>
         </div>
     );

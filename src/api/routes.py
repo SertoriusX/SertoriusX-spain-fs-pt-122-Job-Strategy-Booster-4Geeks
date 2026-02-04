@@ -864,7 +864,7 @@ def ocr_postulation():
         requirements = []
 
     postulation = Postulations(
-        postulation_state="pending",
+        postulation_state="Open",
         company_name=data.get("company_name") or "Unknown",
         role=data.get("role") or "Unknown",
         experience=data.get("experience", 0),
@@ -1360,6 +1360,18 @@ def get_postulation(id):
         return jsonify({"error": "Postulation not found"}), 404
 
     return jsonify(postulation.serialize()), 200
+
+
+@api.route("/postulations/status/<int:id>", methods=["PUT"])
+@jwt_required()
+def edit_status(id):
+    data=request.get_json()
+    postulacin = Postulations.query.filter_by(id=id).first()
+    postulation_state=data.get("postulation_state")
+    if postulation_state:
+        postulacin.postulation_state=postulation_state
+    db.session.commit()
+    return jsonify({"msg":"updated status sucessfully"})
 
 
 @api.route("/postulations", methods=["POST"])

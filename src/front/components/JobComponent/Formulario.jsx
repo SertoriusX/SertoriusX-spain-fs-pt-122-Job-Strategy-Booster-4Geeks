@@ -10,7 +10,7 @@ import { createNewPostulation } from "../../Fetch/postulationFecth";
 export default function Formulario() {
     const authorizationHeader = useGetAuthorizationHeader();
     const [formData, setFormData] = useState({
-        postulation_state: "open",
+        postulation_state: "Open",
         company_name: "",
         role: "",
         experience: "",

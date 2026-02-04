@@ -90,7 +90,7 @@ function Sidebar() {
                 <div className="tools_buttons">
                     <NavBarButton
                         icon={faInfoCircle}
-                        label="Sobre nosotras"
+                        label="Sobre nosotros"
                         to="/about"
                         onClick={() => handleNavigation("/about")}
                     />

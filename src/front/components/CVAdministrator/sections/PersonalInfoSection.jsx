@@ -12,8 +12,46 @@ const PersonalInfoSection = ({ formData, updateCurrentCV }) => {
         const file = e.target.files[0];
         if (!file) return;
 
+        if (!file.type.startsWith('image/')) {
+            alert('Por favor selecciona un archivo de imagen válido');
+            return;
+        }
+
         const reader = new FileReader();
-        reader.onload = () => updateCurrentCV("foto", reader.result);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+
+                let width = img.width;
+                let height = img.height;
+                const maxSize = 800;
+
+                if (width > maxSize || height > maxSize) {
+                    if (width > height) {
+                        height = (height / width) * maxSize;
+                        width = maxSize;
+                    } else {
+                        width = (width / height) * maxSize;
+                        height = maxSize;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                const jpegBase64 = canvas.toDataURL('image/jpeg', 0.9);
+
+                updateCurrentCV("foto", jpegBase64);
+            };
+            img.onerror = () => {
+                alert('Error al cargar la imagen. Intenta con otra foto.');
+            };
+            img.src = event.target.result;
+        };
         reader.readAsDataURL(file);
     };
 

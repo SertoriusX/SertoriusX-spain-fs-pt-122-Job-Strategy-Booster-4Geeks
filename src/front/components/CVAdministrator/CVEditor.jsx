@@ -6,8 +6,8 @@ import SkillsSection from "./sections/SkillsSection.jsx";
 import { Save, XCircle } from "lucide-react";
 
 const CVEditor = ({ formData, updateCurrentCV, setIsEditing, saving, onSave, onSaveAs }) => {
-    const [showSaveAs, setShowSaveAs] = useState(false);
-    const [cvName, setCvName] = useState(formData?.titulo || "");
+    const [mostrarInput, setMostrarInput] = useState(false);
+    const [cvName, setCvName] = useState("");
     const [habilidades, setHabilidades] = useState(formData.habilidades || []);
     const [idiomas, setIdiomas] = useState(formData.idiomas || []);
 
@@ -38,21 +38,44 @@ const CVEditor = ({ formData, updateCurrentCV, setIsEditing, saving, onSave, onS
         scrollToTop();
     };
 
-    const handleSave = () => {
-        onSave({ ...formData, habilidades, idiomas });
+    const confirmarGuardado = () => {
+        if (!cvName.trim()) {
+            alert("Por favor, escribe un nombre para el archivo.");
+            return;
+        }
+
+        if (formData.id) {
+            onSave({
+                ...formData,
+                habilidades,
+                idiomas,
+                titulo: cvName
+            });
+        } else {
+            onSaveAs({
+                ...formData,
+                habilidades,
+                idiomas,
+                titulo: cvName
+            });
+        }
+
+        setMostrarInput(false);
         scrollToTop();
     };
 
-    const handleSaveAs = () => {
-        onSaveAs({
-            ...formData,
-            habilidades,
-            idiomas,
-            titulo: cvName,
-            id: null
-        });
-        setShowSaveAs(false);
-        scrollToTop();
+    const handleGuardarClick = () => {
+        if (formData.id) {
+            onSave({
+                ...formData,
+                habilidades,
+                idiomas
+            });
+            scrollToTop();
+        } else {
+            setCvName("");
+            setMostrarInput(true);
+        }
     };
 
     return (
@@ -89,63 +112,49 @@ const CVEditor = ({ formData, updateCurrentCV, setIsEditing, saving, onSave, onS
                         <XCircle size={18} />
                     </button>
 
-                    <button
-                        className="btn btn-primary"
-                        type="button"
-                        onClick={handleSave}
-                        disabled={saving}
-                    >
-                        {saving ? "Guardando..." : (
-                            <>
-                                <Save size={18} /> Guardar
-                            </>
-                        )}
-                    </button>
+                    {!mostrarInput && (
+                        <button
+                            className="btn btn-primary"
+                            type="button"
+                            onClick={handleGuardarClick}
+                            disabled={saving}
+                        >
+                            <Save size={18} /> Guardar
+                        </button>
+                    )}
 
-                    <button
-                        className="btn btn-secondary"
-                        type="button"
-                        onClick={() => setShowSaveAs(true)}
-                        disabled={saving}
-                    >
-                        Guardar como
-                    </button>
-                </div>
-
-                {showSaveAs && (
-                    <div className="save-as-block">
-                        <label className="save-as-label">Guardar como</label>
-
-                        <div className="save-as-row">
+                    {mostrarInput && (
+                        <div className="save-inline-row">
                             <input
                                 type="text"
                                 className="cv-title-input"
-                                placeholder="Ej: CV-Frontend-Madrid"
+                                placeholder="Nombre del archivo"
                                 value={cvName}
                                 onChange={(e) => setCvName(e.target.value)}
                             />
 
                             <button
                                 className="circle-btn"
-                                onClick={() => setShowSaveAs(false)}
-                                title="Cancelar"
+                                onClick={confirmarGuardado}
+                                title="Confirmar"
                             >
-                                ✖️
+                                💾
                             </button>
 
                             <button
                                 className="circle-btn"
-                                onClick={handleSaveAs}
-                                title="Guardar"
+                                onClick={() => setMostrarInput(false)}
+                                title="Cancelar"
                             >
-                                💾
+                                ✖️
                             </button>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
         </div>
     );
+    
 };
 
 export default CVEditor;
