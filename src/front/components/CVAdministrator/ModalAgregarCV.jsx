@@ -21,7 +21,7 @@ const ModalAgregarCV = ({ cvList, onSelect, onClose }) => {
                     ))}
                 </ul>
 
-                <button className="modal-close-btn" onClick={onClose}>
+                <button className="modal-close-btns" onClick={onClose}>
                     Cerrar
                 </button>
             </div>

@@ -13,7 +13,6 @@ import "../styles/navbar.css";
 import {
     faSun, faMoon
 } from "@fortawesome/free-solid-svg-icons";
-import CreateProfile from '../components/ProfileComponents/CreateProfile.jsx';
 import { ProfileHook } from '../hooks/ProfileHook.jsx';
 import ProfileRead from '../components/ProfileComponents/ProfileRead.jsx';
 export default function App() {
