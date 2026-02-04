@@ -51,12 +51,12 @@
   grid-column: 4 / 7;
   grid-row: 1 / 5;
   background-color: var(--back-color);
+  overflow: scroll;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 10px;
   flex-direction: column;
-  height: 450px;
 }
 
 .todo_list {

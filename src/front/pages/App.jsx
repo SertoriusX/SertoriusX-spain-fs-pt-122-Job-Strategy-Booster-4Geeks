@@ -126,7 +126,7 @@ export default function App() {
                             </select>
 
                             <div className="user_personal_information" style={{ marginLeft: "10px" }}>
-                                <h3>Hello, {profile ? (<>{profile?.first_name} {profile?.last_name}</>) : (<><h1>You dont have yet profile</h1></>)}</h3>
+                                <p>Hello, {profile ? (<>{profile?.first_name} {profile?.last_name}</>) : (<><h5>You dont have yet profile</h5></>)}</p>
                                 <p>{user?.email}</p>
                             </div>
                             {!open ? (<div className="" onClick={() => setOpen(true)}>

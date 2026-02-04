@@ -68,7 +68,7 @@
   color: var(--font-color);
   background-color: var(--back-color);
 
-  .user_personal_information h3 {
+  .user_personal_information p {
     font-size: 16px;
     margin: 0 10px;
   }
