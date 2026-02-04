@@ -35,26 +35,23 @@ const styles = StyleSheet.create({
         fontSize: 28,
         fontFamily: "Helvetica-Bold",
         color: "white",
-        marginBottom: 8
+        marginBottom: 10
     },
     contactRow: {
         flexDirection: "row",
         flexWrap: "wrap",
-        marginTop: 8
-    },
-    contactItem: {
-        flexDirection: "row",
-        alignItems: "center",
-        marginRight: 20,
-        marginBottom: 4
+        marginTop: 6,
+        alignItems: "center"
     },
     contactText: {
-        fontSize: 10,
-        color: "#e0e7ff"
+        fontSize: 12,
+        color: "#ffffff",
+        fontFamily: "Helvetica"
     },
     separator: {
-        color: "#93c5fd",
-        marginHorizontal: 8
+        color: "#bfdbfe",
+        marginHorizontal: 10,
+        fontSize: 12
     },
     contentSection: {
         paddingHorizontal: 50,
@@ -67,7 +64,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontFamily: "Helvetica-Bold",
         color: "#1e3a8a",
-        marginBottom: 12,
+        marginBottom: 15,
         paddingBottom: 6,
         borderBottom: "2px solid #3b82f6"
     },
@@ -80,17 +77,19 @@ const styles = StyleSheet.create({
     skillsContainer: {
         flexDirection: "row",
         flexWrap: "wrap",
-        gap: 8
+        marginTop: 8
     },
     skillBadge: {
         backgroundColor: "#eff6ff",
-        paddingVertical: 6,
-        paddingHorizontal: 12,
+        paddingVertical: 8,
+        paddingHorizontal: 16,
         borderRadius: 12,
-        border: "1px solid #3b82f6"
+        border: "1.5px solid #3b82f6",
+        marginRight: 12,
+        marginBottom: 12
     },
     skillText: {
-        fontSize: 9,
+        fontSize: 10,
         color: "#1e3a8a",
         fontFamily: "Helvetica-Bold"
     },
@@ -125,20 +124,24 @@ const styles = StyleSheet.create({
     },
     listItem: {
         flexDirection: "row",
-        marginBottom: 6
+        marginBottom: 10,
+        alignItems: "flex-start",
+        paddingRight: 10
     },
     bullet: {
         width: 6,
         height: 6,
         backgroundColor: "#3b82f6",
         borderRadius: 3,
-        marginRight: 10,
-        marginTop: 4
+        marginRight: 12,
+        marginTop: 5,
+        flexShrink: 0
     },
     listText: {
         flex: 1,
-        fontSize: 10,
-        color: "#4b5563"
+        fontSize: 11,
+        color: "#374151",
+        lineHeight: 1.5
     }
 });
 
@@ -146,74 +149,81 @@ const CVPDFDocument = ({ formData }) => {
     return (
         <Document>
             <Page size="A4" style={styles.page}>
+
                 <View style={styles.headerSection}>
                     <View style={styles.headerContent}>
-                        {formData.foto && (
+                        {formData?.foto && (
                             <View style={styles.photoContainer}>
                                 <Image src={formData.foto} style={styles.photo} />
                             </View>
                         )}
                         <View style={styles.headerInfo}>
                             <Text style={styles.name}>
-                                {formData.nombre || "Nombre Completo"}
+                                {formData?.nombre || "Nombre Completo"}
                             </Text>
+
+
                             <View style={styles.contactRow}>
-                                {formData.email && (
-                                    <View style={styles.contactItem}>
-                                        <Text style={styles.contactText}>{formData.email}</Text>
-                                    </View>
+                                {formData?.email && (
+                                    <Text style={styles.contactText}>
+                                        {formData.email}
+                                    </Text>
                                 )}
-                                {formData.email && formData.telefono && (
+                                {formData?.email && formData?.telefono && (
                                     <Text style={styles.separator}>|</Text>
                                 )}
-                                {formData.telefono && (
-                                    <View style={styles.contactItem}>
-                                        <Text style={styles.contactText}>{formData.telefono}</Text>
-                                    </View>
+                                {formData?.telefono && (
+                                    <Text style={styles.contactText}>
+                                        {formData.telefono}
+                                    </Text>
                                 )}
                             </View>
+
                             <View style={styles.contactRow}>
-                                {formData.ubicacion && (
-                                    <View style={styles.contactItem}>
-                                        <Text style={styles.contactText}>{formData.ubicacion}</Text>
-                                    </View>
+                                {formData?.ubicacion && (
+                                    <Text style={styles.contactText}>
+                                        {formData.ubicacion}
+                                    </Text>
                                 )}
-                                {formData.ubicacion && formData.linkedin && (
+                                {formData?.ubicacion && formData?.linkedin && (
                                     <Text style={styles.separator}>|</Text>
                                 )}
-                                {formData.linkedin && (
-                                    <View style={styles.contactItem}>
-                                        <Text style={styles.contactText}>{formData.linkedin}</Text>
-                                    </View>
+                                {formData?.linkedin && (
+                                    <Text style={styles.contactText}>
+                                        {formData.linkedin}
+                                    </Text>
                                 )}
                             </View>
                         </View>
                     </View>
                 </View>
 
+
                 <View style={styles.contentSection}>
-                    {formData.resumen && (
+
+                    {formData?.resumen && (
                         <View style={styles.section}>
                             <Text style={styles.sectionTitle}>Resumen Profesional</Text>
                             <Text style={styles.sectionContent}>{formData.resumen}</Text>
                         </View>
                     )}
 
-                    {Array.isArray(formData.experiencia) && formData.experiencia.length > 0 && (
+
+                    {Array.isArray(formData?.experiencia) && formData.experiencia.length > 0 && (
                         <View style={styles.section}>
                             <Text style={styles.sectionTitle}>Experiencia Laboral</Text>
                             {formData.experiencia.map((exp, idx) => (
                                 <View style={styles.entryContainer} key={idx}>
                                     <View style={styles.entryHeader}>
-                                        <Text style={styles.entryTitle}>{exp.puesto || "Puesto"}</Text>
+                                        <Text style={styles.entryTitle}>{exp?.puesto || "Puesto"}</Text>
                                         <Text style={styles.entryDate}>
-                                            {exp.fechaInicio || ""} - {exp.fechaFin || "Presente"}
+                                            {exp?.fechaInicio || ""} - {exp?.fechaFin || "Presente"}
                                         </Text>
                                     </View>
                                     <Text style={styles.entrySubtitle}>
-                                        {exp.empresa || "Empresa"} {exp.ubicacion ? `• ${exp.ubicacion}` : ""}
+                                        {exp?.empresa || "Empresa"} {exp?.ubicacion ? `• ${exp.ubicacion}` : ""}
                                     </Text>
-                                    {exp.descripcion && (
+                                    {exp?.descripcion && (
                                         <Text style={styles.entryDescription}>{exp.descripcion}</Text>
                                     )}
                                 </View>
@@ -221,21 +231,22 @@ const CVPDFDocument = ({ formData }) => {
                         </View>
                     )}
 
-                    {Array.isArray(formData.educacion) && formData.educacion.length > 0 && (
+
+                    {Array.isArray(formData?.educacion) && formData.educacion.length > 0 && (
                         <View style={styles.section}>
                             <Text style={styles.sectionTitle}>Estudios</Text>
                             {formData.educacion.map((edu, idx) => (
                                 <View style={styles.entryContainer} key={idx}>
                                     <View style={styles.entryHeader}>
-                                        <Text style={styles.entryTitle}>{edu.titulo || "Título"}</Text>
+                                        <Text style={styles.entryTitle}>{edu?.titulo || "Título"}</Text>
                                         <Text style={styles.entryDate}>
-                                            {edu.fechaInicio || ""} - {edu.fechaFin || ""}
+                                            {edu?.fechaInicio || ""} - {edu?.fechaFin || ""}
                                         </Text>
                                     </View>
                                     <Text style={styles.entrySubtitle}>
-                                        {edu.institucion || "Institución"}
+                                        {edu?.institucion || "Institución"}
                                     </Text>
-                                    {edu.descripcion && (
+                                    {edu?.descripcion && (
                                         <Text style={styles.entryDescription}>{edu.descripcion}</Text>
                                     )}
                                 </View>
@@ -243,7 +254,8 @@ const CVPDFDocument = ({ formData }) => {
                         </View>
                     )}
 
-                    {Array.isArray(formData.habilidades) && formData.habilidades.length > 0 && (
+
+                    {Array.isArray(formData?.habilidades) && formData.habilidades.length > 0 && (
                         <View style={styles.section}>
                             <Text style={styles.sectionTitle}>Habilidades</Text>
                             <View style={styles.skillsContainer}>
@@ -256,28 +268,47 @@ const CVPDFDocument = ({ formData }) => {
                         </View>
                     )}
 
-                    {Array.isArray(formData.idiomas) && formData.idiomas.length > 0 && (
+
+                    {Array.isArray(formData?.idiomas) && formData.idiomas.length > 0 && (
                         <View style={styles.section}>
                             <Text style={styles.sectionTitle}>Idiomas</Text>
-                            {formData.idiomas.map((idioma, idx) => (
-                                <View style={styles.listItem} key={idx}>
-                                    <View style={styles.bullet} />
-                                    <Text style={styles.listText}>
-                                        {idioma.idioma || ""} - {idioma.nivel || ""}
-                                    </Text>
-                                </View>
-                            ))}
+                            {formData.idiomas.map((idioma, idx) => {
+                                // Si es un string simple
+                                if (typeof idioma === "string") {
+                                    return (
+                                        <View style={styles.listItem} key={idx}>
+                                            <View style={styles.bullet} />
+                                            <Text style={styles.listText}>{idioma}</Text>
+                                        </View>
+                                    );
+                                }
+
+
+                                const nombreIdioma = idioma?.idioma || idioma?.nombre || "";
+                                const nivelIdioma = idioma?.nivel || "";
+
+                                if (!nombreIdioma) return null;
+
+                                return (
+                                    <View style={styles.listItem} key={idx}>
+                                        <View style={styles.bullet} />
+                                        <Text style={styles.listText}>
+                                            {nombreIdioma}{nivelIdioma ? ` - ${nivelIdioma}` : ""}
+                                        </Text>
+                                    </View>
+                                );
+                            })}
                         </View>
                     )}
 
-                    {Array.isArray(formData.certificaciones) && formData.certificaciones.length > 0 && (
+                    {Array.isArray(formData?.certificaciones) && formData.certificaciones.length > 0 && (
                         <View style={styles.section}>
                             <Text style={styles.sectionTitle}>Certificaciones</Text>
                             {formData.certificaciones.map((cert, idx) => (
                                 <View style={styles.listItem} key={idx}>
                                     <View style={styles.bullet} />
                                     <Text style={styles.listText}>
-                                        {cert.nombre || ""} {cert.emisor ? `- ${cert.emisor}` : ""} {cert.fecha ? `(${cert.fecha})` : ""}
+                                        {cert?.nombre || ""}{cert?.emisor ? ` - ${cert.emisor}` : ""}{cert?.fecha ? ` (${cert.fecha})` : ""}
                                     </Text>
                                 </View>
                             ))}
