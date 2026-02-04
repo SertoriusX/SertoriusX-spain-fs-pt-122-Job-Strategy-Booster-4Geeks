@@ -26,7 +26,7 @@ export default function AboutUs() {
 
   const nameSebas = "Juan Sebastian Torres Arias"
   const handleSebas = "sebas"
-
+  const descriptionSebas = 'Soy Full Stack Developer, apasionado por la tecnología y el desarrollo de soluciones web completas. Actualmente continúo perfeccionando mis habilidades en frontend y backend en 4Geeks Academy, con el objetivo de seguir creciendo profesionalmente.'
 
   return (
     <div className="about-container">
@@ -78,6 +78,7 @@ export default function AboutUs() {
 
             avatarUrl={imgSebas}
             name={nameSebas}
+            description={descriptionSebas}
             showIcon={false}
             handle={handleSebas}
 
