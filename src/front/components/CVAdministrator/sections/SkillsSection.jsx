@@ -57,7 +57,7 @@ const SkillsSection = ({ habilidades, setHabilidades, idiomas, setIdiomas }) => 
                     {habilidades.map((skill, i) => (
                         <span key={i} className="chip">
                             {skill}
-                            <button onClick={() => eliminarSkill(i)}>
+                            <button className="btn-primary " onClick={() => eliminarSkill(i)}>
                                 <XCircle size={16} />
                             </button>
                         </span>
