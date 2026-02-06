@@ -2,9 +2,6 @@
 # exit on error
 set -o errexit
 
-# Update apt package lists and install tesseract-ocr
-apt-get update
-apt-get install -y tesseract-ocr
 
 npm install
 npm run build
