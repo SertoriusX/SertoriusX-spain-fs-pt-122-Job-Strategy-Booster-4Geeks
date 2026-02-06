@@ -1,12 +1,19 @@
 FROM node:16
 
-RUN apt update \
-    && apt install software-properties-common \
-    && add-apt-repository ppa:deadsnakes/ppa \
-    && apt update \
-    && apt install python3.10
+RUN apt-get update && apt-get install -y \
+    software-properties-common \
+    tesseract-ocr \
+    libtesseract-dev \
+    libleptonica-dev \
+    pkg-config \
+    python3.10 \
+    python3.10-venv \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt/app
+
+# Your existing copy or build steps here
 COPY --from=build /opt/app/venv /venv
 
 ENV PATH="/opt/app/venv/bin:$PATH"
