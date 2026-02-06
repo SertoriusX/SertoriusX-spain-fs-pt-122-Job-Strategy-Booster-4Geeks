@@ -21,8 +21,6 @@ services:
             value: "any key works"
           - key: PYTHON_VERSION
             value: 3.13.0
-          -key: VITE_API_URL
-                value: https://jsb-1xj0.onrender.com  # your Flask backend URL
           - key: DATABASE_URL # Render PostgreSQL database
             fromDatabase:
                 name: postgresql-jsb
