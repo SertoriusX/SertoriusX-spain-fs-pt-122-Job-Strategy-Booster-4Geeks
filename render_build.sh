@@ -4,13 +4,13 @@ set -o errexit
 npm install
 npm run build
 
-pip install --user pipenv
-export PATH="$HOME/.local/bin:$PATH"
+# Instead of pipenv, just use pip and python directly
+pip install -r requirements.txt
 
-pipenv install --dev --deploy --ignore-pipfile
 psql "$DATABASE_URL" -c "DROP SCHEMA public CASCADE;"
 psql "$DATABASE_URL" -c "CREATE SCHEMA public;"
 
-pipenv run flask db stamp head
-pipenv run migrate
-pipenv run upgrade
+# Run flask migrations using python -m flask
+python -m flask db stamp head
+python -m flask db migrate
+python -m flask db upgrade
