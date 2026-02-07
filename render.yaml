@@ -24,8 +24,7 @@ services:
           - key: DATABASE_URL # Render PostgreSQL database
             fromDatabase:
           - key: TESSDATA_PREFIX
-            value: /usr/share/tesseract-ocr/4.00/tessdata/
-                name: postgresql-jsb
+            value: /usr/share/tessdata/
                 property: connectionString
 
 databases: # Render PostgreSQL database
